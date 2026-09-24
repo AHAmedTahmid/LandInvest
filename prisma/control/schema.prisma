@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../src/generated/control"
+}
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_CONTROL")
+}
+
+model Tenant {
+  id                  String   @id @default(uuid()) @db.Char(36)
+  companyName         String   @map("company_name") @db.VarChar(200)
+  dbHost              String   @map("db_host") @db.VarChar(255)
+  dbName              String   @unique @map("db_name") @db.VarChar(100)
+  dbUser              String   @map("db_user") @db.VarChar(100)
+  dbPasswordEncrypted String   @map("db_password_encrypted") @db.Text
+  status              String   @default("trial") @db.VarChar(20)
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  subscriptions    Subscription[]
+  globalUsers      GlobalUser[]
+  userInvitations  UserInvitation[]
+  billingInvoices  BillingInvoice[]
+
+  @@map("tenants")
+}
+
+model Plan {
+  id           String   @id @default(uuid()) @db.Char(36)
+  name         String   @db.VarChar(50)
+  priceMonthly Decimal  @map("price_monthly") @db.Decimal(10, 2)
+  priceYearly  Decimal? @map("price_yearly") @db.Decimal(10, 2)
+  maxUsers     Int      @default(5) @map("max_users")
+  maxProjects  Int      @default(10) @map("max_projects")
+  features     Json?
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                     String    @id @default(uuid()) @db.Char(36)
+  tenantId               String    @map("tenant_id") @db.Char(36)
+  tenant                 Tenant    @relation(fields: [tenantId], references: [id])
+  planId                 String    @map("plan_id") @db.Char(36)
+  plan                   Plan      @relation(fields: [planId], references: [id])
+  billingCycle           String    @map("billing_cycle") @db.VarChar(20)
+  currentPeriodStart     DateTime? @map("current_period_start") @db.Date
+  currentPeriodEnd       DateTime? @map("current_period_end") @db.Date
+  paymentProvider        String?   @map("payment_provider") @db.VarChar(30)
+  providerSubscriptionId String?   @map("provider_subscription_id") @db.VarChar(255)
+  status                 String    @default("active") @db.VarChar(20)
+
+  billingInvoices BillingInvoice[]
+
+  @@map("subscriptions")
+  @@index([tenantId])
+  @@index([planId])
+}
+
+model GlobalUser {
+  id           String    @id @default(uuid()) @db.Char(36)
+  tenantId     String    @map("tenant_id") @db.Char(36)
+  tenant       Tenant    @relation(fields: [tenantId], references: [id])
+  fullName     String    @map("full_name") @db.VarChar(150)
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @map("password_hash") @db.Text
+  role         String    @db.VarChar(50)
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamp(0)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@map("global_users")
+  @@index([tenantId])
+}
+
+model UserInvitation {
+  id          String   @id @default(uuid()) @db.Char(36)
+  tenantId    String   @map("tenant_id") @db.Char(36)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  email       String   @db.VarChar(255)
+  role        String   @db.VarChar(50)
+  inviteToken String   @unique @map("invite_token") @db.VarChar(255)
+  expiresAt   DateTime @map("expires_at") @db.Timestamp(0)
+  accepted    Boolean  @default(false)
+
+  @@map("user_invitations")
+  @@index([tenantId])
+}
+
+model BillingInvoice {
+  id               String        @id @default(uuid()) @db.Char(36)
+  tenantId         String        @map("tenant_id") @db.Char(36)
+  tenant           Tenant        @relation(fields: [tenantId], references: [id])
+  subscriptionId   String?       @map("subscription_id") @db.Char(36)
+  subscription     Subscription? @relation(fields: [subscriptionId], references: [id])
+  amount           Decimal       @db.Decimal(10, 2)
+  currency         String        @default("BDT") @db.VarChar(10)
+  status           String?       @db.VarChar(20)
+  invoiceDate      DateTime      @map("invoice_date") @db.Date
+  providerInvoiceId String?      @map("provider_invoice_id") @db.VarChar(255)
+
+  @@map("billing_invoices")
+  @@index([tenantId])
+  @@index([subscriptionId])
+}

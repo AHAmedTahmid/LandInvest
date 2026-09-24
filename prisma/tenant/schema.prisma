@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../src/generated/tenant"
+}
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_TENANT")
+}
+
+model Partner {
+  id             String   @id @db.Char(36)
+  globalUserId   String?  @map("global_user_id") @db.Char(36)
+  name           String   @db.VarChar(150)
+  phone          String   @unique @db.VarChar(20)
+  nidNumber      String?  @map("nid_number") @db.VarChar(50)
+  openingBalance Decimal  @default(0.00) @map("opening_balance") @db.Decimal(15, 2)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  projectPartners       ProjectPartner[]
+  partnerTransactions   PartnerTransaction[]
+  paidExpenses          ProjectExpense[]     @relation("ExpensePaidBy")
+  profitDistributions   ProfitDistribution[]
+
+  @@map("partners")
+}
+
+model BankAccount {
+  id              String  @id @db.Char(36)
+  bankName        String  @map("bank_name") @db.VarChar(100)
+  accountNumber   String  @unique @map("account_number") @db.VarChar(50)
+  branchName      String? @map("branch_name") @db.VarChar(100)
+  currentBalance  Decimal @default(0.00) @map("current_balance") @db.Decimal(15, 2)
+  isActive        Boolean @default(true) @map("is_active")
+
+  treasuryLedgers TreasuryLedger[]
+  expenses        ProjectExpense[]
+  customerPayments CustomerPayment[]
+
+  @@map("bank_accounts")
+}
+
+model LandProject {
+  id               String   @id @db.Char(36)
+  projectName      String   @map("project_name") @db.VarChar(200)
+  mouza            String   @db.VarChar(100)
+  jlNumber         String?  @map("jl_number") @db.VarChar(50)
+  dagNumbers       String   @map("dag_numbers") @db.Text
+  khatianNumbers   String   @map("khatian_numbers") @db.Text
+  totalAreaShotok  Decimal  @map("total_area_shotok") @db.Decimal(10, 2)
+  purchasePrice    Decimal  @map("purchase_price") @db.Decimal(15, 2)
+  baynaAmount      Decimal  @default(0.00) @map("bayna_amount") @db.Decimal(15, 2)
+  registrationCost Decimal  @default(0.00) @map("registration_cost") @db.Decimal(15, 2)
+  mutationTaxCost  Decimal  @default(0.00) @map("mutation_tax_cost") @db.Decimal(15, 2)
+  status           String   @default("UNDER_BAYNA") @db.VarChar(30)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  projectPartners     ProjectPartner[]
+  projectExpenses     ProjectExpense[]
+  projectPlots        ProjectPlot[]
+  landSales           LandSale[]
+  profitDistributions ProfitDistribution[]
+
+  @@map("land_projects")
+}
+
+model ProjectPartner {
+  id             String      @id @db.Char(36)
+  projectId      String      @map("project_id") @db.Char(36)
+  project        LandProject @relation(fields: [projectId], references: [id])
+  partnerId      String      @map("partner_id") @db.Char(36)
+  partner        Partner     @relation(fields: [partnerId], references: [id])
+  sharePercentage Decimal    @map("share_percentage") @db.Decimal(5, 2)
+
+  @@unique([projectId, partnerId])
+  @@map("project_partners")
+  @@index([partnerId])
+}
+
+model TreasuryLedger {
+  id            String       @id @db.Char(36)
+  txnDate       DateTime     @map("txn_date") @db.Date
+  accountType   String       @map("account_type") @db.VarChar(20)
+  bankAccountId String?      @map("bank_account_id") @db.Char(36)
+  bankAccount   BankAccount? @relation(fields: [bankAccountId], references: [id])
+  flowType      String       @map("flow_type") @db.VarChar(10)
+  amount        Decimal      @db.Decimal(15, 2)
+  purpose       String       @db.VarChar(255)
+  referenceType String       @map("reference_type") @db.VarChar(30)
+  referenceId   String?      @map("reference_id") @db.Char(36)
+  createdBy     String       @map("created_by") @db.Char(36)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@map("treasury_ledger")
+  @@index([bankAccountId])
+}
+
+model PartnerTransaction {
+  id          String   @id @db.Char(36)
+  partnerId   String   @map("partner_id") @db.Char(36)
+  partner     Partner  @relation(fields: [partnerId], references: [id])
+  txnType     String   @map("txn_type") @db.VarChar(30)
+  amount      Decimal  @db.Decimal(15, 2)
+  txnDate     DateTime @map("txn_date") @db.Date
+  referenceId String?  @map("reference_id") @db.Char(36)
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@map("partner_transactions")
+  @@index([partnerId])
+}
+
+model ProjectExpense {
+  id               String       @id @db.Char(36)
+  projectId        String?      @map("project_id") @db.Char(36)
+  project          LandProject? @relation(fields: [projectId], references: [id])
+  expenseCategory  String       @map("expense_category") @db.VarChar(100)
+  amount           Decimal      @db.Decimal(15, 2)
+  expenseDate      DateTime     @map("expense_date") @db.Date
+  description      String?      @db.Text
+  paymentChannel   String       @map("payment_channel") @db.VarChar(20)
+  bankAccountId    String?      @map("bank_account_id") @db.Char(36)
+  bankAccount      BankAccount? @relation(fields: [bankAccountId], references: [id])
+  paidByPartnerId  String?      @map("paid_by_partner_id") @db.Char(36)
+  paidByPartner    Partner?     @relation("ExpensePaidBy", fields: [paidByPartnerId], references: [id])
+  voucherImageUrl  String?      @map("voucher_image_url") @db.Text
+  status           String       @default("PENDING") @db.VarChar(20)
+  approvedBy       String?      @map("approved_by") @db.Char(36)
+  createdBy        String       @map("created_by") @db.Char(36)
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@map("project_expenses")
+  @@index([projectId])
+  @@index([bankAccountId])
+  @@index([paidByPartnerId])
+}
+
+model ProjectPlot {
+  id              String      @id @db.Char(36)
+  projectId       String      @map("project_id") @db.Char(36)
+  project         LandProject @relation(fields: [projectId], references: [id])
+  plotNumber      String      @map("plot_number") @db.VarChar(50)
+  plotSizeShotok  Decimal     @map("plot_size_shotok") @db.Decimal(10, 2)
+  askingPrice     Decimal     @map("asking_price") @db.Decimal(15, 2)
+  status          String      @default("AVAILABLE") @db.VarChar(20)
+
+  landSales LandSale[]
+
+  @@map("project_plots")
+  @@index([projectId])
+}
+
+model LandSale {
+  id                     String   @id @db.Char(36)
+  projectId              String   @map("project_id") @db.Char(36)
+  project                LandProject @relation(fields: [projectId], references: [id])
+  plotId                 String?  @map("plot_id") @db.Char(36)
+  plot                   ProjectPlot? @relation(fields: [plotId], references: [id])
+  buyerName              String   @map("buyer_name") @db.VarChar(150)
+  buyerPhone             String   @map("buyer_phone") @db.VarChar(20)
+  buyerNid               String?  @map("buyer_nid") @db.VarChar(50)
+  saleDate               DateTime @map("sale_date") @db.Date
+  totalAgreedPrice       Decimal  @map("total_agreed_price") @db.Decimal(15, 2)
+  advanceBookingAmount   Decimal  @default(0.00) @map("advance_booking_amount") @db.Decimal(15, 2)
+  currentDueAmount       Decimal  @map("current_due_amount") @db.Decimal(15, 2)
+  status                 String   @default("BOOKED") @db.VarChar(30)
+
+  installmentSchedules InstallmentSchedule[]
+  customerPayments     CustomerPayment[]
+
+  @@map("land_sales")
+  @@index([projectId])
+  @@index([plotId])
+}
+
+model InstallmentSchedule {
+  id        String   @id @db.Char(36)
+  saleId    String   @map("sale_id") @db.Char(36)
+  sale      LandSale @relation(fields: [saleId], references: [id])
+  dueDate   DateTime @map("due_date") @db.Date
+  dueAmount Decimal  @map("due_amount") @db.Decimal(15, 2)
+  status    String   @default("UPCOMING") @db.VarChar(20)
+
+  @@map("installment_schedule")
+  @@index([saleId])
+}
+
+model CustomerPayment {
+  id            String       @id @db.Char(36)
+  saleId        String       @map("sale_id") @db.Char(36)
+  sale          LandSale     @relation(fields: [saleId], references: [id])
+  paymentDate   DateTime     @map("payment_date") @db.Date
+  amountPaid    Decimal      @map("amount_paid") @db.Decimal(15, 2)
+  paymentMethod String       @map("payment_method") @db.VarChar(20)
+  bankAccountId String?      @map("bank_account_id") @db.Char(36)
+  bankAccount   BankAccount? @relation(fields: [bankAccountId], references: [id])
+  receiptNo     String       @unique @db.VarChar(50)
+  remarks       String?      @db.VarChar(255)
+
+  @@map("customer_payments")
+  @@index([saleId])
+}
+
+model ProfitDistribution {
+  id                    String      @id @db.Char(36)
+  projectId             String      @map("project_id") @db.Char(36)
+  project               LandProject @relation(fields: [projectId], references: [id])
+  distributionDate      DateTime    @map("distribution_date") @db.Date
+  realizationBasis      String      @map("realization_basis") @db.VarChar(20)
+  totalProjectNetProfit Decimal     @map("total_project_net_profit") @db.Decimal(15, 2)
+  partnerId             String      @map("partner_id") @db.Char(36)
+  partner               Partner     @relation(fields: [partnerId], references: [id])
+  partnerSharePercent   Decimal     @map("partner_share_percent") @db.Decimal(5, 2)
+  payoutAmount          Decimal     @map("payout_amount") @db.Decimal(15, 2)
+
+  @@map("profit_distributions")
+  @@index([projectId])
+  @@index([partnerId])
+}
+
+model AuditLog {
+  id        String   @id @db.Char(36)
+  tableName String   @map("table_name") @db.VarChar(100)
+  recordId  String   @map("record_id") @db.Char(36)
+  action    String   @db.VarChar(20)
+  changedBy String   @map("changed_by") @db.Char(36)
+  oldValues Json?    @map("old_values")
+  newValues Json?    @map("new_values")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@map("audit_log")
+}
