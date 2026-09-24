@@ -1,0 +1,27 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
+import { can } from "@/lib/rbac";
+import { getTenantClientFromSession } from "@/lib/tenant";
+import { formatBDT } from "@/lib/format";
+export default async function SalesPage(){
+  const session=await getServerSession(authOptions);
+  if(!can((session?.user as any)?.role,"receiveSales")) return <div className="p-8 text-red-600">Forbidden: receiveSales</div>;
+  const prisma:any=await getTenantClientFromSession();
+  const projects=await prisma.landProject.findMany();
+  const plots=await prisma.projectPlot.findMany({where:{status:"AVAILABLE"}});
+  const sales=await prisma.landSale.findMany({orderBy:{saleDate:"desc"}});
+  const banks=await prisma.bankAccount.findMany();
+  return (<div className="p-6 space-y-6">
+    <h1 className="text-2xl font-bold">Sales</h1>
+    <form action={async(formData:FormData)=>{"use server"; const p:any=await (await import("@/lib/tenant")).getTenantClientFromSession(); const s=await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions); const {sellPlot,writeAudit}=await import("@/lib/tenantRules"); const {can}=await import("@/lib/rbac"); if(!can((s!.user as any).role,"receiveSales")) throw new Error("Forbidden"); const {randomUUID}=await import("crypto"); const saleId=randomUUID(); const total=parseFloat(formData.get("total_agreed_price") as string), adv=parseFloat(formData.get("advance") as string)||0; const data={id:saleId,projectId:formData.get("project_id") as string,plotId:(formData.get("plot_id") as string)||null,buyerName:formData.get("buyer_name") as string,buyerPhone:formData.get("buyer_phone") as string,buyerNid:(formData.get("buyer_nid") as string)||null,saleDate:new Date(),totalAgreedPrice:total,advanceBookingAmount:adv,currentDueAmount:total-adv,status:"BOOKED"}; await p.$transaction(async(tx:any)=>{ if(data.plotId) await sellPlot(tx,data.plotId,data,(s!.user as any).id); else { const sale=await tx.landSale.create({data}); await writeAudit(tx,"land_sales",saleId,"CREATE",(s!.user as any).id,null,data);} if(adv>0){ const payId=randomUUID(); const cp=await tx.customerPayment.create({data:{id:payId,saleId,paymentDate:new Date(),amountPaid:adv,paymentMethod:(formData.get("payment_method") as string)||"CASH",bankAccountId:(formData.get("bank_account") as string)||null,receiptNo:`R-${Date.now()}`,remarks:"Advance"}}); await writeAudit(tx,"customer_payments",payId,"CREATE",(s!.user as any).id,null,cp); const tl=await tx.treasuryLedger.create({data:{id:randomUUID(),txnDate:new Date(),accountType:(formData.get("bank_account") as string)?"BANK":"CASH",bankAccountId:(formData.get("bank_account") as string)||null,flowType:"IN",amount:adv,purpose:`Advance ${saleId}`,referenceType:"SALE_PAYMENT",referenceId:saleId,createdBy:(s!.user as any).id}}); await writeAudit(tx,"treasury_ledger",tl.id,"CREATE",(s!.user as any).id,null,tl);} const months=parseInt(formData.get("installments_count") as string)||0; if(months>0){ const remaining=total-adv; const per=Math.round((remaining/months)*100)/100; for(let i=1;i<=months;i++){ const due=new Date(); due.setMonth(due.getMonth()+i); const rid=randomUUID(); const r=await tx.installmentSchedule.create({data:{id:rid,saleId,dueDate:due,dueAmount:per,status:"UPCOMING"}}); await writeAudit(tx,"installment_schedule",rid,"CREATE",(s!.user as any).id,null,r);} } }); const {revalidatePath}=await import("next/cache"); revalidatePath("/sales");}} className="bg-white p-4 rounded-xl shadow border grid grid-cols-2 gap-3">
+      <select name="project_id" required className="border rounded px-3 py-2">{projects.map((p:any)=><option key={p.id} value={p.id}>{p.projectName}</option>)}</select>
+      <select name="plot_id" className="border rounded px-3 py-2"><option value="">No Plot</option>{plots.map((pl:any)=><option key={pl.id} value={pl.id}>{pl.plotNumber} - {formatBDT(Number(pl.askingPrice))}</option>)}</select>
+      <input name="buyer_name" placeholder="Buyer Name" required className="border rounded px-3 py-2"/><input name="buyer_phone" placeholder="Buyer Phone" required className="border rounded px-3 py-2"/>
+      <input name="buyer_nid" placeholder="Buyer NID" className="border rounded px-3 py-2"/><input name="total_agreed_price" type="number" step="0.01" placeholder="Total Price" required className="border rounded px-3 py-2"/>
+      <input name="advance" type="number" step="0.01" placeholder="Advance" className="border rounded px-3 py-2"/><input name="installments_count" type="number" min="0" placeholder="Installments (months)" className="border rounded px-3 py-2"/><select name="payment_method" className="border rounded px-3 py-2"><option>CASH</option><option>BANK</option></select>
+      <select name="bank_account" className="border rounded px-3 py-2"><option value="">Bank</option>{banks.map((b:any)=><option key={b.id} value={b.id}>{b.bankName}</option>)}</select>
+      <button className="bg-blue-600 text-white rounded px-4 py-2 col-span-2">Create Sale</button>
+    </form>
+    <table className="w-full text-sm bg-white rounded-xl shadow border"><thead><tr className="border-b"><th className="p-2">Buyer</th><th>Total</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>{sales.map((s:any)=><tr key={s.id} className="border-b"><td className="p-2">{s.buyerName}</td><td>{formatBDT(Number(s.totalAgreedPrice))}</td><td>{formatBDT(Number(s.currentDueAmount))}</td><td>{s.status}</td><td><a href={`/sales/${s.id}`} className="text-blue-600 underline">View</a></td></tr>)}</tbody></table>
+  </div>);
+}
