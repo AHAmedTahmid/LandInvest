@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LandInvest ERP - Real Estate Syndicate & Partnership Accounting</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f6f7eb',
+              100: '#e9ecd3',
+              500: '#6a760c', // Safari Olive
+              600: '#5a6509',
+              700: '#4b5c09', // Deep Forest Olive
+              900: '#2c3605'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex h-screen overflow-hidden">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 z-20">
+    <!-- Brand / Logo -->
+    <div class="h-16 px-6 flex items-center gap-3 border-b border-slate-800 bg-slate-950">
+      <div class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+        L
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-white tracking-wide">LANDINVEST</h1>
+        <p class="text-[11px] text-slate-400">Partnership ERP Suite</p>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white bg-brand-700/80 hover:bg-brand-700" data-tab="dashboard">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+      </button>
+
+      <button onclick="switchTab('partners')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800 text-slate-400" data-tab="partners">
+        <i data-lucide="users" class="w-4 h-4"></i> Partners & Capital
+      </button>
+
+      <button onclick="switchTab('treasury')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800 text-slate-400" data-tab="treasury">
+        <i data-lucide="wallet" class="w-4 h-4"></i> Cash & Bank Ledger
+      </button>
+
+      <button onclick="switchTab('projects')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800 text-slate-400" data-tab="projects">
+        <i data-lucide="map" class="w-4 h-4"></i> Land & Acquisition
+      </button>
+
+      <button onclick="switchTab('expenses')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800 text-slate-400" data-tab="expenses">
+        <i data-lucide="receipt" class="w-4 h-4"></i> Project Expenses
+      </button>
+
+      <button onclick="switchTab('sales')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800 text-slate-400" data-tab="sales">
+        <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i> Plot Sales & Dues
+      </button>
+
+      <button onclick="switchTab('pnl')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition hover:text-white hover:bg-slate-800 text-slate-400" data-tab="pnl">
+        <i data-lucide="pie-chart" class="w-4 h-4"></i> Profit & Loss (P&L)
+      </button>
+    </nav>
+
+    <!-- User Footer -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-white">
+        SA
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-medium text-white truncate">Super Admin</p>
+        <p class="text-[10px] text-slate-400 truncate">Dhaka HQ Office</p>
+      </div>
+      <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT AREA ================= -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    
+    <!-- Top Header -->
+    <header class="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <h2 id="page-title" class="text-lg font-bold text-slate-800">Executive Overview</h2>
+        <span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">FY 2026-2027</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="openModal('quickActionModal')" class="flex items-center gap-2 bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-sm">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i> New Entry
+        </button>
+        <button class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Workspace -->
+    <main class="flex-1 overflow-y-auto p-8">
+
+      <!-- ================= 1. TAB: DASHBOARD ================= -->
+      <section id="dashboard" class="tab-content active space-y-6">
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cash in Hand</span>
+              <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600"><i data-lucide="banknote" class="w-4 h-4"></i></div>
+            </div>
+            <p class="text-2xl font-bold text-slate-900 mt-2">৳ 12,45,000</p>
+            <p class="text-[11px] text-slate-500 mt-1">Petty cash for site operations</p>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Bank Balance</span>
+              <div class="p-2 bg-blue-50 rounded-lg text-blue-600"><i data-lucide="building-2" class="w-4 h-4"></i></div>
+            </div>
+            <p class="text-2xl font-bold text-slate-900 mt-2">৳ 84,20,000</p>
+            <p class="text-[11px] text-slate-500 mt-1">Across 3 commercial accounts</p>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Land Book Value</span>
+              <div class="p-2 bg-amber-50 rounded-lg text-amber-600"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+            </div>
+            <p class="text-2xl font-bold text-slate-900 mt-2">৳ 3,85,50,000</p>
+            <p class="text-[11px] text-slate-500 mt-1">Purchase + Dev expenses</p>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Receivables</span>
+              <div class="p-2 bg-rose-50 rounded-lg text-rose-600"><i data-lucide="clock" class="w-4 h-4"></i></div>
+            </div>
+            <p class="text-2xl font-bold text-rose-600 mt-2">৳ 45,80,000</p>
+            <p class="text-[11px] text-slate-500 mt-1">Due from buyers on plots</p>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-slate-800">Project Investment vs. Sales Recovery</h3>
+              <span class="text-xs text-slate-400">Figures in Lakh BDT</span>
+            </div>
+            <div class="h-64">
+              <canvas id="barChartProjects"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-800 mb-4">Partner Capital Share %</h3>
+            <div class="h-56 relative flex items-center justify-center">
+              <canvas id="donutChartPartners"></canvas>
+            </div>
+            <div class="mt-2 text-center text-xs text-slate-500">Total Seed Capital: ৳ 4,50,00,000</div>
+          </div>
+        </div>
+
+        <!-- Active Projects Snapshot -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-800">Active Land Projects</h3>
+            <button onclick="switchTab('projects')" class="text-xs font-semibold text-brand-700 hover:text-brand-500">View All Projects →</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase font-semibold">
+                <tr>
+                  <th class="py-3 px-5">Project Name</th>
+                  <th class="py-3 px-5">Mouza & Dag</th>
+                  <th class="py-3 px-5">Area (Katha/Shotok)</th>
+                  <th class="py-3 px-5">Total Invested</th>
+                  <th class="py-3 px-5">Sales Revenue</th>
+                  <th class="py-3 px-5">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-700">
+                <tr class="hover:bg-slate-50/60">
+                  <td class="py-3.5 px-5 font-semibold text-slate-900">Purbachal Green Oasis</td>
+                  <td class="py-3.5 px-5">Mouza: Nagari, Dag: RS-450</td>
+                  <td class="py-3.5 px-5">60 Shotok (36 Katha)</td>
+                  <td class="py-3.5 px-5">৳ 1,65,00,000</td>
+                  <td class="py-3.5 px-5 text-emerald-600 font-semibold">৳ 2,10,00,000</td>
+                  <td class="py-3.5 px-5"><span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800">Selling (70% Sold)</span></td>
+                </tr>
+                <tr class="hover:bg-slate-50/60">
+                  <td class="py-3.5 px-5 font-semibold text-slate-900">Keraniganj Riverfront</td>
+                  <td class="py-3.5 px-5">Mouza: Rohitpur, Dag: CS-1102</td>
+                  <td class="py-3.5 px-5">120 Shotok (3.6 Bigha)</td>
+                  <td class="py-3.5 px-5">৳ 1,40,50,000</td>
+                  <td class="py-3.5 px-5 text-slate-400">৳ 0 (In Dev)</td>
+                  <td class="py-3.5 px-5"><span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-100 text-amber-800">Earth Filling</span></td>
+                </tr>
+                <tr class="hover:bg-slate-50/60">
+                  <td class="py-3.5 px-5 font-semibold text-slate-900">Savar Smart Town</td>
+                  <td class="py-3.5 px-5">Mouza: Hemayetpur, Dag: BS-89</td>
+                  <td class="py-3.5 px-5">45 Shotok (27 Katha)</td>
+                  <td class="py-3.5 px-5">৳ 80,00,000</td>
+                  <td class="py-3.5 px-5 text-emerald-600 font-semibold">৳ 1,25,00,000</td>
+                  <td class="py-3.5 px-5"><span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-800">Completed / Closed</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. TAB: PARTNERS ================= -->
+      <section id="partners" class="tab-content space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Partners' Capital & Equity</h3>
+            <p class="text-xs text-slate-500">Live ledger of deposits, direct payments, and net profit allocation.</p>
+          </div>
+          <button onclick="openModal('partnerDepositModal')" class="bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Partner Deposit
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Partner Card 1 -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-2 h-full bg-brand-500"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold text-slate-900 text-base">Al-Haj Rafiqul Islam</h4>
+                <p class="text-xs text-slate-400">NID: 1982-269-874-1234</p>
+              </div>
+              <span class="bg-brand-50 text-brand-700 border border-brand-200 text-xs px-2.5 py-0.5 rounded-full font-bold">40% Share</span>
+            </div>
+            <div class="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs">
+              <div class="flex justify-between"><span class="text-slate-500">Total Deposited:</span> <span class="font-semibold text-slate-800">৳ 1,80,00,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Direct Dev Payments:</span> <span class="font-semibold text-slate-800">৳ 8,50,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Withdrawn / Drawn:</span> <span class="font-semibold text-rose-600">৳ (12,00,000)</span></div>
+              <div class="flex justify-between pt-2 border-t border-dashed border-slate-200 font-bold text-sm">
+                <span class="text-slate-900">Current Balance:</span>
+                <span class="text-brand-700">৳ 1,76,50,000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partner Card 2 -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold text-slate-900 text-base">Engr. Tanvir Ahmed</h4>
+                <p class="text-xs text-slate-400">NID: 1987-111-546-9902</p>
+              </div>
+              <span class="bg-blue-50 text-blue-700 border border-blue-200 text-xs px-2.5 py-0.5 rounded-full font-bold">35% Share</span>
+            </div>
+            <div class="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs">
+              <div class="flex justify-between"><span class="text-slate-500">Total Deposited:</span> <span class="font-semibold text-slate-800">৳ 1,57,50,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Direct Dev Payments:</span> <span class="font-semibold text-slate-800">৳ 3,20,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Withdrawn / Drawn:</span> <span class="font-semibold text-rose-600">৳ (5,00,000)</span></div>
+              <div class="flex justify-between pt-2 border-t border-dashed border-slate-200 font-bold text-sm">
+                <span class="text-slate-900">Current Balance:</span>
+                <span class="text-brand-700">৳ 1,55,70,000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partner Card 3 -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-2 h-full bg-amber-500"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold text-slate-900 text-base">Mahmudul Hasan</h4>
+                <p class="text-xs text-slate-400">NID: 1991-889-432-6611</p>
+              </div>
+              <span class="bg-amber-50 text-amber-700 border border-amber-200 text-xs px-2.5 py-0.5 rounded-full font-bold">25% Share</span>
+            </div>
+            <div class="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs">
+              <div class="flex justify-between"><span class="text-slate-500">Total Deposited:</span> <span class="font-semibold text-slate-800">৳ 1,12,50,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Direct Dev Payments:</span> <span class="font-semibold text-slate-800">৳ 1,50,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Withdrawn / Drawn:</span> <span class="font-semibold text-rose-600">৳ (2,50,000)</span></div>
+              <div class="flex justify-between pt-2 border-t border-dashed border-slate-200 font-bold text-sm">
+                <span class="text-slate-900">Current Balance:</span>
+                <span class="text-brand-700">৳ 1,11,50,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Partner Transactions Table -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 font-bold text-sm text-slate-800">Recent Capital Transactions</div>
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+              <tr>
+                <th class="py-3 px-5">Date</th>
+                <th class="py-3 px-5">Partner</th>
+                <th class="py-3 px-5">Type</th>
+                <th class="py-3 px-5">Channel</th>
+                <th class="py-3 px-5">Amount</th>
+                <th class="py-3 px-5">Reference / Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="py-3 px-5">15 Sep 2026</td>
+                <td class="py-3 px-5 font-semibold">Al-Haj Rafiqul Islam</td>
+                <td class="py-3 px-5"><span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold">Deposit</span></td>
+                <td class="py-3 px-5">DBBL Principal A/C</td>
+                <td class="py-3 px-5 font-bold text-slate-900">৳ 25,00,000</td>
+                <td class="py-3 px-5">Cheque #887201 - Land Acquisition</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-5">08 Sep 2026</td>
+                <td class="py-3 px-5 font-semibold">Engr. Tanvir Ahmed</td>
+                <td class="py-3 px-5"><span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded font-semibold">Direct Out-of-Pocket</span></td>
+                <td class="py-3 px-5">Paid to Vendor</td>
+                <td class="py-3 px-5 font-bold text-slate-900">৳ 3,20,000</td>
+                <td class="py-3 px-5">Paid for 40 Truck Earth filling (Keraniganj)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 3. TAB: CASH & BANK ================= -->
+      <section id="treasury" class="tab-content space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Cash & Banking Treasury</h3>
+            <p class="text-xs text-slate-500">Separate ledgers for physical field cash and bank balances with contra support.</p>
+          </div>
+          <button onclick="openModal('contraModal')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i> Fund Transfer (Contra)
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+            <span class="text-xs text-slate-400 font-medium">Petty Cash Box (HQ & Site)</span>
+            <p class="text-xl font-bold text-slate-900 mt-1">৳ 12,45,000</p>
+            <span class="inline-block mt-2 text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Physical Cash</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+            <span class="text-xs text-slate-400 font-medium">DBBL A/C: 115.120.9842</span>
+            <p class="text-xl font-bold text-slate-900 mt-1">৳ 48,50,000</p>
+            <span class="inline-block mt-2 text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded">Principal A/C</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+            <span class="text-xs text-slate-400 font-medium">Islami Bank A/C: 205.8821</span>
+            <p class="text-xl font-bold text-slate-900 mt-1">৳ 25,70,000</p>
+            <span class="inline-block mt-2 text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded">Escrow & Bayna</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+            <span class="text-xs text-slate-400 font-medium">BRAC Bank A/C: 150.3341</span>
+            <p class="text-xl font-bold text-slate-900 mt-1">৳ 10,00,000</p>
+            <span class="inline-block mt-2 text-[10px] bg-purple-50 text-purple-600 px-2 py-0.5 rounded">Operational Reserve</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 font-bold text-sm text-slate-800">Unified Treasury Ledger (All Flows)</div>
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+              <tr>
+                <th class="py-3 px-5">Date</th>
+                <th class="py-3 px-5">Account Medium</th>
+                <th class="py-3 px-5">Flow</th>
+                <th class="py-3 px-5">Amount</th>
+                <th class="py-3 px-5">Purpose</th>
+                <th class="py-3 px-5">Balance After</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="py-3 px-5">18 Sep 2026</td>
+                <td class="py-3 px-5 font-medium">Physical Cash Box</td>
+                <td class="py-3 px-5"><span class="text-rose-600 font-bold">DEBIT (OUT)</span></td>
+                <td class="py-3 px-5 font-bold">৳ 45,000</td>
+                <td class="py-3 px-5">Site Surveyor & Amin fee (Keraniganj)</td>
+                <td class="py-3 px-5 text-slate-500">৳ 12,45,000</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-5">17 Sep 2026</td>
+                <td class="py-3 px-5 font-medium">DBBL Principal A/C</td>
+                <td class="py-3 px-5"><span class="text-emerald-600 font-bold">CREDIT (IN)</span></td>
+                <td class="py-3 px-5 font-bold">৳ 8,00,000</td>
+                <td class="py-3 px-5">Plot #B4 Downpayment - Buyer: Kamal Hossain</td>
+                <td class="py-3 px-5 text-slate-500">৳ 48,50,000</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-5">14 Sep 2026</td>
+                <td class="py-3 px-5 font-medium">Contra: Bank to Cash</td>
+                <td class="py-3 px-5"><span class="text-slate-700 font-bold">TRANSFER</span></td>
+                <td class="py-3 px-5 font-bold">৳ 2,00,000</td>
+                <td class="py-3 px-5">Cheque #55410 withdrawn for Field Petty Cash</td>
+                <td class="py-3 px-5 text-slate-500">Adjusted</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 4. TAB: LAND & PROJECTS ================= -->
+      <section id="projects" class="tab-content space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Land Inventory & Deeds</h3>
+            <p class="text-xs text-slate-500">Master land acquisition records with full legal references (CS, SA, RS, BS).</p>
+          </div>
+          <button onclick="openModal('newLandModal')" class="bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Register New Land
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Project 1 Card Full View -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 border-b border-slate-100 gap-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-lg font-bold text-slate-900">Purbachal Green Oasis</h4>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Selling Stage</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Mouza: Nagari | JL No: 28 | Sub-Registry: Kaliganj, Gazipur</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xs text-slate-400">Total Capital Deployed</span>
+                <p class="text-xl font-bold text-slate-900">৳ 1,65,00,000</p>
+              </div>
+            </div>
+
+            <!-- Land Legal Meta Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 text-xs">
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block">Khatian Numbers</span>
+                <span class="font-semibold text-slate-800">CS: 142 | SA: 388 | RS: 910</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block">Dag Numbers</span>
+                <span class="font-semibold text-slate-800">RS Dag: 450, 451, 452/890</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block">Total Area</span>
+                <span class="font-semibold text-slate-800">60 Shotok (36.3 Katha)</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block">Mutation (Namjari) & Tax</span>
+                <span class="font-semibold text-emerald-600">DCR Approved / Tax Paid 2026</span>
+              </div>
+            </div>
+
+            <!-- Cost Structure Breakdown -->
+            <div class="pt-2 text-xs">
+              <span class="font-semibold text-slate-700 block mb-2">Cost Breakdown & Subdivisions:</span>
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-slate-600">
+                <div class="border border-slate-100 p-2.5 rounded-md">Deed Purchase: <span class="font-semibold text-slate-800">৳ 1,30,00,000</span></div>
+                <div class="border border-slate-100 p-2.5 rounded-md">Registry & Stamp: <span class="font-semibold text-slate-800">৳ 12,00,000</span></div>
+                <div class="border border-slate-100 p-2.5 rounded-md">Mutation Fees: <span class="font-semibold text-slate-800">৳ 1,50,000</span></div>
+                <div class="border border-slate-100 p-2.5 rounded-md">Development/Filling: <span class="font-semibold text-slate-800">৳ 21,50,000</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. TAB: EXPENSES ================= -->
+      <section id="expenses" class="tab-content space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Project Development Expenses</h3>
+            <p class="text-xs text-slate-500">Track all on-site costs including earth filling, boundaries, roads, and mediation.</p>
+          </div>
+          <button onclick="openModal('expenseModal')" class="bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Record Expense
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+              <tr>
+                <th class="py-3 px-5">Date</th>
+                <th class="py-3 px-5">Project</th>
+                <th class="py-3 px-5">Category</th>
+                <th class="py-3 px-5">Description</th>
+                <th class="py-3 px-5">Paid Via</th>
+                <th class="py-3 px-5">Amount</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="py-3 px-5">16 Sep 2026</td>
+                <td class="py-3 px-5 font-semibold text-slate-900">Keraniganj Riverfront</td>
+                <td class="py-3 px-5"><span class="bg-amber-50 text-amber-800 px-2 py-0.5 rounded font-medium">Earth Filling (মাটি)</span></td>
+                <td class="py-3 px-5">40 Truck sand filling + bulldozer contractor</td>
+                <td class="py-3 px-5 text-slate-500">Engr. Tanvir (Direct Pay)</td>
+                <td class="py-3 px-5 font-bold text-slate-900">৳ 3,20,000</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-5">12 Sep 2026</td>
+                <td class="py-3 px-5 font-semibold text-slate-900">Purbachal Green Oasis</td>
+                <td class="py-3 px-5"><span class="bg-blue-50 text-blue-800 px-2 py-0.5 rounded font-medium">Boundary Wall</span></td>
+                <td class="py-3 px-5">Concrete boundary pillars & wire fencing</td>
+                <td class="py-3 px-5 text-slate-500">DBBL Bank Cheque #901</td>
+                <td class="py-3 px-5 font-bold text-slate-900">৳ 1,45,000</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-5">05 Sep 2026</td>
+                <td class="py-3 px-5 font-semibold text-slate-900">Savar Smart Town</td>
+                <td class="py-3 px-5"><span class="bg-purple-50 text-purple-800 px-2 py-0.5 rounded font-medium">Legal & Survey</span></td>
+                <td class="py-3 px-5">AC Land field demarcation & Amin measurement fee</td>
+                <td class="py-3 px-5 text-slate-500">Cash in Hand</td>
+                <td class="py-3 px-5 font-bold text-slate-900">৳ 35,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 6. TAB: SALES & DUES ================= -->
+      <section id="sales" class="tab-content space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Plot Sales & Customer Installments</h3>
+            <p class="text-xs text-slate-500">Manage buyer contracts, booking advances, and pending dues with printable receipts.</p>
+          </div>
+          <button onclick="openModal('newSaleModal')" class="bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> New Sale Agreement
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+              <tr>
+                <th class="py-3 px-5">Sale Date</th>
+                <th class="py-3 px-5">Buyer Name & Phone</th>
+                <th class="py-3 px-5">Project & Plot</th>
+                <th class="py-3 px-5">Total Agreed</th>
+                <th class="py-3 px-5">Received</th>
+                <th class="py-3 px-5">Due Remaining</th>
+                <th class="py-3 px-5">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="py-3.5 px-5">17 Sep 2026</td>
+                <td class="py-3.5 px-5 font-semibold text-slate-900">
+                  Kamal Hossain
+                  <span class="block text-[11px] text-slate-400 font-normal">01711-234567</span>
+                </td>
+                <td class="py-3.5 px-5">Purbachal Oasis (Plot #B4, 5 Katha)</td>
+                <td class="py-3.5 px-5 font-bold text-slate-900">৳ 35,00,000</td>
+                <td class="py-3.5 px-5 text-emerald-600 font-semibold">৳ 15,00,000</td>
+                <td class="py-3.5 px-5 font-bold text-rose-600">৳ 20,00,000</td>
+                <td class="py-3.5 px-5">
+                  <button onclick="printMoneyReceipt('REC-9942', 'Kamal Hossain', 'Purbachal Oasis - Plot #B4', '15,00,000', '20,00,000')" class="text-brand-700 hover:text-brand-500 font-semibold flex items-center gap-1">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Receipt
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-5">02 Aug 2026</td>
+                <td class="py-3.5 px-5 font-semibold text-slate-900">
+                  Dr. Sabrina Jahan
+                  <span class="block text-[11px] text-slate-400 font-normal">01819-987654</span>
+                </td>
+                <td class="py-3.5 px-5">Savar Smart Town (Plot #A1, 4 Katha)</td>
+                <td class="py-3.5 px-5 font-bold text-slate-900">৳ 28,00,000</td>
+                <td class="py-3.5 px-5 text-emerald-600 font-semibold">৳ 28,00,000</td>
+                <td class="py-3.5 px-5 font-semibold text-slate-400">৳ 0 (Fully Cleared)</td>
+                <td class="py-3.5 px-5">
+                  <button onclick="printMoneyReceipt('REC-8821', 'Dr. Sabrina Jahan', 'Savar Smart Town - Plot #A1', '28,00,000', '0')" class="text-brand-700 hover:text-brand-500 font-semibold flex items-center gap-1">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Receipt
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 7. TAB: PROFIT & LOSS ================= -->
+      <section id="pnl" class="tab-content space-y-6">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Project Profit & Loss Distribution</h3>
+          <p class="text-xs text-slate-500">Audited net profit calculation per project and automatic equity share allocation.</p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
+          <div class="flex flex-col md:flex-row justify-between md:items-center pb-4 border-b border-slate-200 gap-2">
+            <div>
+              <h4 class="text-base font-bold text-slate-900">Project: Savar Smart Town (Closed)</h4>
+              <p class="text-xs text-slate-500">Acquired Feb 2025 | Closed Sep 2026 | All 9 Plots Sold</p>
+            </div>
+            <span class="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-bold self-start">Audit Completed</span>
+          </div>
+
+          <!-- Formula Summary -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 bg-slate-50 rounded-lg">
+              <span class="text-xs text-slate-400 uppercase font-semibold">Total Revenue Invoiced</span>
+              <p class="text-xl font-bold text-emerald-600 mt-1">৳ 1,25,00,000</p>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-lg">
+              <span class="text-xs text-slate-400 uppercase font-semibold">All-Inclusive Total Cost</span>
+              <p class="text-xl font-bold text-slate-700 mt-1">৳ 80,00,000</p>
+            </div>
+            <div class="p-4 bg-brand-50 border border-brand-200 rounded-lg">
+              <span class="text-xs text-brand-700 uppercase font-bold">Net Project Profit</span>
+              <p class="text-2xl font-black text-brand-900 mt-1">৳ 45,00,000</p>
+            </div>
+          </div>
+
+          <!-- Partner Share Allocation Matrix -->
+          <div>
+            <h5 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Profit Disbursement Breakdown</h5>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
+                <thead class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                  <tr>
+                    <th class="py-3 px-4">Partner Name</th>
+                    <th class="py-3 px-4">Agreed Equity %</th>
+                    <th class="py-3 px-4">Earned Net Profit</th>
+                    <th class="py-3 px-4">Disbursement Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr>
+                    <td class="py-3 px-4 font-semibold text-slate-900">Al-Haj Rafiqul Islam</td>
+                    <td class="py-3 px-4 font-bold text-brand-700">40%</td>
+                    <td class="py-3 px-4 font-bold text-slate-900">৳ 18,00,000</td>
+                    <td class="py-3 px-4"><span class="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Credited to Balance</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-3 px-4 font-semibold text-slate-900">Engr. Tanvir Ahmed</td>
+                    <td class="py-3 px-4 font-bold text-blue-700">35%</td>
+                    <td class="py-3 px-4 font-bold text-slate-900">৳ 15,75,000</td>
+                    <td class="py-3 px-4"><span class="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Credited to Balance</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-3 px-4 font-semibold text-slate-900">Mahmudul Hasan</td>
+                    <td class="py-3 px-4 font-bold text-amber-700">25%</td>
+                    <td class="py-3 px-4 font-bold text-slate-900">৳ 11,25,000</td>
+                    <td class="py-3 px-4"><span class="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Credited to Balance</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Modal: Quick Action / Add Expense -->
+  <div id="quickActionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <h4 class="font-bold text-slate-800 text-sm">Record Project Expense</h4>
+        <button onclick="closeModal('quickActionModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form onsubmit="handleDemoSubmit(event, 'Expense Voucher saved successfully!')" class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Select Project</label>
+          <select class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500">
+            <option>Purbachal Green Oasis</option>
+            <option>Keraniganj Riverfront</option>
+            <option>Savar Smart Town</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Expense Category</label>
+          <select class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500">
+            <option>Earth Filling (মাটি ভরাট)</option>
+            <option>Boundary Wall / Fencing</option>
+            <option>Land Survey / Amin Fee</option>
+            <option>Deed Registration Fee</option>
+            <option>Site Guard / Caretaker Salary</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Amount (BDT)</label>
+          <input type="number" placeholder="e.g. 50000" class="w-full border border-slate-200 rounded-lg p-2.5 focus:outline-none focus:ring-1 focus:ring-brand-500" required>
+        </div>
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Payment Method</label>
+          <select class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500">
+            <option>Physical Cash in Hand</option>
+            <option>DBBL Bank Account</option>
+            <option>Islami Bank Account</option>
+            <option>Directly Paid by Partner (Out-of-Pocket)</option>
+          </select>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('quickActionModal')" class="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 font-medium">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-700 hover:bg-brand-600 text-white rounded-lg font-semibold">Save Voucher</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Printable Receipt Viewer -->
+  <div id="receiptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-8 border border-slate-200">
+      <div class="text-center border-b border-slate-200 pb-4">
+        <h3 class="text-xl font-black text-brand-700 tracking-wider">LANDINVEST DEVELOPERS</h3>
+        <p class="text-xs text-slate-500">Dhanmondi, Dhaka, Bangladesh | Cell: +880 1700-000000</p>
+        <span class="inline-block mt-2 font-bold text-xs bg-slate-100 px-3 py-1 rounded text-slate-700 uppercase">Official Money Receipt</span>
+      </div>
+
+      <div class="mt-4 space-y-2 text-xs text-slate-600">
+        <div class="flex justify-between"><span class="text-slate-400">Receipt No:</span> <span id="r-no" class="font-bold text-slate-900"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Date:</span> <span class="font-bold text-slate-900">24 September 2026</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Buyer Name:</span> <span id="r-name" class="font-bold text-slate-900"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Land/Plot Description:</span> <span id="r-desc" class="font-bold text-slate-900"></span></div>
+      </div>
+
+      <div class="my-4 p-4 bg-brand-50/60 border border-brand-100 rounded-xl text-center">
+        <span class="text-xs text-slate-500 uppercase font-semibold">Received Amount</span>
+        <p id="r-amount" class="text-2xl font-black text-brand-700 mt-1"></p>
+      </div>
+
+      <div class="flex justify-between text-xs font-bold text-slate-800 pt-2 border-t border-slate-100">
+        <span>Balance Remaining Due:</span>
+        <span id="r-due" class="text-rose-600"></span>
+      </div>
+
+      <div class="mt-8 pt-4 border-t border-dashed border-slate-200 flex justify-between text-[10px] text-slate-400">
+        <div>Authorized Cashier</div>
+        <div>Managing Director</div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2 print:hidden">
+        <button onclick="closeModal('receiptModal')" class="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 text-xs font-medium">Close</button>
+        <button onclick="window.print()" class="px-4 py-2 bg-brand-700 hover:bg-brand-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print Document
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SCRIPTS & CHART INITIALIZATION ================= -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Tab Switching Logic
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-700/80', 'text-white');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeSection = document.getElementById(tabId);
+      if (activeSection) activeSection.classList.add('active');
+
+      const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-brand-700/80', 'text-white');
+        activeBtn.classList.remove('text-slate-400');
+      }
+
+      // Dynamic Page Title
+      const titles = {
+        dashboard: 'Executive Overview',
+        partners: "Partners' Capital & Equity",
+        treasury: 'Cash & Bank Treasury',
+        projects: 'Land Inventory & Acquisition',
+        expenses: 'Project Development Expenses',
+        sales: 'Plot Sales & Customer Installments',
+        pnl: 'Profit & Loss (P&L) Reconciliation'
+      };
+      document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
+      lucide.createIcons();
+    }
+
+    // Modal Handlers
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleDemoSubmit(e, message) {
+      e.preventDefault();
+      alert(message);
+      closeModal('quickActionModal');
+    }
+
+    // Money Receipt Preview Generator
+    function printMoneyReceipt(no, name, desc, amount, due) {
+      document.getElementById('r-no').innerText = no;
+      document.getElementById('r-name').innerText = name;
+      document.getElementById('r-desc').innerText = desc;
+      document.getElementById('r-amount').innerText = '৳ ' + amount;
+      document.getElementById('r-due').innerText = '৳ ' + due;
+      openModal('receiptModal');
+    }
+
+    // Initialize Chart.js Graphs
+    window.addEventListener('DOMContentLoaded', () => {
+      // Bar Chart: Project Cost vs Sales
+      const ctxBar = document.getElementById('barChartProjects').getContext('2d');
+      new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: ['Purbachal Oasis', 'Keraniganj River', 'Savar Smart Town'],
+          datasets: [
+            {
+              label: 'Total Cost (Lakh ৳)',
+              data: [165, 140.5, 80],
+              backgroundColor: '#94a3b8',
+              borderRadius: 6
+            },
+            {
+              label: 'Total Sales (Lakh ৳)',
+              data: [210, 0, 125],
+              backgroundColor: '#6a760c', // Safari Olive
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+          },
+          scales: {
+            y: { grid: { borderDash: [2, 4], color: '#e2e8f0' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // Donut Chart: Partner Shares
+      const ctxDonut = document.getElementById('donutChartPartners').getContext('2d');
+      new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: ['Rafiqul Islam (40%)', 'Tanvir Ahmed (35%)', 'Mahmudul Hasan (25%)'],
+          datasets: [{
+            data: [40, 35, 25],
+            backgroundColor: ['#6a760c', '#3b82f6', '#f59e0b'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+          },
+          cutout: '70%'
+        }
+      });
+    });
+  </script>
+</body>
+</html>
