@@ -29,13 +29,24 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
   async function upsert(formData: FormData) {
     "use server";
     const prisma2: any = await getTenantClientFromSession();
-    const id = formData.get("id") as string;
-    const name = formData.get("name") as string;
-    const phone = formData.get("phone") as string;
-    const nid = formData.get("nidNumber") as string;
+    const rawId = ((formData.get("id") as string) || "").trim();
+    const name = ((formData.get("name") as string) || "").trim();
+    const phone = ((formData.get("phone") as string) || "").trim();
+    const nid = ((formData.get("nidNumber") as string) || "").trim();
     const opening = parseFloat(formData.get("opening_balance") as string) || 0;
-    if (id) await prisma2.partner.update({ where: { id }, data: { name, phone, nidNumber: nid||null, openingBalance: opening } });
-    else await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid||null, openingBalance: opening } });
+    if (!name || !phone) throw new Error("Name and phone are required");
+    try {
+      if (rawId) {
+        const exists = await prisma2.partner.findUnique({ where: { id: rawId } });
+        if (!exists) throw new Error(`No partner found with ID "${rawId}" — leave ID blank to create a new partner.`);
+        await prisma2.partner.update({ where: { id: rawId }, data: { name, phone, nidNumber: nid || null, openingBalance: opening } });
+      } else {
+        await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
+      }
+    } catch (e: any) {
+      if (e.code === "P2002" && e.meta?.target?.includes("phone")) throw new Error(`Phone "${phone}" already exists`);
+      throw new Error(e.message || "Failed to save partner");
+    }
     revalidatePath("/partners");
   }
 
