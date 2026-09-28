@@ -38,8 +38,12 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
     try {
       if (rawId) {
         const exists = await prisma2.partner.findUnique({ where: { id: rawId } });
-        if (!exists) throw new Error(`No partner found with ID "${rawId}" — leave ID blank to create a new partner.`);
-        await prisma2.partner.update({ where: { id: rawId }, data: { name, phone, nidNumber: nid || null, openingBalance: opening } });
+        if (exists) {
+          await prisma2.partner.update({ where: { id: rawId }, data: { name, phone, nidNumber: nid || null, openingBalance: opening } });
+        } else {
+          // treat unknown ID (e.g. "01") as create — don't throw
+          await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
+        }
       } else {
         await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
       }
