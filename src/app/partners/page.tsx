@@ -24,6 +24,7 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
   const partners = await prisma.partner.findMany({ include: { partnerTransactions: true }, orderBy: { createdAt: "desc" } });
   const sp = await searchParams;
   const viewId = sp.view;
+  const viewPartner = viewId ? await prisma.partner.findUnique({ where: { id: viewId } }) : null;
   const viewTxs = viewId ? await prisma.partnerTransaction.findMany({ where: { partnerId: viewId }, orderBy: { txnDate: "desc" } }) : [];
 
   async function upsert(formData: FormData) {
@@ -76,7 +77,7 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
 
       {viewId && (
         <div className="bg-white p-4 rounded-xl shadow border">
-          <h2 className="font-semibold mb-2">Capital Ledger for {viewId}</h2>
+          <h2 className="font-semibold mb-2">Capital Ledger for {viewPartner?.name ?? viewId}</h2>
           <table className="w-full text-sm"><thead><tr className="border-b text-left"><th>Date</th><th>Type</th><th>Amount</th><th>Notes</th></tr></thead>
             <tbody>{viewTxs.map((t: any) => <tr key={t.id} className="border-b"><td>{new Date(t.txnDate).toLocaleDateString()}</td><td>{t.txnType}</td><td>{formatBDT(toNum(t.amount))}</td><td>{t.notes||"-"}</td></tr>)}</tbody>
           </table>
