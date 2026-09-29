@@ -49,7 +49,12 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
         await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
       }
     } catch (e: any) {
-      if (e.code === "P2002" && e.meta?.target?.includes("phone")) return `✗ Phone "${phone}" already exists — use a different number`;
+      if (e.code === "P2002") {
+        const t = e.meta?.target as string[] | string | undefined;
+        const s = Array.isArray(t) ? t.join(",") : String(t ?? "");
+        if (s.includes("phone")) return `✗ Phone "${phone}" already exists — use a different number`;
+        if (s.includes("nid")) return `✗ NID "${nid}" already exists — each partner must have a unique NID`;
+      }
       return `✗ ${e.message || "Failed to save partner"}`;
     }
     revalidatePath("/partners");

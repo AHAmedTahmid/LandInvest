@@ -12,7 +12,7 @@ model Partner {
   globalUserId   String?  @map("global_user_id") @db.Char(36)
   name           String   @db.VarChar(150)
   phone          String   @unique @db.VarChar(20)
-  nidNumber      String?  @map("nid_number") @db.VarChar(50)
+  nidNumber      String?  @unique @map("nid_number") @db.VarChar(50)
   openingBalance Decimal  @default(0.00) @map("opening_balance") @db.Decimal(15, 2)
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
