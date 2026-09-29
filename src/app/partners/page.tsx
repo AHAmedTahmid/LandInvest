@@ -5,6 +5,7 @@ import { can } from "@/lib/rbac";
 import { formatBDT, toNum } from "@/lib/format";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
+import PartnersForm from "./PartnersForm";
 
 function getPartnerBalance(opening: number, txs: any[]) {
   let bal = opening;
@@ -27,7 +28,7 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
   const viewPartner = viewId ? await prisma.partner.findUnique({ where: { id: viewId } }) : null;
   const viewTxs = viewId ? await prisma.partnerTransaction.findMany({ where: { partnerId: viewId }, orderBy: { txnDate: "desc" } }) : [];
 
-  async function upsert(formData: FormData) {
+  async function upsert(_prev: string | null, formData: FormData): Promise<string | null> {
     "use server";
     const prisma2: any = await getTenantClientFromSession();
     const rawId = ((formData.get("id") as string) || "").trim();
@@ -35,37 +36,30 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
     const phone = ((formData.get("phone") as string) || "").trim();
     const nid = ((formData.get("nidNumber") as string) || "").trim();
     const opening = parseFloat(formData.get("opening_balance") as string) || 0;
-    if (!name || !phone) throw new Error("Name and phone are required");
+    if (!name || !phone) return "✗ Name and phone are required";
     try {
       if (rawId) {
         const exists = await prisma2.partner.findUnique({ where: { id: rawId } });
         if (exists) {
           await prisma2.partner.update({ where: { id: rawId }, data: { name, phone, nidNumber: nid || null, openingBalance: opening } });
         } else {
-          // treat unknown ID (e.g. "01") as create — don't throw
           await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
         }
       } else {
         await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
       }
     } catch (e: any) {
-      if (e.code === "P2002" && e.meta?.target?.includes("phone")) throw new Error(`Phone "${phone}" already exists`);
-      throw new Error(e.message || "Failed to save partner");
+      if (e.code === "P2002" && e.meta?.target?.includes("phone")) return `✗ Phone "${phone}" already exists — use a different number`;
+      return `✗ ${e.message || "Failed to save partner"}`;
     }
     revalidatePath("/partners");
+    return `✓ Partner "${name}" saved`;
   }
 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Partners</h1>
-      <form action={upsert} className="bg-white p-4 rounded-xl shadow border grid grid-cols-1 md:grid-cols-5 gap-3">
-        <input name="id" placeholder="ID (blank for new)" className="border rounded px-3 py-2" />
-        <input name="name" placeholder="Name" required className="border rounded px-3 py-2" />
-        <input name="phone" placeholder="Phone" required className="border rounded px-3 py-2" />
-        <input name="nidNumber" placeholder="NID" className="border rounded px-3 py-2" />
-        <input name="opening_balance" placeholder="Opening Balance" type="number" step="0.01" className="border rounded px-3 py-2" />
-        <button className="bg-blue-600 text-white rounded px-4 py-2 md:col-span-5">Add / Update</button>
-      </form>
+      <PartnersForm action={upsert} />
 
       <table className="w-full text-sm bg-white rounded-xl shadow border">
         <thead><tr className="border-b text-left"><th className="p-2">Name</th><th>Phone</th><th>NID</th><th>Opening</th><th>Live Balance</th><th>Ledger</th></tr></thead>
