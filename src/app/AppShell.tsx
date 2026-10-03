@@ -1,36 +1,39 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Wallet, Map, Receipt, BadgeDollarSign, PieChart, ShieldCheck, Bell } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, Map, Receipt, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages } from "lucide-react";
+import { useLang } from "@/lib/i18n";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/partners", label: "Partners & Capital", icon: Users },
-  { href: "/treasury", label: "Cash & Bank Ledger", icon: Wallet },
-  { href: "/projects", label: "Land & Acquisition", icon: Map },
-  { href: "/expenses", label: "Project Expenses", icon: Receipt },
-  { href: "/sales", label: "Plot Sales & Dues", icon: BadgeDollarSign },
-  { href: "/reports", label: "Profit & Loss (P&L)", icon: PieChart },
-  { href: "/audit", label: "Audit Trail", icon: ShieldCheck },
-];
+  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
+  { href: "/partners", key: "partners", icon: Users },
+  { href: "/treasury", key: "treasury", icon: Wallet },
+  { href: "/projects", key: "projects", icon: Map },
+  { href: "/expenses", key: "expenses", icon: Receipt },
+  { href: "/sales", key: "sales", icon: BadgeDollarSign },
+  { href: "/reports", key: "pnl", icon: PieChart },
+  { href: "/audit", key: "audit", icon: ShieldCheck },
+] as const;
 
 const TITLES: Record<string, string> = {
-  "/dashboard": "Executive Overview",
-  "/partners": "Partners' Capital & Equity",
-  "/treasury": "Cash & Bank Treasury",
-  "/projects": "Land Inventory & Acquisition",
-  "/expenses": "Project Development Expenses",
-  "/sales": "Plot Sales & Customer Installments",
-  "/reports": "Profit & Loss (P&L) Reconciliation",
-  "/audit": "Audit Trail",
+  "/dashboard": "executive",
+  "/partners": "partners",
+  "/treasury": "treasury",
+  "/projects": "projects",
+  "/expenses": "expenses",
+  "/sales": "sales",
+  "/reports": "pnl",
+  "/audit": "audit",
 };
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { t, lang, toggle } = useLang();
   const isAuth = pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/invite");
   if (isAuth) return <>{children}</>;
 
-  const title = TITLES[pathname] ?? TITLES[Object.keys(TITLES).find(k => pathname?.startsWith(k)) ?? ""] ?? "LandInvest";
+  const key = TITLES[pathname] ?? TITLES[Object.keys(TITLES).find(k => pathname?.startsWith(k)) ?? ""] ?? "dashboard";
+  const title = t(key);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -40,11 +43,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div><h1 className="text-sm font-bold text-white tracking-wide">LANDINVEST</h1><p className="text-[11px] text-slate-400">Partnership ERP Suite</p></div>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {NAV.map(({ href, label, icon: Icon }) => {
+          {NAV.map(({ href, key, icon: Icon }) => {
             const active = pathname === href || pathname?.startsWith(href + "/");
             return (
               <Link key={href} href={href} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}>
-                <Icon className="w-4 h-4" /> {label}
+                <Icon className="w-4 h-4" /> {t(key)}
               </Link>
             );
           })}
@@ -57,8 +60,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3"><h2 className="text-lg font-bold text-slate-800">{title}</h2><span className="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">FY 2026-2027</span></div>
-          <div className="flex items-center gap-3"><Link href="/sales" className="flex items-center gap-2 bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg">New Entry</Link><span className="p-2 text-slate-400"><Bell className="w-4 h-4" /></span></div>
+          <div className="flex items-center gap-3"><h2 className="text-lg font-bold text-slate-800">{title}</h2><span className="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">{t("fy")}</span></div>
+          <div className="flex items-center gap-3">
+            <button onClick={toggle} className="flex items-center gap-1.5 border px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-slate-50"><Languages className="w-3.5 h-3.5" />{lang === "en" ? "বাংলা" : "English"}</button>
+            <Link href="/sales" className="flex items-center gap-2 bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg">{t("newEntry")}</Link><span className="p-2 text-slate-400"><Bell className="w-4 h-4" /></span></div>
         </header>
         <main className="flex-1 overflow-y-auto p-8 bg-slate-50">{children}</main>
       </div>
