@@ -48,3 +48,10 @@ uploads/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dev logs
+*.log
+worker2.*
+
+*.err
+
