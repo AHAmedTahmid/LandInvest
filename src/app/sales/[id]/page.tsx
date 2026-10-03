@@ -3,6 +3,7 @@ import { authOptions } from "@/auth";
 import { can } from "@/lib/rbac";
 import { getTenantClientFromSession } from "@/lib/tenant";
 import { formatBDT } from "@/lib/format";
+import PrintButton from "@/components/PrintButton";
 
 export default async function SaleDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -51,7 +52,7 @@ export default async function SaleDetail({ params }: { params: Promise<{ id: str
         </form>
       </div>
       <a href={`/api/sales/${id}/receipt`} target="_blank" className="bg-blue-600 text-white px-4 py-2 rounded">Download PDF</a>
-      <button onClick={() => window.print()} className="ml-2 border px-4 py-2 rounded">Print (window.print)</button>
+      <PrintButton />
       <table className="w-full text-sm bg-white rounded-xl shadow border">
         <thead><tr className="border-b"><th className="p-2 text-left">Date</th><th className="text-left">Amount</th><th className="text-left">Method</th><th className="text-left">Receipt</th></tr></thead>
         <tbody>{payments.map((c: any) => <tr key={c.id} className="border-b"><td className="p-2">{new Date(c.paymentDate).toLocaleDateString()}</td><td>{formatBDT(Number(c.amountPaid))}</td><td>{c.paymentMethod}</td><td>{c.receiptNo}</td></tr>)}</tbody>
