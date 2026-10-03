@@ -7,7 +7,7 @@ export default function PartnersForm({ action }: { action: (prev: string | null,
     <>
       {msg && <div className={`p-3 rounded text-sm ${msg.startsWith("✓") ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-700 border border-rose-200"}`}>{msg}</div>}
       <form action={formAction} className="bg-white p-4 rounded-xl shadow border grid grid-cols-1 md:grid-cols-5 gap-3">
-        <input name="id" placeholder="ID (blank for new)" className="border rounded px-3 py-2" />
+        <input name="id" placeholder="Leave blank for new — ID is auto-generated (unique)" className="border rounded px-3 py-2" />
         <input name="name" placeholder="Name" required className="border rounded px-3 py-2" />
         <input name="phone" placeholder="Phone" required className="border rounded px-3 py-2" />
         <input name="nidNumber" placeholder="NID" className="border rounded px-3 py-2" />

@@ -43,7 +43,7 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
         if (exists) {
           await prisma2.partner.update({ where: { id: rawId }, data: { name, phone, nidNumber: nid || null, openingBalance: opening } });
         } else {
-          await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
+          return `✗ No partner found with ID "${rawId}" — leave ID blank to create a new partner (ID is auto-generated and unique)`;
         }
       } else {
         await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
