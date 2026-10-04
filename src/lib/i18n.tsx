@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 type Lang = "en" | "bn";
 const Ctx = createContext<{ lang: Lang; t: (k: string) => string; toggle: () => void }>({ lang: "en", t: (k) => k, toggle: () => {} });
@@ -21,8 +21,10 @@ const DICT: Record<string, { en: string; bn: string }> = {
 };
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Lang>("en");
-  useEffect(() => { const s = localStorage.getItem("lang") as Lang | null; if (s) setLang(s); }, []);
+  const [lang, setLang] = useState<Lang>(() => {
+    if (typeof window !== "undefined") return (localStorage.getItem("lang") as Lang) || "en";
+    return "en";
+  });
   const toggle = () => setLang((l) => { const n: Lang = l === "en" ? "bn" : "en"; localStorage.setItem("lang", n); return n; });
   const t = (k: string) => DICT[k]?.[lang] ?? k;
   return <Ctx.Provider value={{ lang, t, toggle }}>{children}</Ctx.Provider>;
