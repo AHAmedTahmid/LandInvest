@@ -4,6 +4,8 @@ import { getTenantClientFromSession } from "@/lib/tenant";
 import { can } from "@/lib/rbac";
 import { formatBDT, toNum } from "@/lib/format";
 import DashboardCharts from "./Charts";
+import Tiles from "./Tiles";
+import T from "@/components/T";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -43,24 +45,17 @@ export default async function DashboardPage() {
   }));
 
   const tiles = [
-    { label: "Total Capital", value: totalCapital },
-    { label: "Total Land Cost", value: totalLandCost },
-    { label: "Total Expenses", value: totalExpenses },
-    { label: "Total Sales Collected", value: totalSales },
-    { label: "Net P&L", value: netPnL },
+    { key: "totalCapital", value: totalCapital },
+    { key: "totalLandCost", value: totalLandCost },
+    { key: "totalExpenses", value: totalExpenses },
+    { key: "totalSales", value: totalSales },
+    { key: "netPnL", value: netPnL },
   ];
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {tiles.map(t=>(
-          <div key={t.label} className="bg-white rounded-xl shadow p-4 border">
-            <div className="text-sm text-gray-500">{t.label}</div>
-            <div className="text-lg font-bold">{formatBDT(t.value)}</div>
-          </div>
-        ))}
-      </div>
+      <h1 className="text-2xl font-bold"><T k="dashboard" /></h1>
+      <Tiles tiles={tiles} />
       <DashboardCharts costByProject={costByProject} />
       <div className="bg-white rounded-xl shadow border p-4">
         <h2 className="font-semibold mb-2">Recent Treasury Ledger (5)</h2>

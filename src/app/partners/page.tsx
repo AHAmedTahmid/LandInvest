@@ -6,6 +6,7 @@ import { formatBDT, toNum } from "@/lib/format";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import PartnersForm from "./PartnersForm";
+import T from "@/components/T";
 
 function getPartnerBalance(opening: number, txs: any[]) {
   let bal = opening;
@@ -63,11 +64,11 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Partners</h1>
+      <h1 className="text-2xl font-bold"><T k="partners" /></h1>
       <PartnersForm action={upsert} />
 
       <table className="w-full text-sm bg-white rounded-xl shadow border">
-        <thead><tr className="border-b text-left"><th className="p-2">Name</th><th>Phone</th><th>NID</th><th>Opening</th><th>Live Balance</th><th>Ledger</th></tr></thead>
+        <thead><tr className="border-b text-left"><th className="p-2"><T k="name" /></th><th><T k="phone" /></th><th><T k="nid" /></th><th><T k="opening" /></th><th><T k="liveBalance" /></th><th><T k="ledger" /></th></tr></thead>
         <tbody>{partners.map((p: any) => {
           const bal = getPartnerBalance(toNum(p.openingBalance), p.partnerTransactions);
           return <tr key={p.id} className="border-b"><td className="p-2">{p.name}</td><td>{p.phone}</td><td>{p.nidNumber||"-"}</td><td>{formatBDT(toNum(p.openingBalance))}</td><td className="font-bold">{formatBDT(bal)}</td><td><a href={`/partners?view=${p.id}`} className="text-blue-600 underline">View</a></td></tr>;
@@ -76,8 +77,8 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
 
       {viewId && (
         <div className="bg-white p-4 rounded-xl shadow border">
-          <h2 className="font-semibold mb-2">Capital Ledger for {viewPartner?.name ?? viewId}</h2>
-          <table className="w-full text-sm"><thead><tr className="border-b text-left"><th>Date</th><th>Type</th><th>Amount</th><th>Notes</th></tr></thead>
+          <h2 className="font-semibold mb-2"><T k="capitalLedger" /> {viewPartner?.name ?? viewId}</h2>
+          <table className="w-full text-sm"><thead><tr className="border-b text-left"><th><T k="date" /></th><th><T k="type" /></th><th><T k="amount" /></th><th><T k="notes" /></th></tr></thead>
             <tbody>{viewTxs.map((t: any) => <tr key={t.id} className="border-b"><td>{new Date(t.txnDate).toLocaleDateString()}</td><td>{t.txnType}</td><td>{formatBDT(toNum(t.amount))}</td><td>{t.notes||"-"}</td></tr>)}</tbody>
           </table>
         </div>
