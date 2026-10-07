@@ -15,16 +15,20 @@ export default async function ReportsPage() {
   const prisma: any = await getTenantClientFromSession();
   const raw = await computePnl(prisma);
   const pnl = raw.map((r: any) => ({
-    ...r,
+    projectId: r.projectId,
+    projectName: r.projectName,
     revenue: Number(r.revenue),
     landCost: Number(r.landCost),
     expCost: Number(r.expCost),
     totalCost: Number(r.totalCost),
     netProfit: Number(r.netProfit),
     partners: r.partners.map((pp: any) => ({
-      ...pp,
       sharePercentage: Number(pp.sharePercentage),
-      partner: { ...pp.partner },
+      partner: {
+        id: pp.partner.id,
+        name: pp.partner.name,
+        openingBalance: Number(pp.partner.openingBalance ?? 0),
+      },
     })),
   }));
 
