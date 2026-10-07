@@ -13,7 +13,20 @@ export default async function ReportsPage() {
   if (!can(role, "viewDashboard")) return <div className="p-8 text-red-600">Forbidden: viewDashboard</div>;
 
   const prisma: any = await getTenantClientFromSession();
-  const pnl = await computePnl(prisma);
+  const raw = await computePnl(prisma);
+  const pnl = raw.map((r: any) => ({
+    ...r,
+    revenue: Number(r.revenue),
+    landCost: Number(r.landCost),
+    expCost: Number(r.expCost),
+    totalCost: Number(r.totalCost),
+    netProfit: Number(r.netProfit),
+    partners: r.partners.map((pp: any) => ({
+      ...pp,
+      sharePercentage: Number(pp.sharePercentage),
+      partner: { ...pp.partner },
+    })),
+  }));
 
   async function distribute(formData: FormData) {
     "use server";
