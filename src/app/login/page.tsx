@@ -5,18 +5,11 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, Users, Wallet, BadgeDollarSign } from "lucide-react";
 
-const DEMO = [
-  { label: "Owner", email: "owner@demo.com" },
-  { label: "Admin", email: "admin@demo.com" },
-  { label: "Site", email: "site@demo.com" },
-  { label: "Account", email: "acct@demo.com" },
-];
-
 const BARS = [38, 62, 45, 78, 55, 90, 68, 84, 52, 96, 70, 60];
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("123456");
+  const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -113,7 +106,10 @@ export default function LoginPage() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-600">Password</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-600">Password</label>
+                  <Link href="/forgot-password" className="text-xs font-semibold text-brand-700 hover:underline">Forgot password?</Link>
+                </div>
                 <div className="mt-1.5 relative">
                   <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" type={showPw ? "text" : "password"} required
@@ -130,18 +126,6 @@ export default function LoginPage() {
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Sign in <ArrowRight className="w-4 h-4" /></>}
               </button>
             </form>
-
-            <div className="rounded-xl bg-slate-50 border border-slate-100 p-3.5">
-              <p className="text-[11px] font-semibold text-slate-500 mb-2">DEMO ACCOUNTS — TAP TO FILL</p>
-              <div className="flex flex-wrap gap-2">
-                {DEMO.map(d => (
-                  <button key={d.email} onClick={() => { setEmail(d.email); setPassword("123456"); setError(""); }}
-                    className={`text-xs px-3 py-1.5 rounded-full border transition ${email === d.email ? "bg-brand-700 text-white border-brand-700" : "bg-white text-slate-600 border-slate-200 hover:border-brand-600 hover:text-brand-700"}`}>
-                    {d.label}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <p className="text-center text-sm text-slate-500">
               New organization? <Link href="/signup" className="font-semibold text-brand-700 hover:underline">Create account</Link>

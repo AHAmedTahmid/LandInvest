@@ -91,6 +91,17 @@ model UserInvitation {
   @@map("user_invitations")
 }
 
+model PasswordResetToken {
+  id        String   @id @default(uuid()) @db.Char(36)
+  userId    String   @map("user_id") @db.Char(36)
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @map("expires_at") @db.Timestamp(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
 model BillingInvoice {
   id                String        @id @default(uuid()) @db.Char(36)
   tenantId          String        @map("tenant_id") @db.Char(36)

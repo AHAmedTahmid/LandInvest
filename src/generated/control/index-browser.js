@@ -177,6 +177,14 @@ exports.Prisma.UserInvitationScalarFieldEnum = {
   accepted: 'accepted'
 };
 
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.BillingInvoiceScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
@@ -255,6 +263,12 @@ exports.Prisma.UserInvitationOrderByRelevanceFieldEnum = {
   inviteToken: 'inviteToken'
 };
 
+exports.Prisma.PasswordResetTokenOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token'
+};
+
 exports.Prisma.BillingInvoiceOrderByRelevanceFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
@@ -271,6 +285,7 @@ exports.Prisma.ModelName = {
   Subscription: 'Subscription',
   GlobalUser: 'GlobalUser',
   UserInvitation: 'UserInvitation',
+  PasswordResetToken: 'PasswordResetToken',
   BillingInvoice: 'BillingInvoice'
 };
 

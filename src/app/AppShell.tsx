@@ -40,7 +40,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { t, lang, toggle } = useLang();
-  const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname?.startsWith("/invite");
+  const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname === "/forgot-password" || pathname?.startsWith("/invite") || pathname?.startsWith("/reset-password");
   const [perms, setPerms] = useState<string[] | null>(null);
   const [me, setMe] = useState<{ fullName: string | null; email: string | null } | null>(null);
 
