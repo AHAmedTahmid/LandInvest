@@ -16,6 +16,7 @@ const DICT: Record<string, { en: string; bn: string }> = {
   users: { en: "Users", bn: "ব্যবহারকারী" },
   roles: { en: "Roles", bn: "ভূমিকা" },
   administration: { en: "Administration", bn: "প্রশাসন" },
+  logout: { en: "Log out", bn: "লগ আউট" },
   executive: { en: "Executive Overview", bn: "এক্সিকিউটিভ ওভারভিউ" },
   fy: { en: "FY 2026-2027", bn: "অর্থবছর ২০২৬-২০২৭" },
   newEntry: { en: "New Entry", bn: "নতুন এন্ট্রি" },

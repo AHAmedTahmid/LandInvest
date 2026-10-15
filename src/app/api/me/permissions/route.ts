@@ -10,7 +10,7 @@ export async function GET() {
   const perms = await getUserPermissions(session);
   const me: any = await (controlPrisma as any).globalUser.findUnique({
     where: { id: (session.user as any).id },
-    select: { mustChangePassword: true },
+    select: { fullName: true, email: true, mustChangePassword: true },
   });
-  return NextResponse.json({ permissions: perms, isOwner: !!(session.user as any).isOwner, mustChangePassword: !!me?.mustChangePassword });
+  return NextResponse.json({ permissions: perms, isOwner: !!(session.user as any).isOwner, mustChangePassword: !!me?.mustChangePassword, fullName: me?.fullName ?? null, email: me?.email ?? null });
 }

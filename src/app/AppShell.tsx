@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Users, Wallet, Map, Receipt, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, Map, Receipt, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { useLang } from "@/lib/i18n";
 
 const NAV = [
@@ -41,6 +42,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { t, lang, toggle } = useLang();
   const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname?.startsWith("/invite");
   const [perms, setPerms] = useState<string[] | null>(null);
+  const [me, setMe] = useState<{ fullName: string | null; email: string | null } | null>(null);
 
   // load my permissions once; hide menu items I may not open, force password change when required
   useEffect(() => {
@@ -49,6 +51,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     fetch("/api/me/permissions").then(r => (r.ok ? r.json() : null)).then(d => {
       if (!active || !d) return;
       setPerms(d.permissions ?? []);
+      setMe({ fullName: d.fullName ?? null, email: d.email ?? null });
       if (d.mustChangePassword && pathname !== "/change-password") router.replace("/change-password");
     }).catch(() => {});
     return () => { active = false; };
@@ -98,9 +101,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           )}
         </nav>
         <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-white">SA</div>
-          <div className="flex-1 min-w-0"><p className="text-xs font-medium text-white truncate">Super Admin</p><p className="text-[10px] text-slate-400 truncate">Dhaka HQ Office</p></div>
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-white">{(me?.fullName ?? me?.email ?? "?").trim().charAt(0).toUpperCase()}</div>
+          <div className="flex-1 min-w-0"><p className="text-xs font-medium text-white truncate">{me?.fullName ?? me?.email ?? "…"}</p><p className="text-[10px] text-slate-400 truncate">{me?.email ?? ""}</p></div>
+          <button onClick={() => signOut({ callbackUrl: "/login" })} title={t("logout")} className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
