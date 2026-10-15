@@ -7,7 +7,7 @@ import { computePnl } from "@/lib/pnl";
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session) return new Response("Unauthorized", { status: 401 });
-  if (!can((session.user as any).role, "viewDashboard")) return new Response("Forbidden", { status: 403 });
+  if (!(await can(session, "dashboard.view"))) return new Response("Forbidden", { status: 403 });
   const prisma: any = await getTenantClientFromSession();
   const pnl = await computePnl(prisma);
   let csv = "Project,Revenue,Land Cost,Expenses,Total Cost,Net Profit\n";

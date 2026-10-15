@@ -10,7 +10,7 @@ import T from "@/components/T";
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   const role: any = (session?.user as any)?.role;
-  if (!can(role, "viewDashboard")) return <div className="p-8 text-red-600">Forbidden: viewDashboard</div>;
+  if (!(await can(session, "dashboard.view"))) return <div className="p-8 text-red-600">Forbidden: viewDashboard</div>;
   const prisma: any = await getTenantClientFromSession();
 
   const [partners, projects, expenses, payments, ledger] = await Promise.all([

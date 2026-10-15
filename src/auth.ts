@@ -29,7 +29,9 @@ export const authOptions: NextAuthOptions = {
           id: String(user.id),
           email: user.email,
           tenantId: user.tenantId,
-          role: user.role,
+          isOwner: !!user.isOwner,
+          isActive: user.isActive,
+          mustChangePassword: !!user.mustChangePassword,
           fullName: user.fullName,
           dbName: user.tenant?.dbName ?? null,
         } as any;
@@ -43,8 +45,9 @@ export const authOptions: NextAuthOptions = {
         (token as any).user_id = user.id;
         (token as any).tenant_id = user.tenantId;
         token.tenantId = user.tenantId;
-        (token as any).role = user.role;
-        token.role = user.role;
+        (token as any).is_owner = user.isOwner;
+        (token as any).isOwner = user.isOwner;
+        (token as any).must_change_password = user.mustChangePassword;
         (token as any).full_name = user.fullName;
         (token as any).fullName = user.fullName;
         (token as any).dbName = user.dbName;
@@ -53,11 +56,25 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }: any) {
       if (token) {
+        // re-check isActive on every session refresh (deactivated users are rejected at next request)
+        try {
+          const uid = token.sub ?? (token as any).user_id;
+          if (uid) {
+            const gu: any = await (controlPrisma as any).globalUser.findUnique({ where: { id: String(uid) }, select: { isActive: true, isOwner: true, mustChangePassword: true } });
+            if (!gu || gu.isActive === false) {
+              (session as any).error = "Deactivated";
+            }
+            (token as any).is_owner = gu?.isOwner ?? (token as any).is_owner;
+            (token as any).must_change_password = gu?.mustChangePassword ?? (token as any).must_change_password;
+          }
+        } catch {}
         (session.user as any) = {
           id: token.sub ?? (token as any).user_id,
           email: token.email ?? session.user?.email,
           tenantId: (token as any).tenant_id ?? token.tenantId,
-          role: (token as any).role ?? token.role,
+          isOwner: !!(token as any).is_owner || !!(token as any).isOwner,
+          is_owner: !!(token as any).is_owner || !!(token as any).isOwner,
+          mustChangePassword: !!(token as any).must_change_password,
           fullName: (token as any).full_name ?? (token as any).fullName,
           dbName: (token as any).dbName,
         };

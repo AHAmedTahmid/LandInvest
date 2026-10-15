@@ -9,7 +9,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id: recordId } = await params;
   const s = await getServerSession(authOptions);
   if (!s) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!can((s.user as any).role, "receiveSales")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await can(s, "sales.view"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { amount, payment_method, bank_account } = await req.json();
   const prisma: any = await getTenantClientFromSession();
   try {

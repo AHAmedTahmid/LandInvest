@@ -8,7 +8,7 @@ import PrintButton from "@/components/PrintButton";
 export default async function SaleDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
-  if (!can((session?.user as any)?.role, "receiveSales")) return <div className="p-8 text-red-600">Forbidden: receiveSales</div>;
+  if (!(await can(session, "sales.view"))) return <div className="p-8 text-red-600">Forbidden: receiveSales</div>;
 
   const prisma: any = await getTenantClientFromSession();
   const sale = await prisma.landSale.findUnique({ where: { id }, include: { customerPayments: true, installmentSchedules: true } });
@@ -19,7 +19,7 @@ export default async function SaleDetail({ params }: { params: Promise<{ id: str
     "use server";
     const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
     const { can: canFn } = await import("@/lib/rbac");
-    if (!canFn((s!.user as any).role, "receiveSales")) throw new Error("Forbidden: receiveSales");
+    if (!canFn((s!.user as any).role, "sales.view")) throw new Error("Forbidden: receiveSales");
     const { getTenantClientFromSession: gc } = await import("@/lib/tenant");
     const { collectPayment } = await import("@/lib/collections");
     const p: any = await gc();

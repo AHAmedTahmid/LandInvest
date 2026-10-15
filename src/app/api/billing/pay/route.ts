@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 export async function POST(req:Request){
   const s=await getServerSession(authOptions);
   if(!s) return NextResponse.json({error:"Unauthorized"},{status:401});
-  if(!can((s.user as any).role,"manageBilling")) return NextResponse.json({error:"Forbidden"},{status:403});
+  if (!(await can(s, "billing.manage"))) return NextResponse.json({error:"Forbidden"},{status:403});
   const {invoiceId}=await req.json();
   const inv=await (controlPrisma as any).billingInvoice.update({where:{id:invoiceId},data:{status:"paid"}});
   return NextResponse.json(inv);

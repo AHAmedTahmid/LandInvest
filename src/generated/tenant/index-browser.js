@@ -269,6 +269,28 @@ exports.Prisma.AuditLogScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  isSystem: 'isSystem',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RolePermissionScalarFieldEnum = {
+  roleId: 'roleId',
+  permissionKey: 'permissionKey'
+};
+
+exports.Prisma.UserRoleScalarFieldEnum = {
+  userId: 'userId',
+  roleId: 'roleId',
+  assignedBy: 'assignedBy',
+  assignedAt: 'assignedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -406,6 +428,24 @@ exports.Prisma.AuditLogOrderByRelevanceFieldEnum = {
   changedBy: 'changedBy'
 };
 
+exports.Prisma.RoleOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  createdBy: 'createdBy'
+};
+
+exports.Prisma.RolePermissionOrderByRelevanceFieldEnum = {
+  roleId: 'roleId',
+  permissionKey: 'permissionKey'
+};
+
+exports.Prisma.UserRoleOrderByRelevanceFieldEnum = {
+  userId: 'userId',
+  roleId: 'roleId',
+  assignedBy: 'assignedBy'
+};
+
 
 exports.Prisma.ModelName = {
   Partner: 'Partner',
@@ -420,7 +460,10 @@ exports.Prisma.ModelName = {
   InstallmentSchedule: 'InstallmentSchedule',
   CustomerPayment: 'CustomerPayment',
   ProfitDistribution: 'ProfitDistribution',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  Role: 'Role',
+  RolePermission: 'RolePermission',
+  UserRole: 'UserRole'
 };
 
 /**

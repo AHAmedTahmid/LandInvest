@@ -9,7 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "setup": "node scripts/setup.mjs",
-    "seed:roles": "node scripts/seed_roles.mjs",
+    "seed:roles": "tsx scripts/seed_roles.mjs",
     "worker": "tsx src/worker.ts",
     "acceptance": "node scripts/acceptance.mjs",
     "dev:all": "start /b npm run worker && npm run dev"

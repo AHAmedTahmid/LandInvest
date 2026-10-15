@@ -30,8 +30,15 @@ const tenant = await prisma.tenant.upsert({
 });
 await prisma.globalUser.upsert({
   where: { email: "admin@demo.com" },
-  update: { passwordHash: hash, tenantId: tenant.id, role: "managing_partner", fullName: "Demo Admin" },
-  create: { tenantId: tenant.id, fullName: "Demo Admin", email: "admin@demo.com", passwordHash: hash, role: "managing_partner" },
+  update: { passwordHash: hash, tenantId: tenant.id, isOwner: false, fullName: "Demo Admin" },
+  create: { tenantId: tenant.id, fullName: "Demo Admin", email: "admin@demo.com", passwordHash: hash, isOwner: false },
+});
+// ensure owner exists for demo tenant
+const ownerHash = hash;
+await prisma.globalUser.upsert({
+  where: { email: "owner@demo.com" },
+  update: { passwordHash: ownerHash, tenantId: tenant.id, isOwner: true, fullName: "Owner" },
+  create: { tenantId: tenant.id, fullName: "Owner", email: "owner@demo.com", passwordHash: ownerHash, isOwner: true },
 });
 await prisma.subscription.upsert({
   where: { id: "00000000-0000-0000-0000-000000000002" },
@@ -41,7 +48,6 @@ await prisma.subscription.upsert({
 if ((await prisma.billingInvoice.count({ where: { tenantId: tenant.id } })) === 0) {
   await prisma.billingInvoice.create({ data: { tenantId: tenant.id, subscriptionId: "00000000-0000-0000-0000-000000000002", amount: 1000, currency: "BDT", status: "paid", invoiceDate: new Date() } });
 }
-await prisma.$disconnect();
 
 // Same default expense categories the provisioning worker creates for new tenants
 const tenantConn = await mysql.createConnection({ host: "localhost", user: "root", password: "", database: TENANT_DB });
@@ -54,4 +60,31 @@ const { randomUUID } = await import("crypto");
 for (const [name, kind] of categories) await tenantConn.query("INSERT IGNORE INTO default_categories (id,name,kind) VALUES (?,?,?)", [randomUUID(), name, kind]);
 await tenantConn.end();
 
-console.log("Seed done: admin@demo.com / 123456 | billing stubbed | default categories ready");
+// seed RBAC default roles and assign
+const { PrismaClient: TenantClient } = await import("../src/generated/tenant/index.js");
+const tPrisma = new TenantClient({ datasources: { db: { url: `mysql://root:@localhost:3306/${TENANT_DB}` } } });
+const { seedDefaultRoles } = await import("../src/lib/seedRoles.js");
+const ownerUser = await prisma.globalUser.findUnique({ where: { email: "owner@demo.com" } });
+await seedDefaultRoles(tPrisma, ownerUser?.id ?? null);
+if (ownerUser) {
+  const ownerRole = await tPrisma.role.findUnique({ where: { name: "Owner" } });
+  if (ownerRole) await tPrisma.userRole.upsert({ where: { userId: ownerUser.id }, update: { roleId: ownerRole.id }, create: { userId: ownerUser.id, roleId: ownerRole.id, assignedBy: ownerUser.id } });
+  // assign other demo users if they exist
+  const mpRole = await tPrisma.role.findUnique({ where: { name: "Managing Partner" } });
+  const smRole = await tPrisma.role.findUnique({ where: { name: "Site Manager" } });
+  const acRole = await tPrisma.role.findUnique({ where: { name: "Accountant" } });
+  const extras = [
+    ["admin@demo.com", mpRole?.id],
+    ["site@demo.com", smRole?.id],
+    ["acct@demo.com", acRole?.id],
+  ];
+  for (const [email, roleId] of extras) {
+    if (!roleId) continue;
+    const u = await prisma.globalUser.findUnique({ where: { email } });
+    if (u) await tPrisma.userRole.upsert({ where: { userId: u.id }, update: { roleId }, create: { userId: u.id, roleId, assignedBy: ownerUser.id } });
+  }
+}
+await tPrisma.$disconnect();
+await prisma.$disconnect();
+
+console.log("Seed done: owner@demo.com (Owner) / admin@demo.com / 123456 | billing stubbed | default categories + RBAC ready");

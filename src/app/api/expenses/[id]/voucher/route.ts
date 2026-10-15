@@ -9,7 +9,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const s = await getServerSession(authOptions);
   if (!s) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!can((s.user as any).role, "createExpense") && !can((s.user as any).role, "approveExpense")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await can(s, "expenses.view"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const prisma: any = await getTenantClientFromSession();
   const exp = await prisma.projectExpense.findUnique({ where: { id }, include: { project: true, paidByPartner: true } });
   if (!exp) return NextResponse.json({ error: "Not found" }, { status: 404 });

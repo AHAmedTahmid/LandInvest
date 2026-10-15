@@ -14,8 +14,8 @@ async function sessionOr401() {
 export async function POST(req: NextRequest) {
   const session = await sessionOr401();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any).role;
-  if (!can(role, "bankTransfer")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await can(session, "treasury.contra.create"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const canApprove = await can(session, "treasury.contra.approve");
   const { fromType, toType, bankAccountId, amount, purpose } = await req.json();
   const prisma: any = await getTenantClientFromSession();
   try {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       bankAccountId: bankAccountId || null,
       purpose: purpose || "Contra",
       userId: (session.user as any).id,
-      role,
+      role: canApprove ? "super_admin" : "accountant",
     });
     return NextResponse.json(res);
   } catch (e: any) {
@@ -37,8 +37,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   const session = await sessionOr401();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const role = (session.user as any).role;
-  if (!can(role, "bankTransfer") && !can(role, "approveExpense")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await can(session, "treasury.view"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const prisma: any = await getTenantClientFromSession();
   return NextResponse.json(await listContraRequests(prisma));
 }

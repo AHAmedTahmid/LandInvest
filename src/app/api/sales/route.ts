@@ -7,13 +7,13 @@ import { sellPlot, writeAudit } from "@/lib/tenantRules";
 import { randomUUID } from "crypto";
 export async function GET(){
   const s=await getServerSession(authOptions); if(!s) return NextResponse.json({error:"Unauthorized"},{status:401});
-  if(!can((s.user as any).role,"receiveSales")) return NextResponse.json({error:"Forbidden"},{status:403});
+  if (!(await can(s, "sales.view"))) return NextResponse.json({error:"Forbidden"},{status:403});
   const prisma:any=await getTenantClientFromSession();
   return NextResponse.json(await prisma.landSale.findMany({orderBy:{saleDate:"desc"}}));
 }
 export async function POST(req:NextRequest){
   const s=await getServerSession(authOptions); if(!s) return NextResponse.json({error:"Unauthorized"},{status:401});
-  if(!can((s.user as any).role,"receiveSales")) return NextResponse.json({error:"Forbidden"},{status:403});
+  if (!(await can(s, "sales.create"))) return NextResponse.json({error:"Forbidden"},{status:403});
   const b=await req.json();
   const userId=(s.user as any).id; const prisma:any=await getTenantClientFromSession();
   const saleId=randomUUID();

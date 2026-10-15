@@ -21,7 +21,7 @@ function getPartnerBalance(opening: number, txs: any[]) {
 export default async function PartnersPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const session = await getServerSession(authOptions);
   const role: any = (session?.user as any)?.role;
-  if (!can(role, "managePartners")) return <div className="p-8 text-red-600">Forbidden: managePartners</div>;
+  if (!(await can(session, "partners.manage"))) return <div className="p-8 text-red-600">Forbidden: managePartners</div>;
   const prisma: any = await getTenantClientFromSession();
   const partners = await prisma.partner.findMany({ include: { partnerTransactions: true }, orderBy: { createdAt: "desc" } });
   const sp = await searchParams;

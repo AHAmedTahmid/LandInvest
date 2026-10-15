@@ -8,7 +8,7 @@ import { distributeProject } from "@/lib/pnl";
 export async function POST(req: NextRequest) {
   const s = await getServerSession(authOptions);
   if (!s) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!can((s.user as any).role, "distributeProfits")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await can(s, "profit.distribute"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { projectId, basis } = await req.json();
   if (!projectId) return NextResponse.json({ error: "projectId required" }, { status: 400 });
   const prisma: any = await getTenantClientFromSession();

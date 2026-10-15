@@ -50,8 +50,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // hydration-safe: server renders "en", client hydrates "en" then switches after mount
   useEffect(() => {
     const s = localStorage.getItem("lang") as Lang | null;
-    if (s) setLang(s);
     // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (s) setLang(s);
   }, []);
   const toggle = () => setLang((l) => { const n: Lang = l === "en" ? "bn" : "en"; localStorage.setItem("lang", n); return n; });
   const t = (k: string) => DICT[k]?.[lang] ?? k;

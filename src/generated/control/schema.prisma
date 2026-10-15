@@ -61,16 +61,17 @@ model Subscription {
 }
 
 model GlobalUser {
-  id           String    @id @default(uuid()) @db.Char(36)
-  tenantId     String    @map("tenant_id") @db.Char(36)
-  tenant       Tenant    @relation(fields: [tenantId], references: [id])
-  fullName     String    @map("full_name") @db.VarChar(150)
-  email        String    @unique @db.VarChar(255)
-  passwordHash String    @map("password_hash") @db.Text
-  role         String    @db.VarChar(50)
-  isActive     Boolean   @default(true) @map("is_active")
-  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamp(0)
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  id                 String    @id @default(uuid()) @db.Char(36)
+  tenantId           String    @map("tenant_id") @db.Char(36)
+  tenant             Tenant    @relation(fields: [tenantId], references: [id])
+  fullName           String    @map("full_name") @db.VarChar(150)
+  email              String    @unique @db.VarChar(255)
+  passwordHash       String    @map("password_hash") @db.Text
+  isOwner            Boolean   @default(false) @map("is_owner")
+  isActive           Boolean   @default(true) @map("is_active")
+  mustChangePassword Boolean   @default(false) @map("must_change_password")
+  lastLoginAt        DateTime? @map("last_login_at") @db.Timestamp(0)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
 
   @@index([tenantId])
   @@map("global_users")
@@ -81,7 +82,7 @@ model UserInvitation {
   tenantId    String   @map("tenant_id") @db.Char(36)
   tenant      Tenant   @relation(fields: [tenantId], references: [id])
   email       String   @db.VarChar(255)
-  role        String   @db.VarChar(50)
+  roleId      String   @map("role_id") @db.Char(36)
   inviteToken String   @unique @map("invite_token") @db.VarChar(255)
   expiresAt   DateTime @map("expires_at") @db.Timestamp(0)
   accepted    Boolean  @default(false)

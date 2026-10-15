@@ -4501,8 +4501,9 @@ export namespace Prisma {
     fullName: string | null
     email: string | null
     passwordHash: string | null
-    role: string | null
+    isOwner: boolean | null
     isActive: boolean | null
+    mustChangePassword: boolean | null
     lastLoginAt: Date | null
     createdAt: Date | null
   }
@@ -4513,8 +4514,9 @@ export namespace Prisma {
     fullName: string | null
     email: string | null
     passwordHash: string | null
-    role: string | null
+    isOwner: boolean | null
     isActive: boolean | null
+    mustChangePassword: boolean | null
     lastLoginAt: Date | null
     createdAt: Date | null
   }
@@ -4525,8 +4527,9 @@ export namespace Prisma {
     fullName: number
     email: number
     passwordHash: number
-    role: number
+    isOwner: number
     isActive: number
+    mustChangePassword: number
     lastLoginAt: number
     createdAt: number
     _all: number
@@ -4539,8 +4542,9 @@ export namespace Prisma {
     fullName?: true
     email?: true
     passwordHash?: true
-    role?: true
+    isOwner?: true
     isActive?: true
+    mustChangePassword?: true
     lastLoginAt?: true
     createdAt?: true
   }
@@ -4551,8 +4555,9 @@ export namespace Prisma {
     fullName?: true
     email?: true
     passwordHash?: true
-    role?: true
+    isOwner?: true
     isActive?: true
+    mustChangePassword?: true
     lastLoginAt?: true
     createdAt?: true
   }
@@ -4563,8 +4568,9 @@ export namespace Prisma {
     fullName?: true
     email?: true
     passwordHash?: true
-    role?: true
+    isOwner?: true
     isActive?: true
+    mustChangePassword?: true
     lastLoginAt?: true
     createdAt?: true
     _all?: true
@@ -4648,8 +4654,9 @@ export namespace Prisma {
     fullName: string
     email: string
     passwordHash: string
-    role: string
+    isOwner: boolean
     isActive: boolean
+    mustChangePassword: boolean
     lastLoginAt: Date | null
     createdAt: Date
     _count: GlobalUserCountAggregateOutputType | null
@@ -4677,8 +4684,9 @@ export namespace Prisma {
     fullName?: boolean
     email?: boolean
     passwordHash?: boolean
-    role?: boolean
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     tenant?: boolean | TenantDefaultArgs<ExtArgs>
@@ -4692,13 +4700,14 @@ export namespace Prisma {
     fullName?: boolean
     email?: boolean
     passwordHash?: boolean
-    role?: boolean
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
   }
 
-  export type GlobalUserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tenantId" | "fullName" | "email" | "passwordHash" | "role" | "isActive" | "lastLoginAt" | "createdAt", ExtArgs["result"]["globalUser"]>
+  export type GlobalUserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tenantId" | "fullName" | "email" | "passwordHash" | "isOwner" | "isActive" | "mustChangePassword" | "lastLoginAt" | "createdAt", ExtArgs["result"]["globalUser"]>
   export type GlobalUserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tenant?: boolean | TenantDefaultArgs<ExtArgs>
   }
@@ -4714,8 +4723,9 @@ export namespace Prisma {
       fullName: string
       email: string
       passwordHash: string
-      role: string
+      isOwner: boolean
       isActive: boolean
+      mustChangePassword: boolean
       lastLoginAt: Date | null
       createdAt: Date
     }, ExtArgs["result"]["globalUser"]>
@@ -5093,8 +5103,9 @@ export namespace Prisma {
     readonly fullName: FieldRef<"GlobalUser", 'String'>
     readonly email: FieldRef<"GlobalUser", 'String'>
     readonly passwordHash: FieldRef<"GlobalUser", 'String'>
-    readonly role: FieldRef<"GlobalUser", 'String'>
+    readonly isOwner: FieldRef<"GlobalUser", 'Boolean'>
     readonly isActive: FieldRef<"GlobalUser", 'Boolean'>
+    readonly mustChangePassword: FieldRef<"GlobalUser", 'Boolean'>
     readonly lastLoginAt: FieldRef<"GlobalUser", 'DateTime'>
     readonly createdAt: FieldRef<"GlobalUser", 'DateTime'>
   }
@@ -5472,7 +5483,7 @@ export namespace Prisma {
     id: string | null
     tenantId: string | null
     email: string | null
-    role: string | null
+    roleId: string | null
     inviteToken: string | null
     expiresAt: Date | null
     accepted: boolean | null
@@ -5482,7 +5493,7 @@ export namespace Prisma {
     id: string | null
     tenantId: string | null
     email: string | null
-    role: string | null
+    roleId: string | null
     inviteToken: string | null
     expiresAt: Date | null
     accepted: boolean | null
@@ -5492,7 +5503,7 @@ export namespace Prisma {
     id: number
     tenantId: number
     email: number
-    role: number
+    roleId: number
     inviteToken: number
     expiresAt: number
     accepted: number
@@ -5504,7 +5515,7 @@ export namespace Prisma {
     id?: true
     tenantId?: true
     email?: true
-    role?: true
+    roleId?: true
     inviteToken?: true
     expiresAt?: true
     accepted?: true
@@ -5514,7 +5525,7 @@ export namespace Prisma {
     id?: true
     tenantId?: true
     email?: true
-    role?: true
+    roleId?: true
     inviteToken?: true
     expiresAt?: true
     accepted?: true
@@ -5524,7 +5535,7 @@ export namespace Prisma {
     id?: true
     tenantId?: true
     email?: true
-    role?: true
+    roleId?: true
     inviteToken?: true
     expiresAt?: true
     accepted?: true
@@ -5607,7 +5618,7 @@ export namespace Prisma {
     id: string
     tenantId: string
     email: string
-    role: string
+    roleId: string
     inviteToken: string
     expiresAt: Date
     accepted: boolean
@@ -5634,7 +5645,7 @@ export namespace Prisma {
     id?: boolean
     tenantId?: boolean
     email?: boolean
-    role?: boolean
+    roleId?: boolean
     inviteToken?: boolean
     expiresAt?: boolean
     accepted?: boolean
@@ -5647,13 +5658,13 @@ export namespace Prisma {
     id?: boolean
     tenantId?: boolean
     email?: boolean
-    role?: boolean
+    roleId?: boolean
     inviteToken?: boolean
     expiresAt?: boolean
     accepted?: boolean
   }
 
-  export type UserInvitationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tenantId" | "email" | "role" | "inviteToken" | "expiresAt" | "accepted", ExtArgs["result"]["userInvitation"]>
+  export type UserInvitationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tenantId" | "email" | "roleId" | "inviteToken" | "expiresAt" | "accepted", ExtArgs["result"]["userInvitation"]>
   export type UserInvitationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tenant?: boolean | TenantDefaultArgs<ExtArgs>
   }
@@ -5667,7 +5678,7 @@ export namespace Prisma {
       id: string
       tenantId: string
       email: string
-      role: string
+      roleId: string
       inviteToken: string
       expiresAt: Date
       accepted: boolean
@@ -6044,7 +6055,7 @@ export namespace Prisma {
     readonly id: FieldRef<"UserInvitation", 'String'>
     readonly tenantId: FieldRef<"UserInvitation", 'String'>
     readonly email: FieldRef<"UserInvitation", 'String'>
-    readonly role: FieldRef<"UserInvitation", 'String'>
+    readonly roleId: FieldRef<"UserInvitation", 'String'>
     readonly inviteToken: FieldRef<"UserInvitation", 'String'>
     readonly expiresAt: FieldRef<"UserInvitation", 'DateTime'>
     readonly accepted: FieldRef<"UserInvitation", 'Boolean'>
@@ -7490,8 +7501,9 @@ export namespace Prisma {
     fullName: 'fullName',
     email: 'email',
     passwordHash: 'passwordHash',
-    role: 'role',
+    isOwner: 'isOwner',
     isActive: 'isActive',
+    mustChangePassword: 'mustChangePassword',
     lastLoginAt: 'lastLoginAt',
     createdAt: 'createdAt'
   };
@@ -7503,7 +7515,7 @@ export namespace Prisma {
     id: 'id',
     tenantId: 'tenantId',
     email: 'email',
-    role: 'role',
+    roleId: 'roleId',
     inviteToken: 'inviteToken',
     expiresAt: 'expiresAt',
     accepted: 'accepted'
@@ -7606,8 +7618,7 @@ export namespace Prisma {
     tenantId: 'tenantId',
     fullName: 'fullName',
     email: 'email',
-    passwordHash: 'passwordHash',
-    role: 'role'
+    passwordHash: 'passwordHash'
   };
 
   export type GlobalUserOrderByRelevanceFieldEnum = (typeof GlobalUserOrderByRelevanceFieldEnum)[keyof typeof GlobalUserOrderByRelevanceFieldEnum]
@@ -7617,7 +7628,7 @@ export namespace Prisma {
     id: 'id',
     tenantId: 'tenantId',
     email: 'email',
-    role: 'role',
+    roleId: 'roleId',
     inviteToken: 'inviteToken'
   };
 
@@ -7939,8 +7950,9 @@ export namespace Prisma {
     fullName?: StringFilter<"GlobalUser"> | string
     email?: StringFilter<"GlobalUser"> | string
     passwordHash?: StringFilter<"GlobalUser"> | string
-    role?: StringFilter<"GlobalUser"> | string
+    isOwner?: BoolFilter<"GlobalUser"> | boolean
     isActive?: BoolFilter<"GlobalUser"> | boolean
+    mustChangePassword?: BoolFilter<"GlobalUser"> | boolean
     lastLoginAt?: DateTimeNullableFilter<"GlobalUser"> | Date | string | null
     createdAt?: DateTimeFilter<"GlobalUser"> | Date | string
     tenant?: XOR<TenantScalarRelationFilter, TenantWhereInput>
@@ -7952,8 +7964,9 @@ export namespace Prisma {
     fullName?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
-    role?: SortOrder
+    isOwner?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     tenant?: TenantOrderByWithRelationInput
@@ -7969,8 +7982,9 @@ export namespace Prisma {
     tenantId?: StringFilter<"GlobalUser"> | string
     fullName?: StringFilter<"GlobalUser"> | string
     passwordHash?: StringFilter<"GlobalUser"> | string
-    role?: StringFilter<"GlobalUser"> | string
+    isOwner?: BoolFilter<"GlobalUser"> | boolean
     isActive?: BoolFilter<"GlobalUser"> | boolean
+    mustChangePassword?: BoolFilter<"GlobalUser"> | boolean
     lastLoginAt?: DateTimeNullableFilter<"GlobalUser"> | Date | string | null
     createdAt?: DateTimeFilter<"GlobalUser"> | Date | string
     tenant?: XOR<TenantScalarRelationFilter, TenantWhereInput>
@@ -7982,8 +7996,9 @@ export namespace Prisma {
     fullName?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
-    role?: SortOrder
+    isOwner?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: GlobalUserCountOrderByAggregateInput
@@ -8000,8 +8015,9 @@ export namespace Prisma {
     fullName?: StringWithAggregatesFilter<"GlobalUser"> | string
     email?: StringWithAggregatesFilter<"GlobalUser"> | string
     passwordHash?: StringWithAggregatesFilter<"GlobalUser"> | string
-    role?: StringWithAggregatesFilter<"GlobalUser"> | string
+    isOwner?: BoolWithAggregatesFilter<"GlobalUser"> | boolean
     isActive?: BoolWithAggregatesFilter<"GlobalUser"> | boolean
+    mustChangePassword?: BoolWithAggregatesFilter<"GlobalUser"> | boolean
     lastLoginAt?: DateTimeNullableWithAggregatesFilter<"GlobalUser"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"GlobalUser"> | Date | string
   }
@@ -8013,7 +8029,7 @@ export namespace Prisma {
     id?: StringFilter<"UserInvitation"> | string
     tenantId?: StringFilter<"UserInvitation"> | string
     email?: StringFilter<"UserInvitation"> | string
-    role?: StringFilter<"UserInvitation"> | string
+    roleId?: StringFilter<"UserInvitation"> | string
     inviteToken?: StringFilter<"UserInvitation"> | string
     expiresAt?: DateTimeFilter<"UserInvitation"> | Date | string
     accepted?: BoolFilter<"UserInvitation"> | boolean
@@ -8024,7 +8040,7 @@ export namespace Prisma {
     id?: SortOrder
     tenantId?: SortOrder
     email?: SortOrder
-    role?: SortOrder
+    roleId?: SortOrder
     inviteToken?: SortOrder
     expiresAt?: SortOrder
     accepted?: SortOrder
@@ -8040,7 +8056,7 @@ export namespace Prisma {
     NOT?: UserInvitationWhereInput | UserInvitationWhereInput[]
     tenantId?: StringFilter<"UserInvitation"> | string
     email?: StringFilter<"UserInvitation"> | string
-    role?: StringFilter<"UserInvitation"> | string
+    roleId?: StringFilter<"UserInvitation"> | string
     expiresAt?: DateTimeFilter<"UserInvitation"> | Date | string
     accepted?: BoolFilter<"UserInvitation"> | boolean
     tenant?: XOR<TenantScalarRelationFilter, TenantWhereInput>
@@ -8050,7 +8066,7 @@ export namespace Prisma {
     id?: SortOrder
     tenantId?: SortOrder
     email?: SortOrder
-    role?: SortOrder
+    roleId?: SortOrder
     inviteToken?: SortOrder
     expiresAt?: SortOrder
     accepted?: SortOrder
@@ -8066,7 +8082,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"UserInvitation"> | string
     tenantId?: StringWithAggregatesFilter<"UserInvitation"> | string
     email?: StringWithAggregatesFilter<"UserInvitation"> | string
-    role?: StringWithAggregatesFilter<"UserInvitation"> | string
+    roleId?: StringWithAggregatesFilter<"UserInvitation"> | string
     inviteToken?: StringWithAggregatesFilter<"UserInvitation"> | string
     expiresAt?: DateTimeWithAggregatesFilter<"UserInvitation"> | Date | string
     accepted?: BoolWithAggregatesFilter<"UserInvitation"> | boolean
@@ -8406,8 +8422,9 @@ export namespace Prisma {
     fullName: string
     email: string
     passwordHash: string
-    role: string
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     tenant: TenantCreateNestedOneWithoutGlobalUsersInput
@@ -8419,8 +8436,9 @@ export namespace Prisma {
     fullName: string
     email: string
     passwordHash: string
-    role: string
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
   }
@@ -8430,8 +8448,9 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    isOwner?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tenant?: TenantUpdateOneRequiredWithoutGlobalUsersNestedInput
@@ -8443,8 +8462,9 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    isOwner?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8455,8 +8475,9 @@ export namespace Prisma {
     fullName: string
     email: string
     passwordHash: string
-    role: string
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
   }
@@ -8466,8 +8487,9 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    isOwner?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8478,8 +8500,9 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    isOwner?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8487,7 +8510,7 @@ export namespace Prisma {
   export type UserInvitationCreateInput = {
     id?: string
     email: string
-    role: string
+    roleId: string
     inviteToken: string
     expiresAt: Date | string
     accepted?: boolean
@@ -8498,7 +8521,7 @@ export namespace Prisma {
     id?: string
     tenantId: string
     email: string
-    role: string
+    roleId: string
     inviteToken: string
     expiresAt: Date | string
     accepted?: boolean
@@ -8507,7 +8530,7 @@ export namespace Prisma {
   export type UserInvitationUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     inviteToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted?: BoolFieldUpdateOperationsInput | boolean
@@ -8518,7 +8541,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tenantId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     inviteToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted?: BoolFieldUpdateOperationsInput | boolean
@@ -8528,7 +8551,7 @@ export namespace Prisma {
     id?: string
     tenantId: string
     email: string
-    role: string
+    roleId: string
     inviteToken: string
     expiresAt: Date | string
     accepted?: boolean
@@ -8537,7 +8560,7 @@ export namespace Prisma {
   export type UserInvitationUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     inviteToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted?: BoolFieldUpdateOperationsInput | boolean
@@ -8547,7 +8570,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tenantId?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     inviteToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted?: BoolFieldUpdateOperationsInput | boolean
@@ -9075,8 +9098,9 @@ export namespace Prisma {
     fullName?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
-    role?: SortOrder
+    isOwner?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -9087,8 +9111,9 @@ export namespace Prisma {
     fullName?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
-    role?: SortOrder
+    isOwner?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -9099,8 +9124,9 @@ export namespace Prisma {
     fullName?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
-    role?: SortOrder
+    isOwner?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -9123,7 +9149,7 @@ export namespace Prisma {
     id?: SortOrder
     tenantId?: SortOrder
     email?: SortOrder
-    role?: SortOrder
+    roleId?: SortOrder
     inviteToken?: SortOrder
     expiresAt?: SortOrder
     accepted?: SortOrder
@@ -9133,7 +9159,7 @@ export namespace Prisma {
     id?: SortOrder
     tenantId?: SortOrder
     email?: SortOrder
-    role?: SortOrder
+    roleId?: SortOrder
     inviteToken?: SortOrder
     expiresAt?: SortOrder
     accepted?: SortOrder
@@ -9143,7 +9169,7 @@ export namespace Prisma {
     id?: SortOrder
     tenantId?: SortOrder
     email?: SortOrder
-    role?: SortOrder
+    roleId?: SortOrder
     inviteToken?: SortOrder
     expiresAt?: SortOrder
     accepted?: SortOrder
@@ -9877,8 +9903,9 @@ export namespace Prisma {
     fullName: string
     email: string
     passwordHash: string
-    role: string
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
   }
@@ -9888,8 +9915,9 @@ export namespace Prisma {
     fullName: string
     email: string
     passwordHash: string
-    role: string
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
   }
@@ -9907,7 +9935,7 @@ export namespace Prisma {
   export type UserInvitationCreateWithoutTenantInput = {
     id?: string
     email: string
-    role: string
+    roleId: string
     inviteToken: string
     expiresAt: Date | string
     accepted?: boolean
@@ -9916,7 +9944,7 @@ export namespace Prisma {
   export type UserInvitationUncheckedCreateWithoutTenantInput = {
     id?: string
     email: string
-    role: string
+    roleId: string
     inviteToken: string
     expiresAt: Date | string
     accepted?: boolean
@@ -10018,8 +10046,9 @@ export namespace Prisma {
     fullName?: StringFilter<"GlobalUser"> | string
     email?: StringFilter<"GlobalUser"> | string
     passwordHash?: StringFilter<"GlobalUser"> | string
-    role?: StringFilter<"GlobalUser"> | string
+    isOwner?: BoolFilter<"GlobalUser"> | boolean
     isActive?: BoolFilter<"GlobalUser"> | boolean
+    mustChangePassword?: BoolFilter<"GlobalUser"> | boolean
     lastLoginAt?: DateTimeNullableFilter<"GlobalUser"> | Date | string | null
     createdAt?: DateTimeFilter<"GlobalUser"> | Date | string
   }
@@ -10047,7 +10076,7 @@ export namespace Prisma {
     id?: StringFilter<"UserInvitation"> | string
     tenantId?: StringFilter<"UserInvitation"> | string
     email?: StringFilter<"UserInvitation"> | string
-    role?: StringFilter<"UserInvitation"> | string
+    roleId?: StringFilter<"UserInvitation"> | string
     inviteToken?: StringFilter<"UserInvitation"> | string
     expiresAt?: DateTimeFilter<"UserInvitation"> | Date | string
     accepted?: BoolFilter<"UserInvitation"> | boolean
@@ -10603,8 +10632,9 @@ export namespace Prisma {
     fullName: string
     email: string
     passwordHash: string
-    role: string
+    isOwner?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
   }
@@ -10612,7 +10642,7 @@ export namespace Prisma {
   export type UserInvitationCreateManyTenantInput = {
     id?: string
     email: string
-    role: string
+    roleId: string
     inviteToken: string
     expiresAt: Date | string
     accepted?: boolean
@@ -10668,8 +10698,9 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    isOwner?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10679,8 +10710,9 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    isOwner?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10690,8 +10722,9 @@ export namespace Prisma {
     fullName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    isOwner?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10699,7 +10732,7 @@ export namespace Prisma {
   export type UserInvitationUpdateWithoutTenantInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     inviteToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted?: BoolFieldUpdateOperationsInput | boolean
@@ -10708,7 +10741,7 @@ export namespace Prisma {
   export type UserInvitationUncheckedUpdateWithoutTenantInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     inviteToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted?: BoolFieldUpdateOperationsInput | boolean
@@ -10717,7 +10750,7 @@ export namespace Prisma {
   export type UserInvitationUncheckedUpdateManyWithoutTenantInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     inviteToken?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accepted?: BoolFieldUpdateOperationsInput | boolean

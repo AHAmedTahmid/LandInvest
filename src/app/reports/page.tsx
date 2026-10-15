@@ -9,8 +9,7 @@ import { revalidatePath } from "next/cache";
 
 export default async function ReportsPage() {
   const session = await getServerSession(authOptions);
-  const role = (session?.user as any)?.role;
-  if (!can(role, "viewDashboard")) return <div className="p-8 text-red-600">Forbidden: viewDashboard</div>;
+  if (!(await can(session, "profit.view")) && !(await can(session, "reports.view"))) return <div className="p-8 text-red-600">Forbidden: reports.view</div>;
 
   const prisma: any = await getTenantClientFromSession();
   const raw = await computePnl(prisma);
@@ -36,7 +35,7 @@ export default async function ReportsPage() {
     "use server";
     const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
     const { can: canFn } = await import("@/lib/rbac");
-    if (!canFn((s!.user as any).role, "distributeProfits")) throw new Error("Forbidden");
+    if (!(await canFn(s, "profit.distribute"))) throw new Error("Forbidden");
     const { getTenantClientFromSession: gc } = await import("@/lib/tenant");
     const { distributeProject: dp } = await import("@/lib/pnl");
     const p: any = await gc();
@@ -48,7 +47,7 @@ export default async function ReportsPage() {
     revalidatePath("/reports");
   }
 
-  const canDistribute = can(role, "distributeProfits");
+  const canDistribute = await can(session, "profit.distribute");
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">PnL Reports</h1>

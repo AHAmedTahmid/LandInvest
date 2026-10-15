@@ -300,8 +300,8 @@ async function phase3Audit(ids) {
 
 const MATRIX = {
   viewDashboard: ["super_admin", "managing_partner"],
-  managePartners: ["super_admin"],
-  addLand: ["super_admin", "managing_partner", "site_manager"], // site_manager = draft access
+  managePartners: ["super_admin", "managing_partner"], // dynamic roles: Managing Partner holds partners.manage
+  addLand: ["super_admin", "managing_partner", "site_manager"],
   createExpense: ["super_admin", "managing_partner", "site_manager", "accountant"],
   approveExpense: ["super_admin", "managing_partner"],
   receiveSales: ["super_admin", "managing_partner", "accountant"],
@@ -338,15 +338,15 @@ async function phase4Rbac(ids, ctx) {
     { feature: "viewDashboard", kind: "api", run: (s) => call(s, "/api/reports/pnl") },
     { feature: "viewDashboard", kind: "page", path: "/dashboard", marker: "Forbidden: viewDashboard" },
     { feature: "managePartners", kind: "page", path: "/partners", marker: "Forbidden: managePartners" },
-    { feature: "addLand", kind: "page", path: "/projects", marker: "Forbidden: addLand" },
+    { feature: "addLand", kind: "page", path: "/projects", marker: "Forbidden: projects.view" },
     { feature: "createExpense", kind: "api", run: (s) => call(s, "/api/expenses", { method: "POST", form: expenseForm({ amount: "100" }) }) },
     { feature: "approveExpense", kind: "api", run: (s) => call(s, `/api/expenses/${ctx.exp1.json.id}/approve`, { method: "POST", json: { action: "APPROVED" } }) },
     { feature: "receiveSales", kind: "api", run: (s) => call(s, "/api/sales") },
     { feature: "receiveSales", kind: "page", path: "/sales", marker: "Forbidden: receiveSales" },
     { feature: "bankTransfer", kind: "api", run: (s) => call(s, "/api/treasury/contra", { method: "POST", json: { fromType: "CASH", toType: "BANK", amount: 100, bankAccountId: ids.bank, purpose: "rbac probe" } }) },
-    { feature: "bankTransfer", kind: "page", path: "/treasury", marker: "Forbidden: bankTransfer" },
+    { feature: "bankTransfer", kind: "page", path: "/treasury", marker: "Forbidden: treasury.view" },
     { feature: "distributeProfits", kind: "api", run: (s) => call(s, "/api/reports/pnl/distribute", { method: "POST", json: { projectId: ids.project, basis: "CASH_BASIS" } }) },
-    { feature: "inviteUsers", kind: "api", run: (s) => call(s, "/api/invites") },
+    { feature: "inviteUsers", kind: "api", run: (s) => call(s, "/api/invites", { method: "POST", json: { email: "rbac-probe@example.com" } }) },
     { feature: "inviteUsers", kind: "page", path: "/settings/users", marker: "Forbidden: Super Admin only" },
     { feature: "manageBilling", kind: "api", run: (s) => call(s, "/api/billing/pay", { method: "POST", json: { invoiceId } }) },
     { feature: "manageBilling", kind: "page", path: "/settings/billing", marker: "Forbidden" },

@@ -87,6 +87,30 @@ async function main() {
           stdio: "inherit",
         });
         await seedDefaultCategories(dbName);
+        // seed RBAC default roles and assign Owner to signup user
+        try {
+          const { PrismaClient } = await import("./generated/tenant/index.js");
+          const url = `mysql://root:@localhost:3306/${dbName}`;
+          const tPrisma: any = new PrismaClient({ datasources: { db: { url } } } as any);
+          const { seedDefaultRoles } = await import("@/lib/seedRoles");
+          // find owner user for this tenant
+          const owner = await (controlPrisma as any).globalUser.findFirst({ where: { tenantId, isOwner: true } });
+          await seedDefaultRoles(tPrisma, owner?.id ?? null);
+          if (owner) {
+            const ownerRole = await tPrisma.role.findUnique({ where: { name: "Owner" } });
+            if (ownerRole) {
+              await tPrisma.userRole.upsert({
+                where: { userId: owner.id },
+                update: { roleId: ownerRole.id, assignedBy: owner.id },
+                create: { userId: owner.id, roleId: ownerRole.id, assignedBy: owner.id },
+              });
+            }
+          }
+          await tPrisma.$disconnect();
+          console.log(`[worker] seeded RBAC roles for ${dbName}`);
+        } catch (e: any) {
+          console.warn(`[worker] RBAC seed warning for ${dbName}: ${e.message}`);
+        }
         await (controlPrisma as any).tenant.update({ where: { id: tenantId }, data: { status: "active" } });
         console.log(`[worker] ${dbName} active`);
         return { dbName, status: "active" };

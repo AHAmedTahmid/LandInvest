@@ -17,7 +17,7 @@ export async function POST(req:NextRequest){
   const session=await getServerSession(authOptions);
   if(!session) return NextResponse.json({error:"Unauthorized"},{status:401});
   const role=(session.user as any).role;
-  if(!can(role,"createExpense")) return NextResponse.json({error:"Forbidden"},{status:403});
+  if (!(await can(session, "expenses.create"))) return NextResponse.json({error:"Forbidden"},{status:403});
   const form=await req.formData();
   const project_id=form.get("project_id") as string||null;
   const category=form.get("category") as string;

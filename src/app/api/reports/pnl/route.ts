@@ -8,7 +8,7 @@ import { computePnl } from "@/lib/pnl";
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!can((session.user as any).role, "viewDashboard")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await can(session, "dashboard.view"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const prisma: any = await getTenantClientFromSession();
   const pnl = await computePnl(prisma);
   return NextResponse.json(pnl);

@@ -160,8 +160,9 @@ exports.Prisma.GlobalUserScalarFieldEnum = {
   fullName: 'fullName',
   email: 'email',
   passwordHash: 'passwordHash',
-  role: 'role',
+  isOwner: 'isOwner',
   isActive: 'isActive',
+  mustChangePassword: 'mustChangePassword',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt'
 };
@@ -170,7 +171,7 @@ exports.Prisma.UserInvitationScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
   email: 'email',
-  role: 'role',
+  roleId: 'roleId',
   inviteToken: 'inviteToken',
   expiresAt: 'expiresAt',
   accepted: 'accepted'
@@ -243,15 +244,14 @@ exports.Prisma.GlobalUserOrderByRelevanceFieldEnum = {
   tenantId: 'tenantId',
   fullName: 'fullName',
   email: 'email',
-  passwordHash: 'passwordHash',
-  role: 'role'
+  passwordHash: 'passwordHash'
 };
 
 exports.Prisma.UserInvitationOrderByRelevanceFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
   email: 'email',
-  role: 'role',
+  roleId: 'roleId',
   inviteToken: 'inviteToken'
 };
 

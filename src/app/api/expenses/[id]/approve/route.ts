@@ -10,7 +10,7 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
   const session=await getServerSession(authOptions);
   if(!session) return NextResponse.json({error:"Unauthorized"},{status:401});
   const role=(session.user as any).role;
-  if(!can(role,"approveExpense")) return NextResponse.json({error:"Forbidden"},{status:403});
+  if (!(await can(session, "expenses.approve"))) return NextResponse.json({error:"Forbidden"},{status:403});
   const {action}=await req.json(); // APPROVED or REJECTED
   const userId=(session.user as any).id;
   const prisma:any=await getTenantClientFromSession();

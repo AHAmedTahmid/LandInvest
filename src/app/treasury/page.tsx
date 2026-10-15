@@ -7,22 +7,21 @@ import { createContra, listContraRequests } from "@/lib/treasury";
 
 export default async function TreasuryPage() {
   const session = await getServerSession(authOptions);
-  const role = (session?.user as any)?.role;
-  if (!can(role, "bankTransfer")) return <div className="p-8 text-red-600">Forbidden: bankTransfer</div>;
+  if (!(await can(session, "treasury.view"))) return <div className="p-8 text-red-600">Forbidden: treasury.view</div>;
 
   const prisma: any = await getTenantClientFromSession();
   const cashLedger = await prisma.treasuryLedger.findMany({ where: { accountType: "CASH" }, orderBy: { txnDate: "desc" } });
   const banks = await prisma.bankAccount.findMany();
   const bankLedger = await prisma.treasuryLedger.findMany({ where: { accountType: "BANK" }, orderBy: { txnDate: "desc" } });
   const pending = (await listContraRequests(prisma)).filter((r: any) => r.action === "PENDING");
-  const canApprove = can(role, "approveExpense");
+  const canApprove = await can(session, "treasury.contra.approve");
 
   async function submitContra(formData: FormData) {
     "use server";
     const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
     const { can: canFn } = await import("@/lib/rbac");
-    const r = (s!.user as any).role;
-    if (!canFn(r, "bankTransfer")) throw new Error("Forbidden: bankTransfer");
+    if (!(await canFn(s, "treasury.contra.create"))) throw new Error("Forbidden: treasury.contra.create");
+    const canApprove = await canFn(s, "treasury.contra.approve");
     const { getTenantClientFromSession: gc } = await import("@/lib/tenant");
     const { createContra: cc } = await import("@/lib/treasury");
     const p: any = await gc();
@@ -33,7 +32,7 @@ export default async function TreasuryPage() {
       bankAccountId: (formData.get("bankAccountId") as string) || null,
       purpose: (formData.get("purpose") as string) || "Contra",
       userId: (s!.user as any).id,
-      role: r,
+      role: canApprove ? "super_admin" : "accountant",
     });
     const { revalidatePath } = await import("next/cache");
     revalidatePath("/treasury");
@@ -43,12 +42,11 @@ export default async function TreasuryPage() {
     "use server";
     const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
     const { can: canFn } = await import("@/lib/rbac");
-    const r = (s!.user as any).role;
-    if (!canFn(r, "approveExpense")) throw new Error("Forbidden: approval requires super_admin / managing_partner");
+    if (!(await canFn(s, "treasury.contra.approve"))) throw new Error("Forbidden: treasury.contra.approve");
     const { getTenantClientFromSession: gc } = await import("@/lib/tenant");
     const { approveContra: ap } = await import("@/lib/treasury");
     const p: any = await gc();
-    await ap(p, { requestId: formData.get("requestId") as string, approverId: (s!.user as any).id, approverRole: r });
+    await ap(p, { requestId: formData.get("requestId") as string, approverId: (s!.user as any).id, approverRole: "super_admin" });
     const { revalidatePath } = await import("next/cache");
     revalidatePath("/treasury");
   }
@@ -57,8 +55,7 @@ export default async function TreasuryPage() {
     "use server";
     const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
     const { can: canFn } = await import("@/lib/rbac");
-    const r = (s!.user as any).role;
-    if (!canFn(r, "bankTransfer")) throw new Error("Forbidden: bankTransfer");
+    if (!(await canFn(s, "treasury.bank.manage"))) throw new Error("Forbidden: treasury.bank.manage");
     const { getTenantClientFromSession: gc } = await import("@/lib/tenant");
     const { writeAudit } = await import("@/lib/tenantRules");
     const { randomUUID } = await import("crypto");
@@ -114,7 +111,7 @@ export default async function TreasuryPage() {
           <input name="purpose" placeholder="Purpose" className="border rounded px-2 py-1 col-span-3" />
           <button className="bg-emerald-600 text-white rounded px-4 py-2">Transfer</button>
         </form>
-        {role === "accountant" && <p className="text-xs text-amber-600 mt-2">Note: accountant transfers are submitted for approval.</p>}
+        {!canApprove && <p className="text-xs text-amber-600 mt-2">Note: your transfers will be submitted for approval.</p>}
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow border">

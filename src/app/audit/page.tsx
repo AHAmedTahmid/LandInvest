@@ -24,7 +24,7 @@ export default async function AuditPage({
 }) {
   const session = await getServerSession(authOptions);
   const role = (session?.user as any)?.role;
-  if (!can(role, "viewDashboard")) return <div className="p-8 text-red-600">Forbidden: viewDashboard</div>;
+  if (!(await can(session, "dashboard.view"))) return <div className="p-8 text-red-600">Forbidden: viewDashboard</div>;
 
   const params = await searchParams;
   const table = (params.table || "").trim();

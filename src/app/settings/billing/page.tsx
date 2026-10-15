@@ -6,7 +6,7 @@ import { formatBDT } from "@/lib/format";
 
 export default async function BillingPage(){
   const session=await getServerSession(authOptions);
-  if(!can((session?.user as any)?.role,"manageBilling")) return <div className="p-8 text-red-600">Forbidden</div>;
+  if (!(await can(session, "billing.manage"))) return <div className="p-8 text-red-600">Forbidden</div>;
   const tenantId=(session!.user as any).tenantId;
   const sub=await (controlPrisma as any).subscription.findFirst({where:{tenantId},include:{plan:true}});
   const plans=await (controlPrisma as any).plan.findMany();
