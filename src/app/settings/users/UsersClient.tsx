@@ -16,6 +16,7 @@ export default function UsersClient({ canManage }: { canManage: boolean }) {
   const [roleId, setRoleId] = useState("");
   const [mode, setMode] = useState<"invite" | "direct">("invite");
   const [tempPass, setTempPass] = useState("");
+  const [editing, setEditing] = useState<{ id: string; fullName: string; email: string } | null>(null);
 
   const load = async () => {
     const r = await fetch("/api/users");
@@ -69,6 +70,14 @@ export default function UsersClient({ canManage }: { canManage: boolean }) {
     if (!res.ok) alert(d.error); else alert("Reset ok");
   };
 
+  const saveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editing) return;
+    const res = await fetch(`/api/users/${editing.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fullName: editing.fullName, email: editing.email }) });
+    const d = await res.json();
+    if (!res.ok) alert(d.error); else { setEditing(null); load(); }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Users</h1>
@@ -89,6 +98,7 @@ export default function UsersClient({ canManage }: { canManage: boolean }) {
             <td className="p-2">{u.status}{u.mustChangePassword && " (must change)"}</td>
             <td className="p-2 text-xs">{u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString() : "-"}</td>
             <td className="p-2 flex gap-1">
+              {canManage && !u.isOwner && <button onClick={() => setEditing({ id: u.id, fullName: u.fullName, email: u.email })} className="text-xs border px-2 py-1 rounded">Edit</button>}
               {canManage && <button onClick={() => toggleActive(u)} className="text-xs border px-2 py-1 rounded">{u.isActive ? "Deactivate" : "Activate"}</button>}
               {canManage && <button onClick={() => reset(u)} className="text-xs border px-2 py-1 rounded">Reset PW</button>}
               {canManage && <button onClick={() => remove(u)} className="text-xs text-red-600">Remove</button>}
@@ -96,6 +106,18 @@ export default function UsersClient({ canManage }: { canManage: boolean }) {
           </tr>
         ))}</tbody>
       </table>
+
+      {editing && (
+        <form onSubmit={saveEdit} className="bg-white p-4 rounded-xl shadow border space-y-3">
+          <h2 className="font-semibold">Edit user</h2>
+          <input value={editing.fullName} onChange={e => setEditing({ ...editing, fullName: e.target.value })} placeholder="Full name" required className="border rounded px-3 py-2 w-full" />
+          <input value={editing.email} onChange={e => setEditing({ ...editing, email: e.target.value })} placeholder="Email" type="email" required className="border rounded px-3 py-2 w-full" />
+          <div className="flex gap-2">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+            <button type="button" onClick={() => setEditing(null)} className="border px-4 py-2 rounded">Cancel</button>
+          </div>
+        </form>
+      )}
 
       {invited.length > 0 && (
         <div className="bg-white p-4 rounded-xl shadow border">

@@ -98,6 +98,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     await (controlPrisma as any).globalUser.update({ where: { id: targetId }, data: { fullName: String(body.fullName).trim() } });
   }
 
+  // email update (optional)
+  if (body.email !== undefined) {
+    const cleanEmail = String(body.email).trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes("@")) return NextResponse.json({ error: "Valid email required" }, { status: 400 });
+    if (cleanEmail !== target.email) {
+      const taken: any = await (controlPrisma as any).globalUser.findUnique({ where: { email: cleanEmail } });
+      if (taken && String(taken.id) !== String(targetId)) return NextResponse.json({ error: "Email already in use" }, { status: 400 });
+      await (controlPrisma as any).globalUser.update({ where: { id: targetId }, data: { email: cleanEmail } });
+      try { await writeAudit(tPrisma, "global_users", targetId, "UPDATE", actorId, { email: target.email }, { email: cleanEmail }); } catch {}
+      invalidateTenantCache(tenantId);
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }
 
