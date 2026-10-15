@@ -13,6 +13,7 @@ export default function RolesClient() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
 
   const load = async () => {
     const r = await fetch("/api/roles");
@@ -25,9 +26,9 @@ export default function RolesClient() {
     return () => { active = false; };
   }, []);
 
-  const openCreate = () => { setEditing(null); setFormName(""); setFormDesc(""); setSelected(new Set()); setMsg(null); };
-  const openEdit = (role: Role) => { setEditing(role); setFormName(role.name); setFormDesc(role.description ?? ""); setSelected(new Set(role.permissions)); setMsg(null); };
-  const openDuplicate = (role: Role) => { setEditing(null); setFormName(role.name + " Copy"); setFormDesc(role.description ?? ""); setSelected(new Set(role.permissions)); setMsg(null); };
+  const openCreate = () => { setEditing(null); setFormName(""); setFormDesc(""); setSelected(new Set()); setMsg(null); setFormOpen(true); };
+  const openEdit = (role: Role) => { setEditing(role); setFormName(role.name); setFormDesc(role.description ?? ""); setSelected(new Set(role.permissions)); setMsg(null); setFormOpen(true); };
+  const openDuplicate = (role: Role) => { setEditing(null); setFormName(role.name + " Copy"); setFormDesc(role.description ?? ""); setSelected(new Set(role.permissions)); setMsg(null); setFormOpen(true); };
 
   const toggle = (k: string) => {
     const s = new Set(selected); if (s.has(k)) s.delete(k); else s.add(k); setSelected(s);
@@ -46,7 +47,7 @@ export default function RolesClient() {
       res = await fetch("/api/roles", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     }
     const d = await res.json();
-    if (!res.ok) setMsg(d.error || "Failed"); else { setMsg("Saved"); load(); }
+    if (!res.ok) setMsg(d.error || "Failed"); else { setMsg("Saved"); setFormOpen(false); load(); }
   };
 
   const del = async (role: Role) => {
@@ -95,7 +96,7 @@ export default function RolesClient() {
         ))}</tbody>
       </table>
 
-      {(editing !== null || formName || selected.size > 0 || msg) && (
+      {formOpen && (
         <div className="bg-white p-4 rounded-xl shadow border space-y-3">
           <h2 className="font-semibold">{editing ? `Edit ${editing.name}` : "Create / Duplicate Role"}</h2>
           {msg && <div className="text-sm p-2 bg-slate-100 rounded">{msg}</div>}
@@ -122,7 +123,7 @@ export default function RolesClient() {
           </div>
           <div className="flex gap-2">
             <button onClick={save} className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-            <button onClick={() => { setEditing(null); setFormName(""); setSelected(new Set()); setMsg(null); }} className="border px-4 py-2 rounded">Cancel</button>
+            <button onClick={() => { setEditing(null); setFormName(""); setSelected(new Set()); setMsg(null); setFormOpen(false); }} className="border px-4 py-2 rounded">Cancel</button>
           </div>
         </div>
       )}
