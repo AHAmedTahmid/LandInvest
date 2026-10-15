@@ -1,18 +1,25 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Wallet, Map, Receipt, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { LayoutDashboard, Users, Wallet, Map, Receipt, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 
 const NAV = [
-  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
-  { href: "/partners", key: "partners", icon: Users },
-  { href: "/treasury", key: "treasury", icon: Wallet },
-  { href: "/projects", key: "projects", icon: Map },
-  { href: "/expenses", key: "expenses", icon: Receipt },
-  { href: "/sales", key: "sales", icon: BadgeDollarSign },
-  { href: "/reports", key: "pnl", icon: PieChart },
-  { href: "/audit", key: "audit", icon: ShieldCheck },
+  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard, perm: "dashboard.view" },
+  { href: "/partners", key: "partners", icon: Users, perm: "partners.view" },
+  { href: "/treasury", key: "treasury", icon: Wallet, perm: "treasury.view" },
+  { href: "/projects", key: "projects", icon: Map, perm: "projects.view" },
+  { href: "/expenses", key: "expenses", icon: Receipt, perm: ["expenses.view", "expenses.create"] },
+  { href: "/sales", key: "sales", icon: BadgeDollarSign, perm: ["sales.view", "sales.collect"] },
+  { href: "/reports", key: "pnl", icon: PieChart, perm: ["profit.view", "reports.view"] },
+  { href: "/audit", key: "audit", icon: ShieldCheck, perm: "audit.view" },
+] as const;
+
+// Administration section: manage roles (permissions) and users (name + password + role)
+const ADMIN_NAV = [
+  { href: "/settings/users", key: "users", icon: UserCog, perm: "users.manage" },
+  { href: "/settings/roles", key: "roles", icon: KeyRound, perm: "roles.manage" },
 ] as const;
 
 const TITLES: Record<string, string> = {
@@ -24,13 +31,38 @@ const TITLES: Record<string, string> = {
   "/sales": "sales",
   "/reports": "pnl",
   "/audit": "audit",
+  "/settings/users": "users",
+  "/settings/roles": "roles",
 };
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { t, lang, toggle } = useLang();
-  const isAuth = pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/invite");
+  const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname?.startsWith("/invite");
+  const [perms, setPerms] = useState<string[] | null>(null);
+
+  // load my permissions once; hide menu items I may not open, force password change when required
+  useEffect(() => {
+    if (isAuth) return;
+    let active = true;
+    fetch("/api/me/permissions").then(r => (r.ok ? r.json() : null)).then(d => {
+      if (!active || !d) return;
+      setPerms(d.permissions ?? []);
+      if (d.mustChangePassword && pathname !== "/change-password") router.replace("/change-password");
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [isAuth, pathname, router]);
+
   if (isAuth) return <>{children}</>;
+
+  const has = (perm: string | readonly string[]) => {
+    const mine: string[] | null = perms;
+    if (!mine) return true; // loading: show all, filter once known
+    const want: string[] = Array.isArray(perm) ? [...perm] : [perm];
+    return want.some(p => mine.includes(p));
+  };
+  const adminLinks = ADMIN_NAV.filter(l => perms !== null && has(l.perm));
 
   const key = TITLES[pathname] ?? TITLES[Object.keys(TITLES).find(k => pathname?.startsWith(k)) ?? ""] ?? "dashboard";
   const title = t(key);
@@ -43,7 +75,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div><h1 className="text-sm font-bold text-white tracking-wide">LANDINVEST</h1><p className="text-[11px] text-slate-400">Partnership ERP Suite</p></div>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {NAV.map(({ href, key, icon: Icon }) => {
+          {NAV.filter(({ perm }) => has(perm)).map(({ href, key, icon: Icon }) => {
             const active = pathname === href || pathname?.startsWith(href + "/");
             return (
               <Link key={href} href={href} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}>
@@ -51,6 +83,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          {adminLinks.length > 0 && (
+            <>
+              <p className="px-3 pt-4 pb-1 text-[10px] font-semibold tracking-widest text-slate-500 uppercase">{t("administration")}</p>
+              {adminLinks.map(({ href, key, icon: Icon }) => {
+                const active = pathname === href || pathname?.startsWith(href + "/");
+                return (
+                  <Link key={href} href={href} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}>
+                    <Icon className="w-4 h-4" /> {t(key)}
+                  </Link>
+                );
+              })}
+            </>
+          )}
         </nav>
         <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-white">SA</div>
