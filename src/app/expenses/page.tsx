@@ -1,9 +1,13 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { getTenantClientFromSession } from "@/lib/tenant";
+import { can } from "@/lib/rbac";
 import { formatBDT } from "@/lib/format";
+import { redirect } from "next/navigation";
 export default async function ExpensesPage(){
   const session=await getServerSession(authOptions);
+  if (!session) redirect("/login");
+  if (!(await can(session, "expenses.view"))) return <div className="p-8 text-red-600">Forbidden: expenses.view</div>;
   const prisma:any=await getTenantClientFromSession();
   const projects=await prisma.landProject.findMany();
   const partners=await prisma.partner.findMany();
