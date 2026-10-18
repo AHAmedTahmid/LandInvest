@@ -62,6 +62,24 @@ export default function ExpensesPage() {
     }
   };
 
+  const reject = async (id: string) => {
+    if (!confirm("Reject this expense?")) return;
+    setApproving(id);
+    try {
+      const res = await fetch(`/api/expenses/${id}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "REJECTED" }),
+      });
+      const d = await res.json();
+      if (!res.ok) { alert(d.error || "Rejection failed"); return; }
+      setToast(`Expense rejected — ${d.expense?.expenseCategory ?? ""}`);
+      await load();
+    } finally {
+      setApproving(null);
+    }
+  };
+
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 3000);
@@ -101,12 +119,16 @@ export default function ExpensesPage() {
               <td>{formatBDT(Number(e.amount))}</td>
               <td>{e.paymentChannel}</td>
               <td>{e.status}</td>
-              <td>
-                <button onClick={() => approve(e.id)} disabled={approving === e.id}
-                  className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white px-3 py-1 rounded text-xs flex items-center gap-1">
-                  {approving === e.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Approve"}
-                </button>
-              </td>
+                <td className="p-2 flex gap-2">
+                  <button onClick={() => approve(e.id)} disabled={approving === e.id}
+                    className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white px-3 py-1 rounded text-xs flex items-center gap-1">
+                    {approving === e.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Approve"}
+                  </button>
+                  <button onClick={() => reject(e.id)} disabled={approving === e.id}
+                    className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white px-3 py-1 rounded text-xs">
+                    Reject
+                  </button>
+                </td>
             </tr>
           ))}
         </tbody>
