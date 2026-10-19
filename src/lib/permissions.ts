@@ -7,6 +7,8 @@ export type PermissionKey =
   | "sales.view" | "sales.create" | "sales.collect" | "receipts.print"
   | "profit.view" | "profit.distribute"
   | "reports.view" | "reports.export"
+  | "reports.financial.view" | "reports.partners.view" | "reports.projects.view"
+  | "reports.sales.view" | "reports.audit.view"
   | "users.view" | "users.manage" | "roles.manage" | "billing.manage" | "audit.view";
 
 export type PermissionDef = { key: PermissionKey; en: string; bn: string };
@@ -76,6 +78,11 @@ export const PERMISSIONS: PermissionGroup[] = [
     permissions: [
       { key: "reports.view", en: "View reports", bn: "রিপোর্ট দেখুন" },
       { key: "reports.export", en: "Export reports", bn: "রিপোর্ট এক্সপোর্ট" },
+      { key: "reports.financial.view", en: "View financial reports", bn: "আর্থিক প্রতিবেদন দেখুন" },
+      { key: "reports.partners.view", en: "View partner reports", bn: "অংশীদার প্রতিবেদন দেখুন" },
+      { key: "reports.projects.view", en: "View project reports", bn: "প্রকল্প প্রতিবেদন দেখুন" },
+      { key: "reports.sales.view", en: "View sales reports", bn: "বিক্রয় প্রতিবেদন দেখুন" },
+      { key: "reports.audit.view", en: "View audit reports", bn: "অডিট প্রতিবেদন দেখুন" },
     ],
   },
   {
