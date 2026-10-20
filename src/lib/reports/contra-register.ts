@@ -12,23 +12,25 @@ const contraColumns: ReportColumn[] = [
 ];
 
 export async function queryContraRegister(prisma: any, filters: ReportFilters): Promise<ReportData> {
-  const where: any = { action: { in: ["PENDING", "APPROVED", "REJECTED"] } };
+  // Contra transfers are recorded as two treasury_ledger rows (OUT + IN) with referenceType CONTRA.
+  const where: any = { referenceType: "CONTRA", flowType: "OUT" };
   if (filters.from || filters.to) {
-    where.createdAt = {};
-    if (filters.from) where.createdAt.gte = new Date(filters.from);
-    if (filters.to) where.createdAt.lte = new Date(filters.to);
+    where.txnDate = {};
+    if (filters.from) where.txnDate.gte = new Date(filters.from);
+    if (filters.to) where.txnDate.lte = new Date(filters.to);
   }
-  const rows = await prisma.treasuryTransferRequest.findMany({ where, orderBy: [{ createdAt: "desc" }] });
+  const rows: any[] = await prisma.treasuryLedger.findMany({ where, orderBy: [{ txnDate: "desc" }] });
   const accounts: any[] = await prisma.bankAccount.findMany();
   const accMap = new Map(accounts.map((a: any) => [a.id, a]));
+  const label = (type: string, id: string | null) => (type === "CASH" ? "Cash" : (id ? `${accMap.get(id)?.bankName ?? ""} ${accMap.get(id)?.accountNumber ?? ""}`.trim() : type));
 
   const data = rows.map((r: any) => ({
-    date: r.createdAt,
-    from: r.fromType === "CASH" ? "Cash" : accMap.get(r.bankAccountId)?.bankName ?? r.fromType,
-    to: r.toType === "CASH" ? "Cash" : accMap.get(r.bankAccountId)?.bankName ?? r.toType,
+    date: r.txnDate,
+    from: label(r.accountType, r.bankAccountId),
+    to: label(r.accountType === "CASH" ? "BANK" : "CASH", r.bankAccountId),
     amount: toNum(r.amount),
     purpose: r.purpose,
-    status: r.status,
+    status: "APPROVED",
   }));
 
   return {
