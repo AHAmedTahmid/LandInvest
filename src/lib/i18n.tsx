@@ -12,6 +12,7 @@ const DICT: Record<string, { en: string; bn: string }> = {
   expenses: { en: "Project Expenses", bn: "প্রকল্প ব্যয়" },
   sales: { en: "Plot Sales & Dues", bn: "প্লট বিক্রয় ও বকেয়া" },
   pnl: { en: "Profit & Loss (P&L)", bn: "লাভ-ক্ষতি" },
+  reports: { en: "Reports", bn: "প্রতিবেদন" },
   audit: { en: "Audit Trail", bn: "অডিট ট্রেইল" },
   users: { en: "Users", bn: "ব্যবহারকারী" },
   roles: { en: "Roles", bn: "ভূমিকা" },

@@ -13,7 +13,7 @@ const NAV = [
   { href: "/projects", key: "projects", icon: Map, perm: "projects.view" },
   { href: "/expenses", key: "expenses", icon: Receipt, perm: ["expenses.view", "expenses.create"] },
   { href: "/sales", key: "sales", icon: BadgeDollarSign, perm: ["sales.view", "sales.collect"] },
-  { href: "/reports", key: "pnl", icon: PieChart, perm: ["profit.view", "reports.view"] },
+  { href: "/reports", key: "reports", icon: PieChart, perm: ["reports.view", "profit.view", "reports.financial.view", "reports.partners.view", "reports.projects.view", "reports.sales.view", "reports.audit.view"] },
   { href: "/audit", key: "audit", icon: ShieldCheck, perm: "audit.view" },
 ] as const;
 
@@ -30,7 +30,7 @@ const TITLES: Record<string, string> = {
   "/projects": "projects",
   "/expenses": "expenses",
   "/sales": "sales",
-  "/reports": "pnl",
+  "/reports": "reports",
   "/audit": "audit",
   "/settings/users": "users",
   "/settings/roles": "roles",

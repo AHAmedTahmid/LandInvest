@@ -13,20 +13,32 @@ const CATEGORIES: { key: ReportCategory; labelEn: string; labelBn: string }[] = 
   { key: "audit", labelEn: "Control & Audit", labelBn: "নিয়ন্ত্রণ ও অডিট" },
 ];
 
-export default async function ReportsCatalogPage() {
+export default async function ReportCatalog() {
   const session = await getServerSession(authOptions);
-  if (!(await can(session, "reports.view"))) {
+  const isOwner = !!(session?.user as any)?.isOwner;
+
+  // filter reports by the permission this user actually holds
+  const groups = await Promise.all(
+    CATEGORIES.map(async (cat) => ({
+      ...cat,
+      reports: (await Promise.all(
+        reportsByCategory(cat.key).map(async (r) => (isOwner || (await can(session, r.permission as any)) ? r : null))
+      )).filter(Boolean) as typeof REPORT_REGISTRY,
+    }))
+  );
+
+  if (!isOwner && !(await can(session, "reports.view"))) {
     return <div className="p-8 text-red-600">Forbidden: reports.view</div>;
   }
 
   return (
     <div className="p-6 space-y-8">
       <h1 className="text-2xl font-bold">Reports</h1>
-      {CATEGORIES.map((cat) => (
+      {groups.map((cat) => (
         <div key={cat.key}>
           <h2 className="text-lg font-semibold mb-3 text-slate-700">{cat.labelEn}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {reportsByCategory(cat.key).map((r) => (
+            {cat.reports.map((r) => (
               <Link key={r.key} href={`/reports/${r.key}`}
                 className="bg-white rounded-xl shadow border p-4 hover:shadow-md hover:border-brand-600 transition">
                 <h3 className="font-semibold text-slate-800">{r.titleEn}</h3>
