@@ -9,6 +9,7 @@ import { randomUUID } from "crypto";
 export async function GET(){
   const session=await getServerSession(authOptions);
   if(!session) return NextResponse.json({error:"Unauthorized"},{status:401});
+  if (!(await can(session, "expenses.view"))) return NextResponse.json({error:"Forbidden"},{status:403});
   const prisma:any=await getTenantClientFromSession();
   const list=await prisma.projectExpense.findMany({orderBy:{createdAt:"desc"}});
   return NextResponse.json(list);
