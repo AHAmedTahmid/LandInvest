@@ -19,6 +19,8 @@ export const authOptions: NextAuthOptions = {
           include: { tenant: true },
         });
         if (!user || !user.isActive) return null;
+        // suspended/cancelled tenants cannot log in
+        if (!user.tenant || !["active", "trial"].includes(user.tenant.status)) return null;
         const ok = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!ok) return null;
         await (controlPrisma as any).globalUser.update({
@@ -56,18 +58,25 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }: any) {
       if (token) {
-        // re-check isActive on every session refresh (deactivated users are rejected at next request)
+        // re-check isActive + tenant status on every request (deactivated users /
+        // suspended tenants get a null session, which getServerSession surfaces as
+        // unauthenticated to every API route and page)
         try {
           const uid = token.sub ?? (token as any).user_id;
           if (uid) {
-            const gu: any = await (controlPrisma as any).globalUser.findUnique({ where: { id: String(uid) }, select: { isActive: true, isOwner: true, mustChangePassword: true } });
-            if (!gu || gu.isActive === false) {
-              (session as any).error = "Deactivated";
-            }
-            (token as any).is_owner = gu?.isOwner ?? (token as any).is_owner;
-            (token as any).must_change_password = gu?.mustChangePassword ?? (token as any).must_change_password;
+            const gu: any = await (controlPrisma as any).globalUser.findUnique({
+              where: { id: String(uid) },
+              select: { isActive: true, isOwner: true, mustChangePassword: true, tenant: { select: { status: true } } },
+            });
+            if (!gu || gu.isActive === false) return null as any;
+            if (!gu.tenant || !["active", "trial"].includes(gu.tenant.status)) return null as any;
+            (token as any).is_owner = gu.isOwner;
+            (token as any).must_change_password = gu.mustChangePassword;
           }
-        } catch {}
+        } catch {
+          // control DB unreachable: fail closed rather than serve a stale session
+          return null as any;
+        }
         (session.user as any) = {
           id: token.sub ?? (token as any).user_id,
           email: token.email ?? session.user?.email,
