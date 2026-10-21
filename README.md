@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LandInvest — Partnership ERP for Real-Estate Syndicates
 
-## Getting Started
+Multi-tenant SaaS accounting for land-partnership syndicates in Bangladesh: partner
+capital, cash & bank treasury, land projects, plot sales, profit distribution and a
+full report pack.
 
-First, run the development server:
+## Prerequisites
+
+- Node.js 20+
+- MySQL 8.x running on `localhost:3306` (user `root`, no password for local dev)
+- Redis running on `localhost:6379`
+
+## Setup (fresh machine)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo-url> && cd LandInvest
+npm install
+copy .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Start MySQL and Redis, then create the databases and seed:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run setup        # creates control_plane + tenant_demo, pushes schemas, seeds users
+npm run dev          # Next.js app on http://localhost:3000
+npm run worker       # provisioning worker (in a second terminal)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Audit / test dataset
 
-## Learn More
+`scripts/audit_seed.mjs` resets everything and builds the full test dataset
+(2 tenants, 4 partners, 3 projects, 50 expenses, 30 sales with installments, 5 users on
+custom roles):
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npx tsx scripts/audit_seed.mjs
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Demo logins
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+After `npm run setup` (demo tenant):
 
-## Deploy on Vercel
+| Email | Role | Password |
+|---|---|---|
+| `owner@demo.com` | Owner | `123456` |
+| `admin@demo.com` | Managing Partner | `123456` |
+| `site@demo.com` | Site Manager | `123456` |
+| `acct@demo.com` | Accountant | `123456` |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+After `npx tsx scripts/audit_seed.mjs` (audit tenants):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Email | Tenant | Role | Password |
+|---|---|---|---|
+| `owner@alpha.com` | Alpha Estates | Owner | `123456` |
+| `admin@alpha.com` | Alpha Estates | Managing Partner | `123456` |
+| `auditor@alpha.com` | Alpha Estates | Auditor | `123456` |
+| `field@alpha.com` | Alpha Estates | Field Officer | `123456` |
+| `sales@alpha.com` | Alpha Estates | Sales Agent | `123456` |
+| `owner@beta.com` | Beta Holdings | Owner | `123456` |
+
+## Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Next.js dev server |
+| `npm run worker` | BullMQ provisioning worker |
+| `npm run setup` | Create + seed control and demo tenant |
+| `npm run seed:roles` | Seed default roles + demo users (idempotent) |
+| `npm run build` | Production build |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | ESLint |
+| `npm run acceptance` | 4-criteria acceptance suite (services, flows, audit, RBAC) |
+| `npm run rbac:smoke` | Dynamic-RBAC end-to-end smoke suite |
+| `npm run audit` | Full security & integrity audit (see `scripts/audit.mjs`) |
+
+## Architecture
+
+- **Control plane** (`prisma/control/schema.prisma` → `control_plane` DB): tenants, plans,
+  subscriptions, users, invitations, billing, password resets.
+- **Tenant plane** (`prisma/tenant/schema.prisma` → one DB per tenant): partners, projects,
+  plots, sales, payments, treasury, expenses, profit, audit log, roles.
+- **Auth**: NextAuth v4 (JWT sessions, credentials provider, bcrypt passwords).
+- **RBAC**: dynamic per-tenant roles with a permission catalog (`src/lib/permissions.ts`),
+  cached 60s, enforced on the server by `can()` in `src/lib/rbac.ts`.
+- **Provisioning**: BullMQ queue + worker creates, migrates and seeds each tenant DB.
+- **Reports**: 25 reports in `src/lib/reports/` rendered from `registry.ts`, with PDF
+  (Puppeteer) and Excel export.
+
+## Environment variables
+
+See `.env.example` for the full list.

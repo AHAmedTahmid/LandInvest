@@ -12,6 +12,9 @@
     "seed:roles": "tsx scripts/seed_roles.mjs",
     "worker": "tsx src/worker.ts",
     "acceptance": "node scripts/acceptance.mjs",
+    "rbac:smoke": "node scripts/rbac_smoke.mjs",
+    "audit:seed": "tsx scripts/audit_seed.mjs",
+    "audit": "node scripts/audit.mjs",
     "dev:all": "start /b npm run worker && npm run dev"
   },
   "dependencies": {
