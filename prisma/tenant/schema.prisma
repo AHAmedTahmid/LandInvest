@@ -92,6 +92,9 @@ model TreasuryLedger {
 
   @@map("treasury_ledger")
   @@index([bankAccountId])
+  @@index([txnDate])
+  @@index([accountType, txnDate])
+  @@index([referenceType, referenceId])
 }
 
 model PartnerTransaction {
@@ -107,6 +110,7 @@ model PartnerTransaction {
 
   @@map("partner_transactions")
   @@index([partnerId])
+  @@index([txnDate])
 }
 
 model ProjectExpense {
@@ -132,6 +136,8 @@ model ProjectExpense {
   @@index([projectId])
   @@index([bankAccountId])
   @@index([paidByPartnerId])
+  @@index([expenseDate])
+  @@index([status, expenseDate])
 }
 
 model ProjectPlot {
@@ -170,6 +176,8 @@ model LandSale {
   @@map("land_sales")
   @@index([projectId])
   @@index([plotId])
+  @@index([saleDate])
+  @@index([status, saleDate])
 }
 
 model InstallmentSchedule {
@@ -182,6 +190,8 @@ model InstallmentSchedule {
 
   @@map("installment_schedule")
   @@index([saleId])
+  @@index([dueDate])
+  @@index([status, dueDate])
 }
 
 model CustomerPayment {
@@ -198,6 +208,7 @@ model CustomerPayment {
 
   @@map("customer_payments")
   @@index([saleId])
+  @@index([paymentDate])
 }
 
 model ProfitDistribution {
@@ -228,6 +239,9 @@ model AuditLog {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
   @@map("audit_log")
+  @@index([createdAt])
+  @@index([tableName, createdAt])
+  @@index([changedBy])
 }
 
 model Role {
