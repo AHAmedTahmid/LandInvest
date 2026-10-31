@@ -27,6 +27,7 @@ import {
   UserCheck,
   ChevronLeft,
   ChevronRight,
+  Pencil,
 } from "lucide-react";
 import { formatBDT } from "@/lib/format";
 
@@ -147,6 +148,19 @@ export default function VoucherManagementPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [justUpdatedId, setJustUpdatedId] = useState<string | null>(null);
 
+  // Edit Voucher Modal State
+  const [editingVoucher, setEditingVoucher] = useState<Voucher | null>(null);
+  const [editCategory, setEditCategory] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [editProjectId, setEditProjectId] = useState("");
+  const [editPaymentChannel, setEditPaymentChannel] = useState<"CASH" | "BANK" | "PAID_BY_PARTNER">("CASH");
+  const [editBankAccountId, setEditBankAccountId] = useState("");
+  const [editPaidByPartnerId, setEditPaidByPartnerId] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [editSaving, setEditSaving] = useState(false);
+
   const reload = useCallback(() => {
     setReloadTrigger((n) => n + 1);
   }, []);
@@ -253,6 +267,61 @@ export default function VoucherManagementPage() {
       setToast({ message: msg, type: "error" });
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const openEditModal = (v: Voucher) => {
+    setEditingVoucher(v);
+    setEditCategory(v.category);
+    setEditAmount(String(v.amount));
+    setEditProjectId(v.projectId || "");
+    setEditPaymentChannel(v.paymentChannel);
+    setEditBankAccountId(v.paidByDetails.type === "BANK" ? (v.paidByDetails.id || "") : "");
+    setEditPaidByPartnerId(v.paidByDetails.type === "PARTNER" ? (v.paidByDetails.id || "") : "");
+    setEditDate(v.date ? new Date(v.date).toISOString().slice(0, 10) : "");
+    setEditDescription(v.description || "");
+    setEditFile(null);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingVoucher) return;
+    setEditSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append("category", editCategory.trim());
+      fd.append("amount", editAmount);
+      fd.append("project_id", editProjectId);
+      fd.append("payment_channel", editPaymentChannel);
+      fd.append("bank_account", editBankAccountId);
+      fd.append("paid_by_partner", editPaidByPartnerId);
+      fd.append("date", editDate);
+      fd.append("description", editDescription.trim());
+      if (editFile) fd.append("voucher", editFile);
+
+      const res = await fetch(`/api/vouchers/${editingVoucher.id}`, {
+        method: "PATCH",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update voucher");
+
+      setToast({
+        message: `Voucher ${editingVoucher.voucherNo} updated successfully!`,
+        type: "success",
+      });
+      setJustUpdatedId(editingVoucher.id);
+      setTimeout(() => setJustUpdatedId(null), 4000);
+      setEditingVoucher(null);
+      if (activeVoucher?.id === editingVoucher.id) {
+        setActiveVoucher(null);
+      }
+      reload();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to update voucher";
+      setToast({ message: msg, type: "error" });
+    } finally {
+      setEditSaving(false);
     }
   };
 
@@ -914,6 +983,14 @@ export default function VoucherManagementPage() {
                             <Printer className="w-4 h-4" />
                           </a>
 
+                          <button
+                            onClick={() => openEditModal(v)}
+                            className="p-1.5 text-slate-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
+                            title="Edit Voucher Details"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+
                           {isPending && (
                             <>
                               <button
@@ -1309,6 +1386,14 @@ export default function VoucherManagementPage() {
                   <Printer className="w-3.5 h-3.5 text-slate-500" />
                   Print Petty Cash Voucher
                 </a>
+                <button
+                  type="button"
+                  onClick={() => openEditModal(activeVoucher)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition shadow-sm"
+                >
+                  <Pencil className="w-3.5 h-3.5 text-blue-600" />
+                  Edit Voucher
+                </button>
               </div>
 
               {activeVoucher.status === "PENDING" && (
@@ -1424,6 +1509,216 @@ export default function VoucherManagementPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Voucher Modal */}
+      {editingVoucher && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+            <div className="p-5 bg-blue-600 text-white flex items-center justify-between sticky top-0 z-10">
+              <div className="flex items-center gap-2.5">
+                <Pencil className="w-5 h-5" />
+                <div>
+                  <h3 className="font-bold text-base">Edit Voucher {editingVoucher.voucherNo}</h3>
+                  <div className="text-xs text-blue-100">
+                    Status: <span className="font-semibold">{editingVoucher.status}</span>
+                    {editingVoucher.status === "APPROVED" && " (Ledger lock active: amount & channel cannot be changed)"}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingVoucher(null)}
+                className="text-white/80 hover:text-white p-1 rounded hover:bg-blue-700 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="p-6 space-y-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Category */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Expense Category *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                    placeholder="e.g. Legal Fees, Land Survey"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  />
+                </div>
+
+                {/* Amount */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Amount (BDT) *
+                    {editingVoucher.status === "APPROVED" && (
+                      <span className="text-[10px] text-amber-600 font-normal ml-1">(Locked: Approved)</span>
+                    )}
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    step="0.01"
+                    min="1"
+                    disabled={editingVoucher.status === "APPROVED"}
+                    value={editAmount}
+                    onChange={(e) => setEditAmount(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 disabled:bg-slate-100 disabled:text-slate-500"
+                  />
+                </div>
+
+                {/* Project */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Project</label>
+                  <select
+                    value={editProjectId}
+                    onChange={(e) => setEditProjectId(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  >
+                    <option value="">No specific project / General</option>
+                    {projects.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.projectName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Date */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Voucher Date *</label>
+                  <input
+                    type="date"
+                    required
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  />
+                </div>
+
+                {/* Payment Channel */}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Payment Channel *
+                    {editingVoucher.status === "APPROVED" && (
+                      <span className="text-[10px] text-amber-600 font-normal ml-1">(Locked: Approved)</span>
+                    )}
+                  </label>
+                  <select
+                    value={editPaymentChannel}
+                    disabled={editingVoucher.status === "APPROVED"}
+                    onChange={(e) =>
+                      setEditPaymentChannel(e.target.value as "CASH" | "BANK" | "PAID_BY_PARTNER")
+                    }
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 disabled:bg-slate-100 disabled:text-slate-500"
+                  >
+                    <option value="CASH">Cash in Hand</option>
+                    <option value="BANK">Company Bank Account</option>
+                    <option value="PAID_BY_PARTNER">Paid Directly by Partner</option>
+                  </select>
+                </div>
+
+                {/* Bank Account Selector (if BANK) */}
+                {editPaymentChannel === "BANK" && (
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Bank Account *</label>
+                    <select
+                      value={editBankAccountId}
+                      disabled={editingVoucher.status === "APPROVED"}
+                      onChange={(e) => setEditBankAccountId(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                    >
+                      <option value="">Select Bank Account</option>
+                      {banks.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.bankName} - {b.accountNumber}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Partner Selector (if PAID_BY_PARTNER) */}
+                {editPaymentChannel === "PAID_BY_PARTNER" && (
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Paying Partner *</label>
+                    <select
+                      value={editPaidByPartnerId}
+                      disabled={editingVoucher.status === "APPROVED"}
+                      onChange={(e) => setEditPaidByPartnerId(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                    >
+                      <option value="">Select Partner</option>
+                      {partners.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.phone})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Description & Purpose</label>
+                <textarea
+                  rows={3}
+                  placeholder="Notes, payee details, reason, cheque number, etc."
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                />
+              </div>
+
+              {/* Attached Scanned Receipt Replacement / Upload */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Scanned Receipt / Bill File</label>
+                {editingVoucher.voucherImageUrl && (
+                  <div className="mb-2 text-slate-500 flex items-center gap-2">
+                    <span>Current file attached:</span>
+                    <a
+                      href={editingVoucher.voucherImageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-brand-700 hover:underline flex items-center gap-1 font-medium"
+                    >
+                      <ExternalLink className="w-3 h-3" /> View Receipt
+                    </a>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => setEditFile(e.target.files?.[0] || null)}
+                  className="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 border border-slate-300 rounded-lg p-1.5"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">Leave empty to keep existing receipt file</p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setEditingVoucher(null)}
+                  disabled={editSaving}
+                  className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSaving}
+                  className="px-5 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  {editSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
