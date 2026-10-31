@@ -14,6 +14,9 @@ export async function GET(req: NextRequest) {
   const statusParam = url.searchParams.get("status") || "ALL";
   const projectId = url.searchParams.get("projectId") || "";
   const channel = url.searchParams.get("channel") || "";
+  const postedBy = url.searchParams.get("postedBy") || "";
+  const paidBy = url.searchParams.get("paidBy") || "";
+  const reviewedBy = url.searchParams.get("reviewedBy") || "";
   const search = (url.searchParams.get("search") || "").trim().toLowerCase();
   const from = url.searchParams.get("from");
   const to = url.searchParams.get("to");
@@ -31,13 +34,25 @@ export async function GET(req: NextRequest) {
   if (channel) {
     where.paymentChannel = channel;
   }
+  if (postedBy) {
+    where.createdBy = postedBy;
+  }
+  if (paidBy) {
+    if (paidBy === "CASH") {
+      where.paymentChannel = "CASH";
+    } else if (paidBy.startsWith("PARTNER:")) {
+      where.paidByPartnerId = paidBy.replace("PARTNER:", "");
+    } else if (paidBy.startsWith("BANK:")) {
+      where.bankAccountId = paidBy.replace("BANK:", "");
+    }
+  }
   if (from || to) {
     where.expenseDate = {};
     if (from) where.expenseDate.gte = new Date(from);
     if (to) where.expenseDate.lte = new Date(to);
   }
 
-  const [expenses, allStatusExpenses, projects, banks, partners] = await Promise.all([
+  const [expenses, allStatusExpenses, allExpensesMeta, projects, banks, partners] = await Promise.all([
     prisma.projectExpense.findMany({
       where,
       include: {
@@ -49,6 +64,9 @@ export async function GET(req: NextRequest) {
     }),
     prisma.projectExpense.findMany({
       select: { id: true, status: true, amount: true },
+    }),
+    prisma.projectExpense.findMany({
+      select: { id: true, createdBy: true, approvedBy: true, paidByPartnerId: true, bankAccountId: true, paymentChannel: true },
     }),
     prisma.landProject.findMany({ select: { id: true, projectName: true } }),
     prisma.bankAccount.findMany({ select: { id: true, bankName: true, accountNumber: true } }),
@@ -88,9 +106,9 @@ export async function GET(req: NextRequest) {
     auditByRecord.set(log.recordId, list);
   }
 
-  // Collect all unique user IDs
+  // Collect all unique user IDs across all expenses + audit logs
   const userIds = new Set<string>();
-  for (const e of expenses) {
+  for (const e of allExpensesMeta) {
     if (e.createdBy) userIds.add(e.createdBy);
     if (e.approvedBy) userIds.add(e.approvedBy);
   }
@@ -118,6 +136,27 @@ export async function GET(req: NextRequest) {
     }
     return { id: uid, name: `User (${uid.slice(0, 6)})`, email: "" };
   };
+
+  // Distinct posters (who created/posted vouchers)
+  const posterIds = new Set<string>();
+  for (const e of allExpensesMeta) {
+    if (e.createdBy) posterIds.add(e.createdBy);
+  }
+  const posters = Array.from(posterIds)
+    .map((uid) => resolveUser(uid))
+    .filter(Boolean) as Array<{ id: string; name: string; email: string }>;
+
+  // Distinct reviewers (who approved / rejected vouchers)
+  const reviewerIds = new Set<string>();
+  for (const e of allExpensesMeta) {
+    if (e.approvedBy) reviewerIds.add(e.approvedBy);
+  }
+  for (const log of auditLogs) {
+    if (log.changedBy) reviewerIds.add(log.changedBy);
+  }
+  const reviewers = Array.from(reviewerIds)
+    .map((uid) => resolveUser(uid))
+    .filter(Boolean) as Array<{ id: string; name: string; email: string }>;
 
   // Map each expense to enriched voucher object
   const vouchers = expenses.map((e: any) => {
@@ -169,6 +208,7 @@ export async function GET(req: NextRequest) {
       paidByDisplay = `${e.paidByPartner.name} (Partner)`;
       paidByDetails = {
         type: "PARTNER",
+        id: e.paidByPartner.id,
         name: e.paidByPartner.name,
         phone: e.paidByPartner.phone,
       };
@@ -176,6 +216,7 @@ export async function GET(req: NextRequest) {
       paidByDisplay = `${e.bankAccount.bankName} - ${e.bankAccount.accountNumber}`;
       paidByDetails = {
         type: "BANK",
+        id: e.bankAccount.id,
         bankName: e.bankAccount.bankName,
         accountNumber: e.bankAccount.accountNumber,
       };
@@ -227,23 +268,35 @@ export async function GET(req: NextRequest) {
     };
   });
 
+  // Filter by reviewedBy if requested
+  let filteredVouchers = vouchers;
+  if (reviewedBy) {
+    filteredVouchers = filteredVouchers.filter((v: any) => {
+      return (
+        v.approved?.user?.id === reviewedBy ||
+        v.rejected?.user?.id === reviewedBy ||
+        v.cancelled?.user?.id === reviewedBy
+      );
+    });
+  }
+
   // Client search filtering if provided
-  const filteredVouchers = search
-    ? vouchers.filter((v: any) => {
-        return (
-          v.voucherNo.toLowerCase().includes(search) ||
-          v.category.toLowerCase().includes(search) ||
-          v.description.toLowerCase().includes(search) ||
-          v.projectName.toLowerCase().includes(search) ||
-          v.paidByDisplay.toLowerCase().includes(search) ||
-          (v.created.user?.name && v.created.user.name.toLowerCase().includes(search)) ||
-          (v.approved?.user?.name && v.approved.user.name.toLowerCase().includes(search)) ||
-          (v.rejected?.user?.name && v.rejected.user.name.toLowerCase().includes(search)) ||
-          (v.cancelled?.user?.name && v.cancelled.user.name.toLowerCase().includes(search)) ||
-          String(v.amount).includes(search)
-        );
-      })
-    : vouchers;
+  if (search) {
+    filteredVouchers = filteredVouchers.filter((v: any) => {
+      return (
+        v.voucherNo.toLowerCase().includes(search) ||
+        v.category.toLowerCase().includes(search) ||
+        v.description.toLowerCase().includes(search) ||
+        v.projectName.toLowerCase().includes(search) ||
+        v.paidByDisplay.toLowerCase().includes(search) ||
+        (v.created.user?.name && v.created.user.name.toLowerCase().includes(search)) ||
+        (v.approved?.user?.name && v.approved.user.name.toLowerCase().includes(search)) ||
+        (v.rejected?.user?.name && v.rejected.user.name.toLowerCase().includes(search)) ||
+        (v.cancelled?.user?.name && v.cancelled.user.name.toLowerCase().includes(search)) ||
+        String(v.amount).includes(search)
+      );
+    });
+  }
 
   return NextResponse.json({
     vouchers: filteredVouchers,
@@ -252,7 +305,8 @@ export async function GET(req: NextRequest) {
       projects,
       banks,
       partners,
+      posters,
+      reviewers,
     },
   });
 }
-
