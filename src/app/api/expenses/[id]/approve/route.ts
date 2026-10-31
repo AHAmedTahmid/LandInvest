@@ -17,7 +17,8 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
   const result=await prisma.$transaction(async(tx:any)=>{
     const exp=await tx.projectExpense.findUnique({where:{id:recordId}});
     if(!exp) throw new Error("Not found");
-    const updated=await tx.projectExpense.update({where:{id:recordId},data:{status:action==="APPROVED"?"APPROVED":"REJECTED",approvedBy:userId}});
+    const targetStatus = action === "APPROVED" ? "APPROVED" : action === "CANCELLED" ? "CANCELLED" : "REJECTED";
+    const updated=await tx.projectExpense.update({where:{id:recordId},data:{status:targetStatus,approvedBy:userId}});
     await writeAudit(tx,"project_expenses",recordId,"UPDATE",userId,exp,updated);
     if(action==="APPROVED"){
       if(isPaidByPartner(exp.paymentChannel)){
