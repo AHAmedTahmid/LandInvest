@@ -145,6 +145,7 @@ export default function VoucherManagementPage() {
   const [actionReason, setActionReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [justUpdatedId, setJustUpdatedId] = useState<string | null>(null);
 
   const reload = useCallback(() => {
     setReloadTrigger((n) => n + 1);
@@ -233,6 +234,14 @@ export default function VoucherManagementPage() {
         message: `Voucher ${actionTarget.voucher.voucherNo} marked as ${actionTarget.action}`,
         type: "success",
       });
+      setJustUpdatedId(actionTarget.voucher.id);
+      setTimeout(() => setJustUpdatedId(null), 4000);
+
+      // If user approved or cancelled while viewing PENDING, switch to ALL so the updated voucher remains clearly visible!
+      if (statusFilter === "PENDING") {
+        setStatusFilter("ALL");
+      }
+
       setActionTarget(null);
       setActionReason("");
       if (activeVoucher?.id === actionTarget.voucher.id) {
@@ -715,7 +724,14 @@ export default function VoucherManagementPage() {
                   const isCancelled = v.status === "CANCELLED";
 
                   return (
-                    <tr key={v.id} className="hover:bg-slate-50/80 transition-colors group">
+                    <tr
+                      key={v.id}
+                      className={`transition-colors group ${
+                        justUpdatedId === v.id
+                          ? "bg-emerald-50/90 ring-2 ring-emerald-400"
+                          : "hover:bg-slate-50/80"
+                      }`}
+                    >
                       {/* Voucher No & Attachment Icon */}
                       <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">

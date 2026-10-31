@@ -60,6 +60,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (action === "APPROVED") {
       if (isPaidByPartner(exp.paymentChannel)) {
+        if (!exp.paidByPartnerId) {
+          throw new Error("Cannot approve: Paid by Partner is selected, but no partner was assigned to this voucher. Please edit the voucher and assign a partner first.");
+        }
         const pt = await tx.partnerTransaction.create({
           data: {
             id: randomUUID(),
@@ -79,7 +82,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             id: randomUUID(),
             txnDate: new Date(),
             accountType: accType,
-            bankAccountId: exp.bankAccountId,
+            bankAccountId: exp.bankAccountId || null,
             flowType: "OUT",
             amount: exp.amount,
             purpose: exp.expenseCategory,
