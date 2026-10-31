@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Users, Wallet, Map, Receipt, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, Map, Receipt, FileCheck, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useLang } from "@/lib/i18n";
 
@@ -12,6 +12,7 @@ const NAV = [
   { href: "/treasury", key: "treasury", icon: Wallet, perm: "treasury.view" },
   { href: "/projects", key: "projects", icon: Map, perm: "projects.view" },
   { href: "/expenses", key: "expenses", icon: Receipt, perm: ["expenses.view", "expenses.create"] },
+  { href: "/vouchers", key: "vouchers", icon: FileCheck, perm: ["expenses.view", "expenses.approve"] },
   { href: "/sales", key: "sales", icon: BadgeDollarSign, perm: ["sales.view", "sales.collect"] },
   { href: "/reports", key: "reports", icon: PieChart, perm: ["reports.view", "profit.view", "reports.financial.view", "reports.partners.view", "reports.projects.view", "reports.sales.view", "reports.audit.view"] },
   { href: "/audit", key: "audit", icon: ShieldCheck, perm: "audit.view" },
@@ -29,6 +30,7 @@ const TITLES: Record<string, string> = {
   "/treasury": "treasury",
   "/projects": "projects",
   "/expenses": "expenses",
+  "/vouchers": "vouchers",
   "/sales": "sales",
   "/reports": "reports",
   "/audit": "audit",

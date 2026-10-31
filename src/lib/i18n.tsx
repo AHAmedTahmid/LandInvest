@@ -10,6 +10,7 @@ const DICT: Record<string, { en: string; bn: string }> = {
   treasury: { en: "Cash & Bank Ledger", bn: "ক্যাশ ও ব্যাংক লেজার" },
   projects: { en: "Land & Acquisition", bn: "জমি ও অধিগ্রহণ" },
   expenses: { en: "Project Expenses", bn: "প্রকল্প ব্যয়" },
+  vouchers: { en: "Voucher Management", bn: "ভাউচার ব্যবস্থাপনা" },
   sales: { en: "Plot Sales & Dues", bn: "প্লট বিক্রয় ও বকেয়া" },
   pnl: { en: "Profit & Loss (P&L)", bn: "লাভ-ক্ষতি" },
   reports: { en: "Reports", bn: "প্রতিবেদন" },

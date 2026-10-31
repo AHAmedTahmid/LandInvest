@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, Loader2, FileCheck } from "lucide-react";
 import { formatBDT } from "@/lib/format";
 
 type Expense = {
@@ -104,7 +105,15 @@ export default function ExpensesPage() {
         </div>
       )}
 
-      <h1 className="text-2xl font-bold">Expenses</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Expenses</h1>
+        <Link
+          href="/vouchers"
+          className="flex items-center gap-2 bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-sm"
+        >
+          <FileCheck className="w-4 h-4" /> Go to Voucher Management
+        </Link>
+      </div>
 
       <ExpenseForm projects={projects} banks={banks} partners={partners} />
 
