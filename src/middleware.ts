@@ -22,6 +22,11 @@ export function middleware(request: NextRequest) {
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "127.0.0.1";
+
+  // Do not rate-limit local development / loopback connections so testing & admin work is never blocked
+  if (ip === "127.0.0.1" || ip === "::1" || ip === "localhost") {
+    return NextResponse.next();
+  }
   const now = Date.now();
   sweep(now);
   const rec = attempts.get(ip);
