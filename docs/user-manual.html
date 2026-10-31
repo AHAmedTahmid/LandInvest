@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LandInvest - User Manual</title>
+<style>
+  @page { size: A4; margin: 20mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11.5px; line-height: 1.55; color: #222; margin: 0; }
+  .page { page-break-after: always; padding: 0; }
+  .page:last-child { page-break-after: auto; }
+  h1 { font-size: 24px; margin: 0 0 4px 0; color: #0f3d91; }
+  h2 { font-size: 16.5px; margin: 26px 0 8px 0; padding-bottom: 4px; border-bottom: 2px solid #0f3d91; color: #0f3d91; page-break-after: avoid; }
+  h3 { font-size: 13.5px; margin: 16px 0 6px 0; color: #123c7c; page-break-after: avoid; }
+  h4 { font-size: 12px; margin: 12px 0 4px 0; color: #123c7c; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  .cover { text-align: center; padding-top: 60px; }
+  .cover h1 { font-size: 30px; }
+  .cover .subtitle { font-size: 15px; color: #444; margin: 10px 0; }
+  .cover .meta { font-size: 12px; color: #666; margin-top: 40px; }
+  .muted { color: #666; font-size: 10.5px; }
+  .step { margin: 8px 0 8px 4px; }
+  .step ol { margin: 4px 0 6px 22px; padding: 0; }
+  .step li { margin: 3px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 12px 0; font-size: 10.5px; }
+  th { background: #0f3d91; color: #fff; padding: 5px 6px; text-align: left; border: 1px solid #9db8e0; }
+  td { padding: 4px 6px; border: 1px solid #b9c8e4; vertical-align: top; }
+  tr:nth-child(even) td { background: #eef3fb; }
+  pre { background: #f4f6fb; border: 1px solid #c9d6ee; border-radius: 4px; padding: 8px; font-size: 9.5px; overflow-x: auto; white-space: pre; page-break-inside: avoid; }
+  .diagram { background: #fafbfe; border: 1px dashed #9db8e0; border-radius: 6px; padding: 10px; font-family: Consolas, monospace; font-size: 10px; overflow-x: auto; page-break-inside: avoid; }
+  .callout { background: #fff8e1; border-left: 4px solid #f0a500; padding: 8px 10px; margin: 10px 0; font-size: 10.5px; border-radius: 0 4px 4px 0; }
+  .callout.info { background: #e8f0fe; border-left-color: #0f3d91; }
+  .callout.ok { background: #e6f4ea; border-left-color: #1e8e3e; }
+  .two-col { column-count: 2; }
+  ul.tight { margin: 4px 0; padding-left: 20px; }
+  ul.tight li { margin: 2px 0; }
+  .box { display: inline-block; background: #0f3d91; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10.5px; }
+  .box.green { background: #1e8e3e; }
+  .box.orange { background: #e8710a; }
+  .flow-step { display: inline-block; background: #eef3fb; border: 1px solid #0f3d91; color: #0f3d91; padding: 3px 10px; border-radius: 12px; font-size: 10.5px; margin: 2px; }
+  .flow-arrow { color: #e8710a; font-weight: bold; margin: 0 4px; }
+  .footer { position: fixed; bottom: 12mm; left: 0; right: 0; text-align: center; font-size: 9px; color: #888; }
+  @media print { .footer { position: static; } }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="cover">
+      <div class="muted">LandInvest Software</div>
+      <h1>User Manual</h1>
+      <div class="subtitle">Land Partnership Accounting &amp; Management System</div>
+      <p>For partners, managers, accountants, sales agents and auditors of a land-investment syndicate.</p>
+      <div class="meta">Version 1.0 &nbsp;|&nbsp; LandInvest ERP &nbsp;|&nbsp; For Use with Demo Data</div>
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>1. Welcome to LandInvest</h1>
+    <p><b>LandInvest</b> is a smart accounting &amp; management system made for land-investment partnerships (called <b>syndicates</b>) in Bangladesh.</p>
+    <h2>What LandInvest does (in simple words)</h2>
+    <p>Running a land partnership means many people invest together to buy land, build on it, sell plots and share the profit.</p>
+    <p>LandInvest keeps everything in one place:</p>
+    <ul class="tight">
+      <li><b>Partners</b> — the people who invested money into the partnership.</li>
+      <li><b>Land projects</b> — the plots of land the partnership owns or is building on.</li>
+      <li><b>Sales</b> — selling plots to buyers, and tracking installments (monthly payments).</li>
+      <li><b>Expenses</b> — recording money spent on buying land, development, labor, etc.</li>
+      <li><b>Treasury</b> — tracking money received (from sales) and money paid (for expenses / partner withdrawals).</li>
+      <li><b>Profit distribution</b> — splitting the net profit among partners according to their share.</li>
+      <li><b>Reports</b> — creating financial reports and exporting them as PDF or Excel.</li>
+    </ul>
+    <h2>How the money flows (simple diagram)</h2>
+    <div class="diagram">
+      <span class="flow-step">1. Partner invests capital</span> <span class="flow-arrow">-&gt;</span> <span class="flow-step">2. Syndicate buys land / develops plots</span> <span class="flow-arrow">-&gt</span> <span class="flow-step">3. Syndicate sells plot to buyer</span> <span class="flow-arrow">-&gt</span> <span class="flow-step">4. Buyer pays installments</span> <span class="flow-arrow">-&gt</span> <span class="flow-step">5. Money received &amp; paid out (Treasury)</span> <span class="flow-arrow">-&gt</span> <span class="flow-step">6. Revenue - Costs = Profit</span> <span class="flow-arrow">-&gt</span> <span class="flow-step">7. Profit split among partners</span>
+    </div>
+    <pre>
+      [Partner A] --invests--> [Syndicate Land Fund]
+        --&gt; [Buy Land / Build] --&gt; [Sell Plots] --&gt; [Buyer Inst. Payments]
+        --&gt; [Treasury: Money In / Money Out]
+        --&gt; [Net Profit] --split by share--> [Partner A, Partner B, ...]
+    </pre>
+    <div class="callout info">In simple terms: LandInvest is the single source of truth for money, land, sales and profit of your partnership.</div>
+  </div>
+
+  <div class="page">
+    <h1>2. Getting Started</h1>
+    <p>This manual helps you use LandInvest step by step. You need:</p>
+    <ul class="tight">
+      <li>An internet browser (Chrome, Edge, Firefox).</li>
+      <li>The LandInvest web address: <b>http://localhost:3000</b></li>
+      <li>Your login email and password (provided by your administrator).</li>
+    </ul>
+    <h2>2.1 System access</h2>
+    <p>The application is already installed and running on the server. Ask your administrator for the correct web address and login details.</p>
+    <h2>2.2 First login</h2>
+    <div class="step">
+      <ol>
+        <li>Open your browser and go to the LandInvest address.</li>
+        <li>On the login page, type your <b>registered email address</b>.</li>
+        <li>Type your <b>password</b>.</li>
+        <li>Click the <b>Sign In</b> button.</li>
+        <li>If the details are correct, you will be taken to the <b>Dashboard</b>.</li>
+      </ol>
+    </div>
+    <div class="callout ok">Tip: If you forgot your password, use the <b>Forgot Password</b> option on the login page and follow the instructions sent to your email.</div>
+  </div>
+
+  <div class="page">
+    <h1>3. Logging In / Logging Out / Account</h1>
+    <h2>3.1 Logout</h2>
+    <div class="step">
+      <ol>
+        <li>Click your name / profile icon in the top-right corner.</li>
+        <li>Click <b>Logout</b>.</li>
+        <li>The login page will appear again.</li>
+      </ol>
+    </div>
+    <h2>3.2 Change password</h2>
+    <div class="step">
+      <ol>
+        <li>Go to <b>Settings</b> (or your profile menu).</li>
+        <li>Open <b>Change Password</b>.</li>
+        <li>Enter current password, new password and confirm new password.</li>
+        <li>Click <b>Save</b>.</li>
+      </ol>
+    </div>
+    <h2>3.3 Inviting a new user</h2>
+    <div class="step">
+      <ol>
+        <li>Go to <b>Settings &gt; Users &amp; Invites</b> (depending on your role permissions).</li>
+        <li>Click <b>Invite User</b>.</li>
+        <li>Enter the email, full name and assign a role.</li>
+        <li>Send the invitation. The invited person receives an email with sign-up instructions.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>4. Dashboard</h1>
+    <p>The Dashboard is your first screen after login. It gives you a quick summary:</p>
+    <ul class="tight">
+      <li>Total partners / capital.</li>
+      <li>Active land projects.</li>
+      <li>Total sales and collections.</li>
+      <li>Current expenses and treasury balance.</li>
+      <li>Profit summary.</li>
+    </ul>
+    <h2>How to use it</h2>
+    <div class="step">
+      <ol>
+        <li>Log in as usual.</li>
+        <li>You land on <b>Dashboard</b>.</li>
+        <li>Use the menu on the left / top to jump to any module.</li>
+      </ol>
+    </div>
+    <div class="callout info">The Dashboard refreshes automatically. You do not need to refresh manually.</div>
+  </div>
+
+  <div class="page">
+    <h1>5. Partners</h1>
+    <p><b>Partners</b> are the people or entities who put money into the partnership (partner capital).</p>
+    <h2>What you can do</h2>
+    <ul class="tight">
+      <li>Add a new partner.</li>
+      <li>View partner details (capital contributed, expenses, sales, profit, withdrawals).</li>
+      <li>See a summary of all partners.</li>
+    </ul>
+    <h2>How to add a partner</h2>
+    <div class="step">
+      <ol>
+        <li>Open the <b>Partners</b> menu.</li>
+        <li>Click <b>Add Partner</b> (or the <b>+</b> button).</li>
+        <li>Fill in the partner information (name, capital, share, etc.).</li>
+        <li>Click <b>Save</b>.</li>
+        <li>The partner appears in the partner list.</li>
+      </ol>
+    </div>
+    <div class="callout">Important: Adding a partner does not mean money has come in yet. Partner capital is usually created when the partner contributes to the partnership fund.</div>
+  </div>
+
+  <div class="page">
+    <h1>6. Sales &amp; Buyers</h1>
+    <p>This module handles plot sales: which plot was sold, to which buyer, at what price, and through which installments.</p>
+    <h2>Key screens</h2>
+    <ul class="tight">
+      <li><b>Sales Register</b> — list of all sales (buyer, price, paid amount, due amount).</li>
+      <li><b>Plot Inventory</b> — plots by status with inventory value.</li>
+      <li><b>Buyer Statement</b> — contract details, installments, payments, remaining due.</li>
+      <li><b>Installment Due / Overdue</b> — upcoming and overdue installments with buyer phone.</li>
+      <li><b>Collection Report</b> — payments received in a period.</li>
+    </ul>
+    <h2>How to record / follow a sale</h2>
+    <div class="step">
+      <ol>
+        <li>Open the <b>Sales</b> menu.</li>
+        <li>Open the relevant <b>Sale / Project</b>.</li>
+        <li>Enter or update buyer and plot details.</li>
+        <li>Record installment payments against the sale.</li>
+        <li>Use the <b>Reports &gt; Sales Register</b> to see status: Paid / Due / Overdue.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>7. Expenses</h1>
+    <p>Expenses are money paid out by the partnership (land acquisition, development, labor, misc).</p>
+    <h2>How to record an expense</h2>
+    <div class="step">
+      <ol>
+        <li>Open the <b>Expenses</b> menu.</li>
+        <li>Click <b>New Expense</b>.</li>
+        <li>Select the <b>Project</b>, category (Registration, Mutation, Bayna, Labor, Survey, Misc), amount, date, payee, etc.</li>
+        <li>Save the expense.</li>
+      </ol>
+    </div>
+    <h2>Approval</h2>
+    <p>Some expenses may need approval. Check the <b>Pending Approval</b> report to see expenses waiting for approval and their age in days.</p>
+  </div>
+
+  <div class="page">
+    <h1>8. Vouchers</h1>
+    <p>Every financial transaction in LandInvest that involves money is recorded through a <b>voucher</b>.</p>
+    <h2>Where vouchers are generated</h2>
+    <ul class="tight">
+      <li><b>Expense Vouchers</b> — generated automatically when a new expense is recorded (land acquisition, development, labor, survey, etc.) from the <b>Expenses</b> module.</li>
+      <li><b>Payment Vouchers</b> — generated when a payment is made out of the partnership funds.</li>
+      <li><b>Petty Cash Vouchers</b> — generated for small cash expenses (petty cash).</li>
+    </ul>
+    <h2>What a voucher contains</h2>
+    <ul class="tight">
+      <li>Voucher number (auto-generated from the expense / transaction reference).</li>
+      <li>Date of the transaction.</li>
+      <li>Receiver / payee name and phone.</li>
+      <li>Amount and purpose of payment.</li>
+      <li>Payment mode (cash / bank / partner), account head, cheque number.</li>
+    </ul>
+    <h2>Attached voucher image</h2>
+    <div class="step">
+      <ol>
+        <li>When recording an expense, attach the scanned <b>voucher / bill / receipt</b> image using the voucher file field.</li>
+        <li>The image is stored together with the expense record.</li>
+      </ol>
+    </div>
+    <h2>Where to see vouchers</h2>
+    <div class="step">
+      <ol>
+        <li>Go to <b>Reports &gt; Expense Register</b>.</li>
+        <li>This report lists <b>all vouchers</b> with subtotals grouped by category.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>9. Projects</h1>
+    <p><b>Land projects</b> group plots, costs and sales together.</p>
+    <ul class="tight">
+      <li><b>Project Cost Statement</b> — acquisition + development expenses, cost per plot (Shotok).</li>
+      <li><b>Project Profit &amp; Loss</b> — invoiced and realised profit.</li>
+      <li><b>All Projects Comparison</b> — area, cost, sales, collected, receivable, profit, ROI, status.</li>
+      <li><b>Land Document Register</b> — Mouza, JL, Dag, Khatian numbers, area, status.</li>
+    </ul>
+    <div class="callout info">Open a project from the Projects menu to see its plots, costs, sales and reports.</div>
+  </div>
+
+  <div class="page">
+    <h1>10. Treasury &amp; Money Movement</h1>
+    <p>The Treasury module tracks all money: what came in and what went out.</p>
+    <h2>Key screens</h2>
+    <ul class="tight">
+      <li><b>Cash Book</b> — date-wise cash in/out with running balance.</li>
+      <li><b>Bank Book</b> — bank account transactions with running balance.</li>
+      <li><b>Receipts &amp; Payments Statement</b> — money in/out grouped by purpose.</li>
+      <li><b>Contra / Fund Transfer Register</b> — all cash/bank transfers.</li>
+    </ul>
+    <h2>How money moves</h2>
+    <div class="diagram">
+      Money In (Sale installments / capital) --> Treasury <br>
+      Money Out (Expenses / payouts) --> Treasury <br>
+      Balance = Money In - Money Out
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>11. Reports</h1>
+    <p>LandInvest provides a rich set of reports. All reports can be exported as <b>PDF</b> or <b>Excel</b>.</p>
+    <h2>Report categories</h2>
+    <table>
+      <tr><th>Category</th><th>Reports</th></tr>
+      <tr><td><b>Financial / Treasury</b></td><td>Cash Book, Bank Book, Daily Collection &amp; Payment Summary, Receipts &amp; Payments Statement, Contra Register</td></tr>
+      <tr><td><b>Partners</b></td><td>Partner Capital Statement, All Partners Summary, Partner Contribution by Project</td></tr>
+      <tr><td><b>Projects</b></td><td>Project Cost Statement, Project P&amp;L, Projects Comparison, Expense Register, Pending Approval, Land Documents</td></tr>
+      <tr><td><b>Sales</b></td><td>Sales Register, Plot Inventory, Buyer Statement, Receivables Aging, Installment Due &amp; Overdue, Collection Report</td></tr>
+      <tr><td><b>Profit</b></td><td>Profit Allocation Sheet, Profit Distribution History</td></tr>
+      <tr><td><b>Audit</b></td><td>Audit Trail, User Activity, Reconciliation Check</td></tr>
+    </table>
+    <h2>How to open and use a report</h2>
+    <div class="step">
+      <ol>
+        <li>Open the <b>Reports</b> menu.</li>
+        <li>Choose a report (for example <b>Cash Book</b>).</li>
+        <li>Apply filters if needed (date range, project, partner, status, sale, user, table, action).</li>
+        <li>Click <b>Generate</b> / <b>Run</b>.</li>
+        <li>To export, use the <b>PDF</b> or <b>Excel</b> export button.</li>
+      </ol>
+    </div>
+    <div class="callout ok">The exported file (PDF / Excel) can be shared with clients, auditors or management for review.</div>
+  </div>
+
+  <div class="page">
+    <h1>12. Profit Distribution</h1>
+    <p>After sales generate revenue and costs are recorded, the net profit is distributed among partners according to their capital share.</p>
+    <h2>Steps</h2>
+    <div class="step">
+      <ol>
+        <li>Check the <b>Profit Allocation Sheet</b> report.</li>
+        <li>Check <b>Profit Distribution History</b> to see past runs.</li>
+        <li>Confirm amounts with the partnership owner before distributing to partners.</li>
+      </ol>
+    </div>
+    <div class="diagram">
+      [Sales Revenue] - [Project Costs] = [Net Profit]
+                            |
+                            |  split by Partner Share (%)
+                            v
+              [Partner A] [Partner B] [Partner C]
+    </div>
+  </div>
+
+  <div class="page">
+    <h1>13. Users, Roles, Audit &amp; Billing</h1>
+    <h2>Roles</h2>
+    <p>Each user gets a role (Owner, Managing Partner, Site Manager, Accountant, Auditor, Sales Agent, etc.) which controls what they can see and do. Permissions are managed from <b>Settings</b>.</p>
+    <h2>Audit Trail</h2>
+    <p>The system keeps an <b>Audit Trail</b> of who changed what and when, plus <b>User Activity</b>.</p>
+    <h2>Billing</h2>
+    <p>Syndicate subscription / billing records are under <b>Billing</b>.</p>
+  </div>
+
+  <div class="page">
+    <h1>14. Troubleshooting</h1>
+    <table>
+      <tr><th>Problem</th><th>What to do</th></tr>
+      <tr><td>Cannot log in / wrong password</td><td>Use <b>Forgot Password</b> or ask your administrator to reset it.</td></tr>
+      <tr><td>Old data missing after adding new partner/sale</td><td>Check that you saved the entry, then refresh the page.</td></tr>
+      <tr><td>Report is empty</td><td>Check the applied filters (date range / project / status) and try again.</td></tr>
+      <tr><td>Export fails</td><td>Try again with a smaller date range; large reports may take time.</td></tr>
+      <tr><td>Seeing an error / blank screen</td><td>Refresh the page; if it persists, contact support with the error message.</td></tr>
+    </table>
+  </div>
+
+  <div class="page">
+    <h1>15. Quick Reference — Common Tasks</h1>
+    <table>
+      <tr><th>I want to...</th><th>Go to...</th><th>How</th></tr>
+      <tr><td>See today's cash position</td><td>Treasury &gt; Cash Book</td><td>Open Cash Book, check balance</td></tr>
+      <tr><td>Know who owes money</td><td>Sales &gt; Receivables Aging / Installments</td><td>Open report, review due/overdue</td></tr>
+      <tr><td>Check profit for a project</td><td>Reports &gt; Project P&amp;L</td><td>Open report, select project, generate</td></tr>
+      <tr><td>See audit of changes</td><td>Reports &gt; Audit Trail</td><td>Open report, filter by user/table/action</td></tr>
+      <tr><td>Change my password</td><td>Settings &gt; Change Password</td><td>Enter current + new, save</td></tr>
+    </table>
+  </div>
+
+  <div class="page">
+    <h1>16. Support</h1>
+    <p>If you need help, contact your system administrator or the LandInvest support team.</p>
+    <div class="callout">For technical issues related to server setup, contact your administrator. For usage questions, your manager / partner owner can assist.</div>
+    <h2>Glossary (simple terms)</h2>
+    <ul class="tight">
+      <li><b>Partner</b> — person who invested in the partnership.</li>
+      <li><b>Plot</b> — a piece of land.</li>
+      <li><b>Buyer</b> — person who buys the plot.</li>
+      <li><b>Installment</b> — scheduled payment by buyer.</li>
+      <li><b>Expense</b> — money spent by the partnership.</li>
+      <li><b>Profit</b> — money left after selling land minus costs.</li>
+      <li><b>Capital</b> — money contributed by partners.</li>
+    </ul>
+    <div class="footer">LandInvest User Manual &nbsp;|&nbsp; Land Partnership Accounting System</div>
+  </div>
+</body>
+</html>
