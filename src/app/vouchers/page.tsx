@@ -25,6 +25,8 @@ import {
   X,
   Filter,
   UserCheck,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { formatBDT } from "@/lib/format";
 
@@ -127,6 +129,10 @@ export default function VoucherManagementPage() {
   const [reviewedByFilter, setReviewedByFilter] = useState<string>("");
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
+
+  // Pagination (Show 10, 25, 50, 100 entries)
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const [reloadTrigger, setReloadTrigger] = useState(0);
 
@@ -250,7 +256,24 @@ export default function VoucherManagementPage() {
     setReviewedByFilter("");
     setFromDate("");
     setToDate("");
+    setCurrentPage(1);
   };
+
+  // Reset page to 1 when any filter changes (render-phase state adjustment per React docs)
+  const [prevFilterKey, setPrevFilterKey] = useState("");
+  const filterKey = `${statusFilter}|${projectFilter}|${postedByFilter}|${paidByFilter}|${reviewedByFilter}|${searchTerm}|${fromDate}|${toDate}|${pageSize}`;
+  if (prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey);
+    setCurrentPage(1);
+  }
+
+  // Pagination calculations
+  const totalEntries = vouchers.length;
+  const totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = totalEntries === 0 ? 0 : (safeCurrentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalEntries);
+  const paginatedVouchers = vouchers.slice(startIndex, endIndex);
 
   const hasActiveFilters =
     statusFilter !== "ALL" ||
@@ -593,6 +616,39 @@ export default function VoucherManagementPage() {
 
       {/* Vouchers Table with explicit Posted By, Paid By, and Reviewed By columns */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Table Top Bar: Show entries selector & summary */}
+        <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
+          <div className="flex items-center gap-2 text-xs text-slate-600">
+            <span className="font-medium text-slate-700">Show</span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-slate-300 rounded px-2.5 py-1 text-xs bg-white font-semibold text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span className="font-medium text-slate-700">entries</span>
+          </div>
+
+          <div className="text-xs text-slate-500 font-medium">
+            {totalEntries === 0 ? (
+              "Showing 0 to 0 of 0 entries"
+            ) : (
+              <>
+                Showing <b className="text-slate-800">{startIndex + 1}</b> to{" "}
+                <b className="text-slate-800">{endIndex}</b> of{" "}
+                <b className="text-slate-800">{totalEntries}</b> entries
+              </>
+            )}
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
@@ -652,7 +708,7 @@ export default function VoucherManagementPage() {
                   </td>
                 </tr>
               ) : (
-                vouchers.map((v) => {
+                paginatedVouchers.map((v) => {
                   const isPending = v.status === "PENDING";
                   const isApproved = v.status === "APPROVED";
                   const isRejected = v.status === "REJECTED";
@@ -872,6 +928,74 @@ export default function VoucherManagementPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Table Footer with Pagination Controls */}
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="text-slate-500 font-medium">
+            {totalEntries === 0 ? (
+              "Showing 0 to 0 of 0 entries"
+            ) : (
+              <>
+                Showing <b className="text-slate-700">{startIndex + 1}</b> to{" "}
+                <b className="text-slate-700">{endIndex}</b> of{" "}
+                <b className="text-slate-700">{totalEntries}</b> entries
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={safeCurrentPage <= 1}
+              className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-white flex items-center gap-1 font-medium transition shadow-sm"
+              title="Previous Page"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
+            </button>
+
+            {/* Page number buttons */}
+            <div className="flex items-center gap-1 mx-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => {
+                  return (
+                    p === 1 ||
+                    p === totalPages ||
+                    Math.abs(p - safeCurrentPage) <= 1
+                  );
+                })
+                .map((p, idx, arr) => {
+                  const prev = arr[idx - 1];
+                  const hasGap = prev && p - prev > 1;
+                  return (
+                    <div key={p} className="flex items-center">
+                      {hasGap && <span className="px-1 text-slate-400">&hellip;</span>}
+                      <button
+                        onClick={() => setCurrentPage(p)}
+                        className={`min-w-[30px] h-7 px-2 rounded-lg text-xs font-semibold transition ${
+                          safeCurrentPage === p
+                            ? "bg-brand-700 text-white shadow-sm"
+                            : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safeCurrentPage >= totalPages}
+              className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-white flex items-center gap-1 font-medium transition shadow-sm"
+              title="Next Page"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
