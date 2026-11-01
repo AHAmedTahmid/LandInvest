@@ -28,6 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Pencil,
+  RotateCcw,
 } from "lucide-react";
 import { formatBDT } from "@/lib/format";
 
@@ -141,7 +142,7 @@ export default function VoucherManagementPage() {
   const [activeVoucher, setActiveVoucher] = useState<Voucher | null>(null);
   const [actionTarget, setActionTarget] = useState<{
     voucher: Voucher;
-    action: "APPROVED" | "REJECTED" | "CANCELLED";
+    action: "APPROVED" | "REJECTED" | "CANCELLED" | "REACTIVATED";
   } | null>(null);
   const [actionReason, setActionReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
@@ -245,14 +246,20 @@ export default function VoucherManagementPage() {
       if (!res.ok) throw new Error(data.error || "Action failed");
 
       setToast({
-        message: `Voucher ${actionTarget.voucher.voucherNo} marked as ${actionTarget.action}`,
+        message:
+          actionTarget.action === "REACTIVATED"
+            ? `Voucher ${actionTarget.voucher.voucherNo} reactivated to PENDING. Financial amounts reversed from ledgers.`
+            : `Voucher ${actionTarget.voucher.voucherNo} marked as ${actionTarget.action}`,
         type: "success",
       });
       setJustUpdatedId(actionTarget.voucher.id);
       setTimeout(() => setJustUpdatedId(null), 4000);
 
-      // If user approved or cancelled while viewing PENDING, switch to ALL so the updated voucher remains clearly visible!
-      if (statusFilter === "PENDING") {
+      // If user approved, cancelled, or reactivated while a single status filter is active, switch to ALL so the updated voucher remains visible!
+      if (
+        (statusFilter === "PENDING" && actionTarget.action !== "REACTIVATED") ||
+        (statusFilter !== "ALL" && actionTarget.action === "REACTIVATED")
+      ) {
         setStatusFilter("ALL");
       }
 
@@ -991,7 +998,7 @@ export default function VoucherManagementPage() {
                             <Pencil className="w-4 h-4" />
                           </button>
 
-                          {isPending && (
+                          {isPending ? (
                             <>
                               <button
                                 onClick={() => setActionTarget({ voucher: v, action: "APPROVED" })}
@@ -1012,6 +1019,15 @@ export default function VoucherManagementPage() {
                                 Cancel
                               </button>
                             </>
+                          ) : (
+                            <button
+                              onClick={() => setActionTarget({ voucher: v, action: "REACTIVATED" })}
+                              className="flex items-center gap-1 px-2 py-1 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded transition shadow-sm"
+                              title="Reactivate voucher to PENDING (reverses amounts from financial ledgers)"
+                            >
+                              <RotateCcw className="w-3 h-3 text-amber-600" />
+                              Reactivate
+                            </button>
                           )}
                         </div>
                       </td>
@@ -1394,6 +1410,18 @@ export default function VoucherManagementPage() {
                   <Pencil className="w-3.5 h-3.5 text-blue-600" />
                   Edit Voucher
                 </button>
+                {activeVoucher.status !== "PENDING" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActionTarget({ voucher: activeVoucher, action: "REACTIVATED" });
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 transition shadow-sm"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
+                    Reactivate to Pending
+                  </button>
+                )}
               </div>
 
               {activeVoucher.status === "PENDING" && (
@@ -1439,6 +1467,8 @@ export default function VoucherManagementPage() {
                   ? "bg-emerald-600"
                   : actionTarget.action === "REJECTED"
                   ? "bg-rose-600"
+                  : actionTarget.action === "REACTIVATED"
+                  ? "bg-amber-600"
                   : "bg-slate-800"
               }`}
             >
@@ -1447,10 +1477,16 @@ export default function VoucherManagementPage() {
                   <CheckCircle2 className="w-5 h-5" />
                 ) : actionTarget.action === "REJECTED" ? (
                   <XCircle className="w-5 h-5" />
+                ) : actionTarget.action === "REACTIVATED" ? (
+                  <RotateCcw className="w-5 h-5" />
                 ) : (
                   <Ban className="w-5 h-5" />
                 )}
-                <h3 className="font-bold text-sm">Confirm Voucher {actionTarget.action}</h3>
+                <h3 className="font-bold text-sm">
+                  {actionTarget.action === "REACTIVATED"
+                    ? "Confirm Voucher Reactivation"
+                    : `Confirm Voucher ${actionTarget.action}`}
+                </h3>
               </div>
               <button
                 onClick={() => setActionTarget(null)}
@@ -1461,21 +1497,48 @@ export default function VoucherManagementPage() {
             </div>
 
             <div className="p-5 space-y-4">
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Are you sure you want to mark voucher{" "}
-                <b className="text-slate-900">{actionTarget.voucher.voucherNo}</b> (
-                {formatBDT(actionTarget.voucher.amount)} - {actionTarget.voucher.category}) as{" "}
-                <b className="uppercase">{actionTarget.action}</b>?
-              </p>
+              {actionTarget.action === "REACTIVATED" ? (
+                <div className="space-y-2.5">
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    Are you sure you want to reactivate voucher{" "}
+                    <b className="text-slate-900">{actionTarget.voucher.voucherNo}</b> (
+                    {formatBDT(actionTarget.voucher.amount)} - {actionTarget.voucher.category}) back to{" "}
+                    <b className="text-amber-700 font-bold uppercase">PENDING</b>?
+                  </p>
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed">
+                    <p className="font-semibold mb-1 flex items-center gap-1.5 text-amber-800">
+                      <AlertCircle className="w-4 h-4 text-amber-600" />
+                      Financial Ledger Impact Notice
+                    </p>
+                    Reactivating will return this voucher to the approval queue. The amount of{" "}
+                    <b>{formatBDT(actionTarget.voucher.amount)}</b> will be immediately reduced and reversed from all financial balance sheets, treasury cash/bank books, and partner capital ledgers.
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Are you sure you want to mark voucher{" "}
+                  <b className="text-slate-900">{actionTarget.voucher.voucherNo}</b> (
+                  {formatBDT(actionTarget.voucher.amount)} - {actionTarget.voucher.category}) as{" "}
+                  <b className="uppercase">{actionTarget.action}</b>?
+                </p>
+              )}
 
-              {(actionTarget.action === "REJECTED" || actionTarget.action === "CANCELLED") && (
+              {(actionTarget.action === "REJECTED" ||
+                actionTarget.action === "CANCELLED" ||
+                actionTarget.action === "REACTIVATED") && (
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Reason / Remarks (Optional)
+                    {actionTarget.action === "REACTIVATED"
+                      ? "Reason for Reactivation (Optional)"
+                      : "Reason / Remarks (Optional)"}
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="Provide a reason for rejection/cancellation…"
+                    placeholder={
+                      actionTarget.action === "REACTIVATED"
+                        ? "e.g. Returned for correction of amount or receipt attachment…"
+                        : "Provide a reason for rejection/cancellation…"
+                    }
                     value={actionReason}
                     onChange={(e) => setActionReason(e.target.value)}
                     className="w-full p-2.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
@@ -1501,11 +1564,15 @@ export default function VoucherManagementPage() {
                       ? "bg-emerald-600 hover:bg-emerald-500"
                       : actionTarget.action === "REJECTED"
                       ? "bg-rose-600 hover:bg-rose-500"
+                      : actionTarget.action === "REACTIVATED"
+                      ? "bg-amber-600 hover:bg-amber-500"
                       : "bg-slate-800 hover:bg-slate-700"
                   }`}
                 >
                   {actionLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  Confirm {actionTarget.action}
+                  {actionTarget.action === "REACTIVATED"
+                    ? "Confirm Reactivation"
+                    : `Confirm ${actionTarget.action}`}
                 </button>
               </div>
             </div>
