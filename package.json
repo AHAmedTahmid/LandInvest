@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test:i18n": "node scripts/test_translation_keys.mjs",
     "setup": "node scripts/setup.mjs",
     "clean:data": "node scripts/clean_test_data.mjs",
     "seed:roles": "tsx scripts/seed_roles.mjs",
