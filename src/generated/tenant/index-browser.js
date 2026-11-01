@@ -291,6 +291,23 @@ exports.Prisma.UserRoleScalarFieldEnum = {
   assignedAt: 'assignedAt'
 };
 
+exports.Prisma.DashboardLayoutScalarFieldEnum = {
+  id: 'id',
+  scope: 'scope',
+  scopeId: 'scopeId',
+  layout: 'layout',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DashboardSettingScalarFieldEnum = {
+  id: 'id',
+  settingKey: 'settingKey',
+  settingValue: 'settingValue',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -298,6 +315,10 @@ exports.Prisma.SortOrder = {
 
 exports.Prisma.NullableJsonNullValueInput = {
   DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -446,6 +467,19 @@ exports.Prisma.UserRoleOrderByRelevanceFieldEnum = {
   assignedBy: 'assignedBy'
 };
 
+exports.Prisma.DashboardLayoutOrderByRelevanceFieldEnum = {
+  id: 'id',
+  scope: 'scope',
+  scopeId: 'scopeId',
+  updatedBy: 'updatedBy'
+};
+
+exports.Prisma.DashboardSettingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  settingKey: 'settingKey',
+  updatedBy: 'updatedBy'
+};
+
 
 exports.Prisma.ModelName = {
   Partner: 'Partner',
@@ -463,7 +497,9 @@ exports.Prisma.ModelName = {
   AuditLog: 'AuditLog',
   Role: 'Role',
   RolePermission: 'RolePermission',
-  UserRole: 'UserRole'
+  UserRole: 'UserRole',
+  DashboardLayout: 'DashboardLayout',
+  DashboardSetting: 'DashboardSetting'
 };
 
 /**

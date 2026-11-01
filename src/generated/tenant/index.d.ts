@@ -93,6 +93,16 @@ export type RolePermission = $Result.DefaultSelection<Prisma.$RolePermissionPayl
  * 
  */
 export type UserRole = $Result.DefaultSelection<Prisma.$UserRolePayload>
+/**
+ * Model DashboardLayout
+ * 
+ */
+export type DashboardLayout = $Result.DefaultSelection<Prisma.$DashboardLayoutPayload>
+/**
+ * Model DashboardSetting
+ * 
+ */
+export type DashboardSetting = $Result.DefaultSelection<Prisma.$DashboardSettingPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -371,6 +381,26 @@ export class PrismaClient<
     * ```
     */
   get userRole(): Prisma.UserRoleDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dashboardLayout`: Exposes CRUD operations for the **DashboardLayout** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DashboardLayouts
+    * const dashboardLayouts = await prisma.dashboardLayout.findMany()
+    * ```
+    */
+  get dashboardLayout(): Prisma.DashboardLayoutDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dashboardSetting`: Exposes CRUD operations for the **DashboardSetting** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DashboardSettings
+    * const dashboardSettings = await prisma.dashboardSetting.findMany()
+    * ```
+    */
+  get dashboardSetting(): Prisma.DashboardSettingDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -827,7 +857,9 @@ export namespace Prisma {
     AuditLog: 'AuditLog',
     Role: 'Role',
     RolePermission: 'RolePermission',
-    UserRole: 'UserRole'
+    UserRole: 'UserRole',
+    DashboardLayout: 'DashboardLayout',
+    DashboardSetting: 'DashboardSetting'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -846,7 +878,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "partner" | "bankAccount" | "landProject" | "projectPartner" | "treasuryLedger" | "partnerTransaction" | "projectExpense" | "projectPlot" | "landSale" | "installmentSchedule" | "customerPayment" | "profitDistribution" | "auditLog" | "role" | "rolePermission" | "userRole"
+      modelProps: "partner" | "bankAccount" | "landProject" | "projectPartner" | "treasuryLedger" | "partnerTransaction" | "projectExpense" | "projectPlot" | "landSale" | "installmentSchedule" | "customerPayment" | "profitDistribution" | "auditLog" | "role" | "rolePermission" | "userRole" | "dashboardLayout" | "dashboardSetting"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1906,6 +1938,138 @@ export namespace Prisma {
           }
         }
       }
+      DashboardLayout: {
+        payload: Prisma.$DashboardLayoutPayload<ExtArgs>
+        fields: Prisma.DashboardLayoutFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DashboardLayoutFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DashboardLayoutFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload>
+          }
+          findFirst: {
+            args: Prisma.DashboardLayoutFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DashboardLayoutFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload>
+          }
+          findMany: {
+            args: Prisma.DashboardLayoutFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload>[]
+          }
+          create: {
+            args: Prisma.DashboardLayoutCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload>
+          }
+          createMany: {
+            args: Prisma.DashboardLayoutCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.DashboardLayoutDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload>
+          }
+          update: {
+            args: Prisma.DashboardLayoutUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload>
+          }
+          deleteMany: {
+            args: Prisma.DashboardLayoutDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DashboardLayoutUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DashboardLayoutUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardLayoutPayload>
+          }
+          aggregate: {
+            args: Prisma.DashboardLayoutAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDashboardLayout>
+          }
+          groupBy: {
+            args: Prisma.DashboardLayoutGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DashboardLayoutGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DashboardLayoutCountArgs<ExtArgs>
+            result: $Utils.Optional<DashboardLayoutCountAggregateOutputType> | number
+          }
+        }
+      }
+      DashboardSetting: {
+        payload: Prisma.$DashboardSettingPayload<ExtArgs>
+        fields: Prisma.DashboardSettingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DashboardSettingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DashboardSettingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload>
+          }
+          findFirst: {
+            args: Prisma.DashboardSettingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DashboardSettingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload>
+          }
+          findMany: {
+            args: Prisma.DashboardSettingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload>[]
+          }
+          create: {
+            args: Prisma.DashboardSettingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload>
+          }
+          createMany: {
+            args: Prisma.DashboardSettingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.DashboardSettingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload>
+          }
+          update: {
+            args: Prisma.DashboardSettingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload>
+          }
+          deleteMany: {
+            args: Prisma.DashboardSettingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DashboardSettingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DashboardSettingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DashboardSettingPayload>
+          }
+          aggregate: {
+            args: Prisma.DashboardSettingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDashboardSetting>
+          }
+          groupBy: {
+            args: Prisma.DashboardSettingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DashboardSettingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DashboardSettingCountArgs<ExtArgs>
+            result: $Utils.Optional<DashboardSettingCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2018,6 +2182,8 @@ export namespace Prisma {
     role?: RoleOmit
     rolePermission?: RolePermissionOmit
     userRole?: UserRoleOmit
+    dashboardLayout?: DashboardLayoutOmit
+    dashboardSetting?: DashboardSettingOmit
   }
 
   /* Types for Logging */
@@ -18708,6 +18874,1773 @@ export namespace Prisma {
 
 
   /**
+   * Model DashboardLayout
+   */
+
+  export type AggregateDashboardLayout = {
+    _count: DashboardLayoutCountAggregateOutputType | null
+    _min: DashboardLayoutMinAggregateOutputType | null
+    _max: DashboardLayoutMaxAggregateOutputType | null
+  }
+
+  export type DashboardLayoutMinAggregateOutputType = {
+    id: string | null
+    scope: string | null
+    scopeId: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type DashboardLayoutMaxAggregateOutputType = {
+    id: string | null
+    scope: string | null
+    scopeId: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type DashboardLayoutCountAggregateOutputType = {
+    id: number
+    scope: number
+    scopeId: number
+    layout: number
+    updatedBy: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DashboardLayoutMinAggregateInputType = {
+    id?: true
+    scope?: true
+    scopeId?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type DashboardLayoutMaxAggregateInputType = {
+    id?: true
+    scope?: true
+    scopeId?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type DashboardLayoutCountAggregateInputType = {
+    id?: true
+    scope?: true
+    scopeId?: true
+    layout?: true
+    updatedBy?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DashboardLayoutAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DashboardLayout to aggregate.
+     */
+    where?: DashboardLayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardLayouts to fetch.
+     */
+    orderBy?: DashboardLayoutOrderByWithRelationInput | DashboardLayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DashboardLayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardLayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardLayouts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DashboardLayouts
+    **/
+    _count?: true | DashboardLayoutCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DashboardLayoutMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DashboardLayoutMaxAggregateInputType
+  }
+
+  export type GetDashboardLayoutAggregateType<T extends DashboardLayoutAggregateArgs> = {
+        [P in keyof T & keyof AggregateDashboardLayout]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDashboardLayout[P]>
+      : GetScalarType<T[P], AggregateDashboardLayout[P]>
+  }
+
+
+
+
+  export type DashboardLayoutGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DashboardLayoutWhereInput
+    orderBy?: DashboardLayoutOrderByWithAggregationInput | DashboardLayoutOrderByWithAggregationInput[]
+    by: DashboardLayoutScalarFieldEnum[] | DashboardLayoutScalarFieldEnum
+    having?: DashboardLayoutScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DashboardLayoutCountAggregateInputType | true
+    _min?: DashboardLayoutMinAggregateInputType
+    _max?: DashboardLayoutMaxAggregateInputType
+  }
+
+  export type DashboardLayoutGroupByOutputType = {
+    id: string
+    scope: string
+    scopeId: string
+    layout: JsonValue
+    updatedBy: string | null
+    updatedAt: Date
+    _count: DashboardLayoutCountAggregateOutputType | null
+    _min: DashboardLayoutMinAggregateOutputType | null
+    _max: DashboardLayoutMaxAggregateOutputType | null
+  }
+
+  type GetDashboardLayoutGroupByPayload<T extends DashboardLayoutGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DashboardLayoutGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DashboardLayoutGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DashboardLayoutGroupByOutputType[P]>
+            : GetScalarType<T[P], DashboardLayoutGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DashboardLayoutSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scope?: boolean
+    scopeId?: boolean
+    layout?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["dashboardLayout"]>
+
+
+
+  export type DashboardLayoutSelectScalar = {
+    id?: boolean
+    scope?: boolean
+    scopeId?: boolean
+    layout?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DashboardLayoutOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scope" | "scopeId" | "layout" | "updatedBy" | "updatedAt", ExtArgs["result"]["dashboardLayout"]>
+
+  export type $DashboardLayoutPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DashboardLayout"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      scope: string
+      scopeId: string
+      layout: Prisma.JsonValue
+      updatedBy: string | null
+      updatedAt: Date
+    }, ExtArgs["result"]["dashboardLayout"]>
+    composites: {}
+  }
+
+  type DashboardLayoutGetPayload<S extends boolean | null | undefined | DashboardLayoutDefaultArgs> = $Result.GetResult<Prisma.$DashboardLayoutPayload, S>
+
+  type DashboardLayoutCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DashboardLayoutFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DashboardLayoutCountAggregateInputType | true
+    }
+
+  export interface DashboardLayoutDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DashboardLayout'], meta: { name: 'DashboardLayout' } }
+    /**
+     * Find zero or one DashboardLayout that matches the filter.
+     * @param {DashboardLayoutFindUniqueArgs} args - Arguments to find a DashboardLayout
+     * @example
+     * // Get one DashboardLayout
+     * const dashboardLayout = await prisma.dashboardLayout.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DashboardLayoutFindUniqueArgs>(args: SelectSubset<T, DashboardLayoutFindUniqueArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DashboardLayout that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DashboardLayoutFindUniqueOrThrowArgs} args - Arguments to find a DashboardLayout
+     * @example
+     * // Get one DashboardLayout
+     * const dashboardLayout = await prisma.dashboardLayout.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DashboardLayoutFindUniqueOrThrowArgs>(args: SelectSubset<T, DashboardLayoutFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DashboardLayout that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardLayoutFindFirstArgs} args - Arguments to find a DashboardLayout
+     * @example
+     * // Get one DashboardLayout
+     * const dashboardLayout = await prisma.dashboardLayout.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DashboardLayoutFindFirstArgs>(args?: SelectSubset<T, DashboardLayoutFindFirstArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DashboardLayout that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardLayoutFindFirstOrThrowArgs} args - Arguments to find a DashboardLayout
+     * @example
+     * // Get one DashboardLayout
+     * const dashboardLayout = await prisma.dashboardLayout.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DashboardLayoutFindFirstOrThrowArgs>(args?: SelectSubset<T, DashboardLayoutFindFirstOrThrowArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DashboardLayouts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardLayoutFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DashboardLayouts
+     * const dashboardLayouts = await prisma.dashboardLayout.findMany()
+     * 
+     * // Get first 10 DashboardLayouts
+     * const dashboardLayouts = await prisma.dashboardLayout.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dashboardLayoutWithIdOnly = await prisma.dashboardLayout.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DashboardLayoutFindManyArgs>(args?: SelectSubset<T, DashboardLayoutFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DashboardLayout.
+     * @param {DashboardLayoutCreateArgs} args - Arguments to create a DashboardLayout.
+     * @example
+     * // Create one DashboardLayout
+     * const DashboardLayout = await prisma.dashboardLayout.create({
+     *   data: {
+     *     // ... data to create a DashboardLayout
+     *   }
+     * })
+     * 
+     */
+    create<T extends DashboardLayoutCreateArgs>(args: SelectSubset<T, DashboardLayoutCreateArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DashboardLayouts.
+     * @param {DashboardLayoutCreateManyArgs} args - Arguments to create many DashboardLayouts.
+     * @example
+     * // Create many DashboardLayouts
+     * const dashboardLayout = await prisma.dashboardLayout.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DashboardLayoutCreateManyArgs>(args?: SelectSubset<T, DashboardLayoutCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a DashboardLayout.
+     * @param {DashboardLayoutDeleteArgs} args - Arguments to delete one DashboardLayout.
+     * @example
+     * // Delete one DashboardLayout
+     * const DashboardLayout = await prisma.dashboardLayout.delete({
+     *   where: {
+     *     // ... filter to delete one DashboardLayout
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DashboardLayoutDeleteArgs>(args: SelectSubset<T, DashboardLayoutDeleteArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DashboardLayout.
+     * @param {DashboardLayoutUpdateArgs} args - Arguments to update one DashboardLayout.
+     * @example
+     * // Update one DashboardLayout
+     * const dashboardLayout = await prisma.dashboardLayout.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DashboardLayoutUpdateArgs>(args: SelectSubset<T, DashboardLayoutUpdateArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DashboardLayouts.
+     * @param {DashboardLayoutDeleteManyArgs} args - Arguments to filter DashboardLayouts to delete.
+     * @example
+     * // Delete a few DashboardLayouts
+     * const { count } = await prisma.dashboardLayout.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DashboardLayoutDeleteManyArgs>(args?: SelectSubset<T, DashboardLayoutDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DashboardLayouts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardLayoutUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DashboardLayouts
+     * const dashboardLayout = await prisma.dashboardLayout.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DashboardLayoutUpdateManyArgs>(args: SelectSubset<T, DashboardLayoutUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DashboardLayout.
+     * @param {DashboardLayoutUpsertArgs} args - Arguments to update or create a DashboardLayout.
+     * @example
+     * // Update or create a DashboardLayout
+     * const dashboardLayout = await prisma.dashboardLayout.upsert({
+     *   create: {
+     *     // ... data to create a DashboardLayout
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DashboardLayout we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DashboardLayoutUpsertArgs>(args: SelectSubset<T, DashboardLayoutUpsertArgs<ExtArgs>>): Prisma__DashboardLayoutClient<$Result.GetResult<Prisma.$DashboardLayoutPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DashboardLayouts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardLayoutCountArgs} args - Arguments to filter DashboardLayouts to count.
+     * @example
+     * // Count the number of DashboardLayouts
+     * const count = await prisma.dashboardLayout.count({
+     *   where: {
+     *     // ... the filter for the DashboardLayouts we want to count
+     *   }
+     * })
+    **/
+    count<T extends DashboardLayoutCountArgs>(
+      args?: Subset<T, DashboardLayoutCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DashboardLayoutCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DashboardLayout.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardLayoutAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DashboardLayoutAggregateArgs>(args: Subset<T, DashboardLayoutAggregateArgs>): Prisma.PrismaPromise<GetDashboardLayoutAggregateType<T>>
+
+    /**
+     * Group by DashboardLayout.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardLayoutGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DashboardLayoutGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DashboardLayoutGroupByArgs['orderBy'] }
+        : { orderBy?: DashboardLayoutGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DashboardLayoutGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDashboardLayoutGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DashboardLayout model
+   */
+  readonly fields: DashboardLayoutFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DashboardLayout.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DashboardLayoutClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DashboardLayout model
+   */
+  interface DashboardLayoutFieldRefs {
+    readonly id: FieldRef<"DashboardLayout", 'String'>
+    readonly scope: FieldRef<"DashboardLayout", 'String'>
+    readonly scopeId: FieldRef<"DashboardLayout", 'String'>
+    readonly layout: FieldRef<"DashboardLayout", 'Json'>
+    readonly updatedBy: FieldRef<"DashboardLayout", 'String'>
+    readonly updatedAt: FieldRef<"DashboardLayout", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DashboardLayout findUnique
+   */
+  export type DashboardLayoutFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardLayout to fetch.
+     */
+    where: DashboardLayoutWhereUniqueInput
+  }
+
+  /**
+   * DashboardLayout findUniqueOrThrow
+   */
+  export type DashboardLayoutFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardLayout to fetch.
+     */
+    where: DashboardLayoutWhereUniqueInput
+  }
+
+  /**
+   * DashboardLayout findFirst
+   */
+  export type DashboardLayoutFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardLayout to fetch.
+     */
+    where?: DashboardLayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardLayouts to fetch.
+     */
+    orderBy?: DashboardLayoutOrderByWithRelationInput | DashboardLayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DashboardLayouts.
+     */
+    cursor?: DashboardLayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardLayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardLayouts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DashboardLayouts.
+     */
+    distinct?: DashboardLayoutScalarFieldEnum | DashboardLayoutScalarFieldEnum[]
+  }
+
+  /**
+   * DashboardLayout findFirstOrThrow
+   */
+  export type DashboardLayoutFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardLayout to fetch.
+     */
+    where?: DashboardLayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardLayouts to fetch.
+     */
+    orderBy?: DashboardLayoutOrderByWithRelationInput | DashboardLayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DashboardLayouts.
+     */
+    cursor?: DashboardLayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardLayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardLayouts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DashboardLayouts.
+     */
+    distinct?: DashboardLayoutScalarFieldEnum | DashboardLayoutScalarFieldEnum[]
+  }
+
+  /**
+   * DashboardLayout findMany
+   */
+  export type DashboardLayoutFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardLayouts to fetch.
+     */
+    where?: DashboardLayoutWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardLayouts to fetch.
+     */
+    orderBy?: DashboardLayoutOrderByWithRelationInput | DashboardLayoutOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DashboardLayouts.
+     */
+    cursor?: DashboardLayoutWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardLayouts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardLayouts.
+     */
+    skip?: number
+    distinct?: DashboardLayoutScalarFieldEnum | DashboardLayoutScalarFieldEnum[]
+  }
+
+  /**
+   * DashboardLayout create
+   */
+  export type DashboardLayoutCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * The data needed to create a DashboardLayout.
+     */
+    data: XOR<DashboardLayoutCreateInput, DashboardLayoutUncheckedCreateInput>
+  }
+
+  /**
+   * DashboardLayout createMany
+   */
+  export type DashboardLayoutCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DashboardLayouts.
+     */
+    data: DashboardLayoutCreateManyInput | DashboardLayoutCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DashboardLayout update
+   */
+  export type DashboardLayoutUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * The data needed to update a DashboardLayout.
+     */
+    data: XOR<DashboardLayoutUpdateInput, DashboardLayoutUncheckedUpdateInput>
+    /**
+     * Choose, which DashboardLayout to update.
+     */
+    where: DashboardLayoutWhereUniqueInput
+  }
+
+  /**
+   * DashboardLayout updateMany
+   */
+  export type DashboardLayoutUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DashboardLayouts.
+     */
+    data: XOR<DashboardLayoutUpdateManyMutationInput, DashboardLayoutUncheckedUpdateManyInput>
+    /**
+     * Filter which DashboardLayouts to update
+     */
+    where?: DashboardLayoutWhereInput
+    /**
+     * Limit how many DashboardLayouts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DashboardLayout upsert
+   */
+  export type DashboardLayoutUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * The filter to search for the DashboardLayout to update in case it exists.
+     */
+    where: DashboardLayoutWhereUniqueInput
+    /**
+     * In case the DashboardLayout found by the `where` argument doesn't exist, create a new DashboardLayout with this data.
+     */
+    create: XOR<DashboardLayoutCreateInput, DashboardLayoutUncheckedCreateInput>
+    /**
+     * In case the DashboardLayout was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DashboardLayoutUpdateInput, DashboardLayoutUncheckedUpdateInput>
+  }
+
+  /**
+   * DashboardLayout delete
+   */
+  export type DashboardLayoutDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+    /**
+     * Filter which DashboardLayout to delete.
+     */
+    where: DashboardLayoutWhereUniqueInput
+  }
+
+  /**
+   * DashboardLayout deleteMany
+   */
+  export type DashboardLayoutDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DashboardLayouts to delete
+     */
+    where?: DashboardLayoutWhereInput
+    /**
+     * Limit how many DashboardLayouts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DashboardLayout without action
+   */
+  export type DashboardLayoutDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardLayout
+     */
+    select?: DashboardLayoutSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardLayout
+     */
+    omit?: DashboardLayoutOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DashboardSetting
+   */
+
+  export type AggregateDashboardSetting = {
+    _count: DashboardSettingCountAggregateOutputType | null
+    _min: DashboardSettingMinAggregateOutputType | null
+    _max: DashboardSettingMaxAggregateOutputType | null
+  }
+
+  export type DashboardSettingMinAggregateOutputType = {
+    id: string | null
+    settingKey: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type DashboardSettingMaxAggregateOutputType = {
+    id: string | null
+    settingKey: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type DashboardSettingCountAggregateOutputType = {
+    id: number
+    settingKey: number
+    settingValue: number
+    updatedBy: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DashboardSettingMinAggregateInputType = {
+    id?: true
+    settingKey?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type DashboardSettingMaxAggregateInputType = {
+    id?: true
+    settingKey?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type DashboardSettingCountAggregateInputType = {
+    id?: true
+    settingKey?: true
+    settingValue?: true
+    updatedBy?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DashboardSettingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DashboardSetting to aggregate.
+     */
+    where?: DashboardSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardSettings to fetch.
+     */
+    orderBy?: DashboardSettingOrderByWithRelationInput | DashboardSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DashboardSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DashboardSettings
+    **/
+    _count?: true | DashboardSettingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DashboardSettingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DashboardSettingMaxAggregateInputType
+  }
+
+  export type GetDashboardSettingAggregateType<T extends DashboardSettingAggregateArgs> = {
+        [P in keyof T & keyof AggregateDashboardSetting]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDashboardSetting[P]>
+      : GetScalarType<T[P], AggregateDashboardSetting[P]>
+  }
+
+
+
+
+  export type DashboardSettingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DashboardSettingWhereInput
+    orderBy?: DashboardSettingOrderByWithAggregationInput | DashboardSettingOrderByWithAggregationInput[]
+    by: DashboardSettingScalarFieldEnum[] | DashboardSettingScalarFieldEnum
+    having?: DashboardSettingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DashboardSettingCountAggregateInputType | true
+    _min?: DashboardSettingMinAggregateInputType
+    _max?: DashboardSettingMaxAggregateInputType
+  }
+
+  export type DashboardSettingGroupByOutputType = {
+    id: string
+    settingKey: string
+    settingValue: JsonValue
+    updatedBy: string | null
+    updatedAt: Date
+    _count: DashboardSettingCountAggregateOutputType | null
+    _min: DashboardSettingMinAggregateOutputType | null
+    _max: DashboardSettingMaxAggregateOutputType | null
+  }
+
+  type GetDashboardSettingGroupByPayload<T extends DashboardSettingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DashboardSettingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DashboardSettingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DashboardSettingGroupByOutputType[P]>
+            : GetScalarType<T[P], DashboardSettingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DashboardSettingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    settingKey?: boolean
+    settingValue?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["dashboardSetting"]>
+
+
+
+  export type DashboardSettingSelectScalar = {
+    id?: boolean
+    settingKey?: boolean
+    settingValue?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DashboardSettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "settingKey" | "settingValue" | "updatedBy" | "updatedAt", ExtArgs["result"]["dashboardSetting"]>
+
+  export type $DashboardSettingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DashboardSetting"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      settingKey: string
+      settingValue: Prisma.JsonValue
+      updatedBy: string | null
+      updatedAt: Date
+    }, ExtArgs["result"]["dashboardSetting"]>
+    composites: {}
+  }
+
+  type DashboardSettingGetPayload<S extends boolean | null | undefined | DashboardSettingDefaultArgs> = $Result.GetResult<Prisma.$DashboardSettingPayload, S>
+
+  type DashboardSettingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DashboardSettingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DashboardSettingCountAggregateInputType | true
+    }
+
+  export interface DashboardSettingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DashboardSetting'], meta: { name: 'DashboardSetting' } }
+    /**
+     * Find zero or one DashboardSetting that matches the filter.
+     * @param {DashboardSettingFindUniqueArgs} args - Arguments to find a DashboardSetting
+     * @example
+     * // Get one DashboardSetting
+     * const dashboardSetting = await prisma.dashboardSetting.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DashboardSettingFindUniqueArgs>(args: SelectSubset<T, DashboardSettingFindUniqueArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DashboardSetting that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DashboardSettingFindUniqueOrThrowArgs} args - Arguments to find a DashboardSetting
+     * @example
+     * // Get one DashboardSetting
+     * const dashboardSetting = await prisma.dashboardSetting.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DashboardSettingFindUniqueOrThrowArgs>(args: SelectSubset<T, DashboardSettingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DashboardSetting that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardSettingFindFirstArgs} args - Arguments to find a DashboardSetting
+     * @example
+     * // Get one DashboardSetting
+     * const dashboardSetting = await prisma.dashboardSetting.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DashboardSettingFindFirstArgs>(args?: SelectSubset<T, DashboardSettingFindFirstArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DashboardSetting that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardSettingFindFirstOrThrowArgs} args - Arguments to find a DashboardSetting
+     * @example
+     * // Get one DashboardSetting
+     * const dashboardSetting = await prisma.dashboardSetting.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DashboardSettingFindFirstOrThrowArgs>(args?: SelectSubset<T, DashboardSettingFindFirstOrThrowArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DashboardSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardSettingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DashboardSettings
+     * const dashboardSettings = await prisma.dashboardSetting.findMany()
+     * 
+     * // Get first 10 DashboardSettings
+     * const dashboardSettings = await prisma.dashboardSetting.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dashboardSettingWithIdOnly = await prisma.dashboardSetting.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DashboardSettingFindManyArgs>(args?: SelectSubset<T, DashboardSettingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DashboardSetting.
+     * @param {DashboardSettingCreateArgs} args - Arguments to create a DashboardSetting.
+     * @example
+     * // Create one DashboardSetting
+     * const DashboardSetting = await prisma.dashboardSetting.create({
+     *   data: {
+     *     // ... data to create a DashboardSetting
+     *   }
+     * })
+     * 
+     */
+    create<T extends DashboardSettingCreateArgs>(args: SelectSubset<T, DashboardSettingCreateArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DashboardSettings.
+     * @param {DashboardSettingCreateManyArgs} args - Arguments to create many DashboardSettings.
+     * @example
+     * // Create many DashboardSettings
+     * const dashboardSetting = await prisma.dashboardSetting.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DashboardSettingCreateManyArgs>(args?: SelectSubset<T, DashboardSettingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a DashboardSetting.
+     * @param {DashboardSettingDeleteArgs} args - Arguments to delete one DashboardSetting.
+     * @example
+     * // Delete one DashboardSetting
+     * const DashboardSetting = await prisma.dashboardSetting.delete({
+     *   where: {
+     *     // ... filter to delete one DashboardSetting
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DashboardSettingDeleteArgs>(args: SelectSubset<T, DashboardSettingDeleteArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DashboardSetting.
+     * @param {DashboardSettingUpdateArgs} args - Arguments to update one DashboardSetting.
+     * @example
+     * // Update one DashboardSetting
+     * const dashboardSetting = await prisma.dashboardSetting.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DashboardSettingUpdateArgs>(args: SelectSubset<T, DashboardSettingUpdateArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DashboardSettings.
+     * @param {DashboardSettingDeleteManyArgs} args - Arguments to filter DashboardSettings to delete.
+     * @example
+     * // Delete a few DashboardSettings
+     * const { count } = await prisma.dashboardSetting.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DashboardSettingDeleteManyArgs>(args?: SelectSubset<T, DashboardSettingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DashboardSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardSettingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DashboardSettings
+     * const dashboardSetting = await prisma.dashboardSetting.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DashboardSettingUpdateManyArgs>(args: SelectSubset<T, DashboardSettingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DashboardSetting.
+     * @param {DashboardSettingUpsertArgs} args - Arguments to update or create a DashboardSetting.
+     * @example
+     * // Update or create a DashboardSetting
+     * const dashboardSetting = await prisma.dashboardSetting.upsert({
+     *   create: {
+     *     // ... data to create a DashboardSetting
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DashboardSetting we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DashboardSettingUpsertArgs>(args: SelectSubset<T, DashboardSettingUpsertArgs<ExtArgs>>): Prisma__DashboardSettingClient<$Result.GetResult<Prisma.$DashboardSettingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DashboardSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardSettingCountArgs} args - Arguments to filter DashboardSettings to count.
+     * @example
+     * // Count the number of DashboardSettings
+     * const count = await prisma.dashboardSetting.count({
+     *   where: {
+     *     // ... the filter for the DashboardSettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends DashboardSettingCountArgs>(
+      args?: Subset<T, DashboardSettingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DashboardSettingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DashboardSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardSettingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DashboardSettingAggregateArgs>(args: Subset<T, DashboardSettingAggregateArgs>): Prisma.PrismaPromise<GetDashboardSettingAggregateType<T>>
+
+    /**
+     * Group by DashboardSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DashboardSettingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DashboardSettingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DashboardSettingGroupByArgs['orderBy'] }
+        : { orderBy?: DashboardSettingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DashboardSettingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDashboardSettingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DashboardSetting model
+   */
+  readonly fields: DashboardSettingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DashboardSetting.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DashboardSettingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DashboardSetting model
+   */
+  interface DashboardSettingFieldRefs {
+    readonly id: FieldRef<"DashboardSetting", 'String'>
+    readonly settingKey: FieldRef<"DashboardSetting", 'String'>
+    readonly settingValue: FieldRef<"DashboardSetting", 'Json'>
+    readonly updatedBy: FieldRef<"DashboardSetting", 'String'>
+    readonly updatedAt: FieldRef<"DashboardSetting", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DashboardSetting findUnique
+   */
+  export type DashboardSettingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardSetting to fetch.
+     */
+    where: DashboardSettingWhereUniqueInput
+  }
+
+  /**
+   * DashboardSetting findUniqueOrThrow
+   */
+  export type DashboardSettingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardSetting to fetch.
+     */
+    where: DashboardSettingWhereUniqueInput
+  }
+
+  /**
+   * DashboardSetting findFirst
+   */
+  export type DashboardSettingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardSetting to fetch.
+     */
+    where?: DashboardSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardSettings to fetch.
+     */
+    orderBy?: DashboardSettingOrderByWithRelationInput | DashboardSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DashboardSettings.
+     */
+    cursor?: DashboardSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DashboardSettings.
+     */
+    distinct?: DashboardSettingScalarFieldEnum | DashboardSettingScalarFieldEnum[]
+  }
+
+  /**
+   * DashboardSetting findFirstOrThrow
+   */
+  export type DashboardSettingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardSetting to fetch.
+     */
+    where?: DashboardSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardSettings to fetch.
+     */
+    orderBy?: DashboardSettingOrderByWithRelationInput | DashboardSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DashboardSettings.
+     */
+    cursor?: DashboardSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DashboardSettings.
+     */
+    distinct?: DashboardSettingScalarFieldEnum | DashboardSettingScalarFieldEnum[]
+  }
+
+  /**
+   * DashboardSetting findMany
+   */
+  export type DashboardSettingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which DashboardSettings to fetch.
+     */
+    where?: DashboardSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DashboardSettings to fetch.
+     */
+    orderBy?: DashboardSettingOrderByWithRelationInput | DashboardSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DashboardSettings.
+     */
+    cursor?: DashboardSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DashboardSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DashboardSettings.
+     */
+    skip?: number
+    distinct?: DashboardSettingScalarFieldEnum | DashboardSettingScalarFieldEnum[]
+  }
+
+  /**
+   * DashboardSetting create
+   */
+  export type DashboardSettingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to create a DashboardSetting.
+     */
+    data: XOR<DashboardSettingCreateInput, DashboardSettingUncheckedCreateInput>
+  }
+
+  /**
+   * DashboardSetting createMany
+   */
+  export type DashboardSettingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DashboardSettings.
+     */
+    data: DashboardSettingCreateManyInput | DashboardSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DashboardSetting update
+   */
+  export type DashboardSettingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to update a DashboardSetting.
+     */
+    data: XOR<DashboardSettingUpdateInput, DashboardSettingUncheckedUpdateInput>
+    /**
+     * Choose, which DashboardSetting to update.
+     */
+    where: DashboardSettingWhereUniqueInput
+  }
+
+  /**
+   * DashboardSetting updateMany
+   */
+  export type DashboardSettingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DashboardSettings.
+     */
+    data: XOR<DashboardSettingUpdateManyMutationInput, DashboardSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which DashboardSettings to update
+     */
+    where?: DashboardSettingWhereInput
+    /**
+     * Limit how many DashboardSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DashboardSetting upsert
+   */
+  export type DashboardSettingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * The filter to search for the DashboardSetting to update in case it exists.
+     */
+    where: DashboardSettingWhereUniqueInput
+    /**
+     * In case the DashboardSetting found by the `where` argument doesn't exist, create a new DashboardSetting with this data.
+     */
+    create: XOR<DashboardSettingCreateInput, DashboardSettingUncheckedCreateInput>
+    /**
+     * In case the DashboardSetting was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DashboardSettingUpdateInput, DashboardSettingUncheckedUpdateInput>
+  }
+
+  /**
+   * DashboardSetting delete
+   */
+  export type DashboardSettingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+    /**
+     * Filter which DashboardSetting to delete.
+     */
+    where: DashboardSettingWhereUniqueInput
+  }
+
+  /**
+   * DashboardSetting deleteMany
+   */
+  export type DashboardSettingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DashboardSettings to delete
+     */
+    where?: DashboardSettingWhereInput
+    /**
+     * Limit how many DashboardSettings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DashboardSetting without action
+   */
+  export type DashboardSettingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DashboardSetting
+     */
+    select?: DashboardSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DashboardSetting
+     */
+    omit?: DashboardSettingOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -18939,6 +20872,29 @@ export namespace Prisma {
   export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
+  export const DashboardLayoutScalarFieldEnum: {
+    id: 'id',
+    scope: 'scope',
+    scopeId: 'scopeId',
+    layout: 'layout',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DashboardLayoutScalarFieldEnum = (typeof DashboardLayoutScalarFieldEnum)[keyof typeof DashboardLayoutScalarFieldEnum]
+
+
+  export const DashboardSettingScalarFieldEnum: {
+    id: 'id',
+    settingKey: 'settingKey',
+    settingValue: 'settingValue',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DashboardSettingScalarFieldEnum = (typeof DashboardSettingScalarFieldEnum)[keyof typeof DashboardSettingScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -18953,6 +20909,13 @@ export namespace Prisma {
   };
 
   export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const NullsOrder: {
@@ -19155,6 +21118,25 @@ export namespace Prisma {
   };
 
   export type UserRoleOrderByRelevanceFieldEnum = (typeof UserRoleOrderByRelevanceFieldEnum)[keyof typeof UserRoleOrderByRelevanceFieldEnum]
+
+
+  export const DashboardLayoutOrderByRelevanceFieldEnum: {
+    id: 'id',
+    scope: 'scope',
+    scopeId: 'scopeId',
+    updatedBy: 'updatedBy'
+  };
+
+  export type DashboardLayoutOrderByRelevanceFieldEnum = (typeof DashboardLayoutOrderByRelevanceFieldEnum)[keyof typeof DashboardLayoutOrderByRelevanceFieldEnum]
+
+
+  export const DashboardSettingOrderByRelevanceFieldEnum: {
+    id: 'id',
+    settingKey: 'settingKey',
+    updatedBy: 'updatedBy'
+  };
+
+  export type DashboardSettingOrderByRelevanceFieldEnum = (typeof DashboardSettingOrderByRelevanceFieldEnum)[keyof typeof DashboardSettingOrderByRelevanceFieldEnum]
 
 
   /**
@@ -20400,6 +22382,118 @@ export namespace Prisma {
     assignedAt?: DateTimeWithAggregatesFilter<"UserRole"> | Date | string
   }
 
+  export type DashboardLayoutWhereInput = {
+    AND?: DashboardLayoutWhereInput | DashboardLayoutWhereInput[]
+    OR?: DashboardLayoutWhereInput[]
+    NOT?: DashboardLayoutWhereInput | DashboardLayoutWhereInput[]
+    id?: StringFilter<"DashboardLayout"> | string
+    scope?: StringFilter<"DashboardLayout"> | string
+    scopeId?: StringFilter<"DashboardLayout"> | string
+    layout?: JsonFilter<"DashboardLayout">
+    updatedBy?: StringNullableFilter<"DashboardLayout"> | string | null
+    updatedAt?: DateTimeFilter<"DashboardLayout"> | Date | string
+  }
+
+  export type DashboardLayoutOrderByWithRelationInput = {
+    id?: SortOrder
+    scope?: SortOrder
+    scopeId?: SortOrder
+    layout?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _relevance?: DashboardLayoutOrderByRelevanceInput
+  }
+
+  export type DashboardLayoutWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    scope_scopeId?: DashboardLayoutScopeScopeIdCompoundUniqueInput
+    AND?: DashboardLayoutWhereInput | DashboardLayoutWhereInput[]
+    OR?: DashboardLayoutWhereInput[]
+    NOT?: DashboardLayoutWhereInput | DashboardLayoutWhereInput[]
+    scope?: StringFilter<"DashboardLayout"> | string
+    scopeId?: StringFilter<"DashboardLayout"> | string
+    layout?: JsonFilter<"DashboardLayout">
+    updatedBy?: StringNullableFilter<"DashboardLayout"> | string | null
+    updatedAt?: DateTimeFilter<"DashboardLayout"> | Date | string
+  }, "id" | "scope_scopeId">
+
+  export type DashboardLayoutOrderByWithAggregationInput = {
+    id?: SortOrder
+    scope?: SortOrder
+    scopeId?: SortOrder
+    layout?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: DashboardLayoutCountOrderByAggregateInput
+    _max?: DashboardLayoutMaxOrderByAggregateInput
+    _min?: DashboardLayoutMinOrderByAggregateInput
+  }
+
+  export type DashboardLayoutScalarWhereWithAggregatesInput = {
+    AND?: DashboardLayoutScalarWhereWithAggregatesInput | DashboardLayoutScalarWhereWithAggregatesInput[]
+    OR?: DashboardLayoutScalarWhereWithAggregatesInput[]
+    NOT?: DashboardLayoutScalarWhereWithAggregatesInput | DashboardLayoutScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DashboardLayout"> | string
+    scope?: StringWithAggregatesFilter<"DashboardLayout"> | string
+    scopeId?: StringWithAggregatesFilter<"DashboardLayout"> | string
+    layout?: JsonWithAggregatesFilter<"DashboardLayout">
+    updatedBy?: StringNullableWithAggregatesFilter<"DashboardLayout"> | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"DashboardLayout"> | Date | string
+  }
+
+  export type DashboardSettingWhereInput = {
+    AND?: DashboardSettingWhereInput | DashboardSettingWhereInput[]
+    OR?: DashboardSettingWhereInput[]
+    NOT?: DashboardSettingWhereInput | DashboardSettingWhereInput[]
+    id?: StringFilter<"DashboardSetting"> | string
+    settingKey?: StringFilter<"DashboardSetting"> | string
+    settingValue?: JsonFilter<"DashboardSetting">
+    updatedBy?: StringNullableFilter<"DashboardSetting"> | string | null
+    updatedAt?: DateTimeFilter<"DashboardSetting"> | Date | string
+  }
+
+  export type DashboardSettingOrderByWithRelationInput = {
+    id?: SortOrder
+    settingKey?: SortOrder
+    settingValue?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _relevance?: DashboardSettingOrderByRelevanceInput
+  }
+
+  export type DashboardSettingWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    settingKey?: string
+    AND?: DashboardSettingWhereInput | DashboardSettingWhereInput[]
+    OR?: DashboardSettingWhereInput[]
+    NOT?: DashboardSettingWhereInput | DashboardSettingWhereInput[]
+    settingValue?: JsonFilter<"DashboardSetting">
+    updatedBy?: StringNullableFilter<"DashboardSetting"> | string | null
+    updatedAt?: DateTimeFilter<"DashboardSetting"> | Date | string
+  }, "id" | "settingKey">
+
+  export type DashboardSettingOrderByWithAggregationInput = {
+    id?: SortOrder
+    settingKey?: SortOrder
+    settingValue?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: DashboardSettingCountOrderByAggregateInput
+    _max?: DashboardSettingMaxOrderByAggregateInput
+    _min?: DashboardSettingMinOrderByAggregateInput
+  }
+
+  export type DashboardSettingScalarWhereWithAggregatesInput = {
+    AND?: DashboardSettingScalarWhereWithAggregatesInput | DashboardSettingScalarWhereWithAggregatesInput[]
+    OR?: DashboardSettingScalarWhereWithAggregatesInput[]
+    NOT?: DashboardSettingScalarWhereWithAggregatesInput | DashboardSettingScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DashboardSetting"> | string
+    settingKey?: StringWithAggregatesFilter<"DashboardSetting"> | string
+    settingValue?: JsonWithAggregatesFilter<"DashboardSetting">
+    updatedBy?: StringNullableWithAggregatesFilter<"DashboardSetting"> | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"DashboardSetting"> | Date | string
+  }
+
   export type PartnerCreateInput = {
     id: string
     globalUserId?: string | null
@@ -21641,6 +23735,125 @@ export namespace Prisma {
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DashboardLayoutCreateInput = {
+    id: string
+    scope: string
+    scopeId: string
+    layout: JsonNullValueInput | InputJsonValue
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type DashboardLayoutUncheckedCreateInput = {
+    id: string
+    scope: string
+    scopeId: string
+    layout: JsonNullValueInput | InputJsonValue
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type DashboardLayoutUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scope?: StringFieldUpdateOperationsInput | string
+    scopeId?: StringFieldUpdateOperationsInput | string
+    layout?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DashboardLayoutUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scope?: StringFieldUpdateOperationsInput | string
+    scopeId?: StringFieldUpdateOperationsInput | string
+    layout?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DashboardLayoutCreateManyInput = {
+    id: string
+    scope: string
+    scopeId: string
+    layout: JsonNullValueInput | InputJsonValue
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type DashboardLayoutUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scope?: StringFieldUpdateOperationsInput | string
+    scopeId?: StringFieldUpdateOperationsInput | string
+    layout?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DashboardLayoutUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scope?: StringFieldUpdateOperationsInput | string
+    scopeId?: StringFieldUpdateOperationsInput | string
+    layout?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DashboardSettingCreateInput = {
+    id: string
+    settingKey: string
+    settingValue: JsonNullValueInput | InputJsonValue
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type DashboardSettingUncheckedCreateInput = {
+    id: string
+    settingKey: string
+    settingValue: JsonNullValueInput | InputJsonValue
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type DashboardSettingUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    settingKey?: StringFieldUpdateOperationsInput | string
+    settingValue?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DashboardSettingUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    settingKey?: StringFieldUpdateOperationsInput | string
+    settingValue?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DashboardSettingCreateManyInput = {
+    id: string
+    settingKey: string
+    settingValue: JsonNullValueInput | InputJsonValue
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type DashboardSettingUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    settingKey?: StringFieldUpdateOperationsInput | string
+    settingValue?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DashboardSettingUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    settingKey?: StringFieldUpdateOperationsInput | string
+    settingValue?: JsonNullValueInput | InputJsonValue
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -22700,6 +24913,119 @@ export namespace Prisma {
     roleId?: SortOrder
     assignedBy?: SortOrder
     assignedAt?: SortOrder
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type DashboardLayoutOrderByRelevanceInput = {
+    fields: DashboardLayoutOrderByRelevanceFieldEnum | DashboardLayoutOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type DashboardLayoutScopeScopeIdCompoundUniqueInput = {
+    scope: string
+    scopeId: string
+  }
+
+  export type DashboardLayoutCountOrderByAggregateInput = {
+    id?: SortOrder
+    scope?: SortOrder
+    scopeId?: SortOrder
+    layout?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DashboardLayoutMaxOrderByAggregateInput = {
+    id?: SortOrder
+    scope?: SortOrder
+    scopeId?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DashboardLayoutMinOrderByAggregateInput = {
+    id?: SortOrder
+    scope?: SortOrder
+    scopeId?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type DashboardSettingOrderByRelevanceInput = {
+    fields: DashboardSettingOrderByRelevanceFieldEnum | DashboardSettingOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type DashboardSettingCountOrderByAggregateInput = {
+    id?: SortOrder
+    settingKey?: SortOrder
+    settingValue?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DashboardSettingMaxOrderByAggregateInput = {
+    id?: SortOrder
+    settingKey?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DashboardSettingMinOrderByAggregateInput = {
+    id?: SortOrder
+    settingKey?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type ProjectPartnerCreateNestedManyWithoutPartnerInput = {
@@ -23850,6 +26176,29 @@ export namespace Prisma {
     | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
   export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
     equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     path?: string
     mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>

@@ -277,3 +277,26 @@ model UserRole {
 
   @@map("user_roles")
 }
+
+model DashboardLayout {
+  id        String   @id @db.Char(36)
+  scope     String   @db.VarChar(10)
+  scopeId   String   @map("scope_id") @db.Char(36)
+  layout    Json
+  updatedBy String?  @map("updated_by") @db.Char(36)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@unique([scope, scopeId])
+  @@map("dashboard_layouts")
+}
+
+model DashboardSetting {
+  id           String   @id @db.Char(36)
+  settingKey   String   @unique @map("setting_key") @db.VarChar(100)
+  settingValue Json     @map("setting_value")
+  updatedBy    String?  @map("updated_by") @db.Char(36)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("dashboard_settings")
+}
+
