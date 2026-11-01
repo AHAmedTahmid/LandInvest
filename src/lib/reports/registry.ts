@@ -15,6 +15,7 @@ export type ReportDef = {
 
 export const REPORT_REGISTRY: ReportDef[] = [
   // A. Financial / Treasury
+  { key: "balance-sheet", titleEn: "Balance Sheet", titleBn: "উদ্বৃত্তপত্র / ব্যালেন্স শিট", category: "financial", permission: "reports.financial.view", filters: ["dateRange", "project"], descriptionEn: "Financial position: Assets vs Liabilities & Equity (Only approved vouchers are capitalized)", descriptionBn: "আর্থিক অবস্থা: সম্পদ বনাম দায় ও মূলধন (কেবল অনুমোদিত ভাউচার যোগ হয়)" },
   { key: "cash-book", titleEn: "Cash Book", titleBn: "নগদ খাতা", category: "financial", permission: "reports.financial.view", filters: ["dateRange"], descriptionEn: "Date-wise cash in/out with running balance", descriptionBn: "তারিখভিত্তিক নগদ আদায়-পরিশোধ এবং চলতি ব্যালেন্স" },
   { key: "bank-book", titleEn: "Bank Book", titleBn: "ব্যাংক খাতা", category: "financial", permission: "reports.financial.view", filters: ["dateRange", "bankAccount"], descriptionEn: "Bank account transactions with running balance", descriptionBn: "ব্যাংক অ্যাকাউন্টের লেনদেন এবং চলতি ব্যালেন্স" },
   { key: "daily-summary", titleEn: "Daily Collection & Payment Summary", titleBn: "দৈনিক আদায় ও পরিশোধ সারাংশ", category: "financial", permission: "reports.financial.view", filters: ["dateRange"], descriptionEn: "Daily cash/bank receipts, payments and net movement", descriptionBn: "দৈনিক নগদ/ব্যাংক আদায়, পরিশোধ এবং নেট চলাচল" },

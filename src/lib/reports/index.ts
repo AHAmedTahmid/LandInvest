@@ -3,6 +3,7 @@ import type { ReportData } from "./pdf";
 
 export type QueryFn = (prisma: any, filters: ReportFilters) => Promise<ReportData>;
 
+import { queryBalanceSheet } from "./balance-sheet";
 import { queryCashBook } from "./cash-book";
 import { queryBankBook } from "./bank-book";
 import { queryDailySummary } from "./daily-summary";
@@ -30,6 +31,7 @@ import { queryUserActivity } from "./user-activity";
 import { queryReconciliation } from "./reconciliation";
 
 export const REPORT_QUERIES: Record<string, QueryFn> = {
+  "balance-sheet": queryBalanceSheet,
   "cash-book": queryCashBook,
   "bank-book": queryBankBook,
   "daily-summary": queryDailySummary,
