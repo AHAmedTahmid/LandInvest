@@ -10,42 +10,93 @@ export const DEFAULT_ROLES: { name: string; description: string; isSystem: boole
   },
   {
     name: "Managing Partner",
-    description: "Everything except user/role/billing management",
+    description: "Executive access across all operations, financial ledgers, and reporting",
     isSystem: false,
     keys: ALL_KEYS.filter((k) => !["users.manage", "roles.manage", "billing.manage"].includes(k)) as PermissionKey[],
   },
   {
-    name: "Site Manager",
-    description: "Projects view + expenses view/create",
+    name: "Accountant",
+    description: "Treasury ledger, cash & bank management, payment collection, and expense accounting",
     isSystem: false,
-    keys: ["projects.view", "expenses.view", "expenses.create"] as PermissionKey[],
+    keys: [
+      "dashboard.view",
+      "dashboard.tab.overview",
+      "dashboard.tab.financial",
+      "dashboard.tab.operations",
+      "dashboard.customize",
+      "dashboard.export",
+      "dashboard.widget.cash_balance",
+      "dashboard.widget.bank_balance",
+      "dashboard.widget.total_liquidity",
+      "dashboard.widget.working_capital",
+      "dashboard.widget.cash_flow_trend",
+      "dashboard.widget.cash_flow_forecast",
+      "dashboard.widget.recent_transactions",
+      "dashboard.widget.expenses_month",
+      "dashboard.widget.pending_approvals",
+      "dashboard.widget.pending_vouchers",
+      "dashboard.widget.quick_actions",
+      "expenses.view",
+      "expenses.create",
+      "expenses.approve",
+      "sales.view",
+      "sales.collect",
+      "receipts.print",
+      "treasury.view",
+      "treasury.bank.manage",
+      "treasury.contra.create",
+      "reports.view",
+      "reports.financial.view",
+    ] as PermissionKey[],
   },
   {
-    name: "Accountant",
-    description: "Expenses, sales collect, receipts, treasury view/contra",
+    name: "Site Manager",
+    description: "Land projects inspection, plots management, and on-site project expense entries",
     isSystem: false,
-    keys: ["expenses.create", "sales.view", "sales.collect", "receipts.print", "treasury.view", "treasury.contra.create"] as PermissionKey[],
+    keys: [
+      "dashboard.view",
+      "dashboard.tab.overview",
+      "dashboard.tab.projects",
+      "dashboard.tab.operations",
+      "dashboard.customize",
+      "dashboard.widget.capital_deployed",
+      "dashboard.widget.unsold_inventory",
+      "dashboard.widget.plot_inventory_status",
+      "dashboard.widget.project_cost_vs_sales",
+      "dashboard.widget.project_summary",
+      "dashboard.widget.expenses_month",
+      "dashboard.widget.pending_approvals",
+      "dashboard.widget.expense_breakdown",
+      "dashboard.widget.quick_actions",
+      "projects.view",
+      "plots.manage",
+      "expenses.view",
+      "expenses.create",
+      "reports.view",
+      "reports.projects.view",
+    ] as PermissionKey[],
   },
 ];
 
 export async function seedDefaultRoles(prisma: any, createdBy: string | null) {
   for (const r of DEFAULT_ROLES) {
-    const existing = await prisma.role.findUnique({ where: { name: r.name } });
-    if (existing) continue;
-    const id = randomUUID();
-    await prisma.role.create({ data: { id, name: r.name, description: r.description, isSystem: r.isSystem, createdBy } });
-    // Owner is system — permissions are implicit, but we still store them for visibility if desired; skip to keep it implicit per spec
-    if (!r.isSystem) {
-      for (const k of r.keys) {
-        await prisma.rolePermission.create({ data: { roleId: id, permissionKey: k } });
-      }
-    } else {
-      // optionally store all keys for Owner as well for audit visibility — spec says implicitly has EVERY, but we can store none and treat isSystem as all
+    let role = await prisma.role.findUnique({ where: { name: r.name } });
+    if (!role) {
+      const id = randomUUID();
+      role = await prisma.role.create({
+        data: { id, name: r.name, description: r.description, isSystem: r.isSystem, createdBy },
+      });
     }
-    // audit log for role creation
-    try {
-      const { writeAudit } = await import("@/lib/tenantRules");
-      await writeAudit(prisma, "roles", id, "CREATE", createdBy ?? "system", null, { name: r.name, isSystem: r.isSystem, keys: r.keys });
-    } catch {}
+
+    if (!r.isSystem) {
+      // Ensure role has current keys
+      const existingPerms = await prisma.rolePermission.findMany({ where: { roleId: role.id } });
+      const existingSet = new Set(existingPerms.map((p: any) => p.permissionKey));
+      for (const k of r.keys) {
+        if (!existingSet.has(k)) {
+          await prisma.rolePermission.create({ data: { roleId: role.id, permissionKey: k } });
+        }
+      }
+    }
   }
 }

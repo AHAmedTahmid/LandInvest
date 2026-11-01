@@ -1,5 +1,11 @@
-export type PermissionKey =
+import { DASHBOARD_TABS, WIDGET_REGISTRY } from "@/lib/dashboard/widgets";
+
+export type BasePermissionKey =
   | "dashboard.view"
+  | "dashboard.customize"
+  | "dashboard.layout.manage"
+  | "dashboard.export"
+  | "dashboard.settings.manage"
   | "partners.view" | "partners.manage" | "partners.capital.deposit" | "partners.capital.withdraw" | "partners.ledger.view"
   | "treasury.view" | "treasury.bank.manage" | "treasury.contra.create" | "treasury.contra.approve"
   | "projects.view" | "projects.create" | "projects.edit" | "projects.delete" | "plots.manage"
@@ -11,16 +17,49 @@ export type PermissionKey =
   | "reports.sales.view" | "reports.audit.view"
   | "users.view" | "users.manage" | "roles.manage" | "billing.manage" | "audit.view";
 
-export type PermissionDef = { key: PermissionKey; en: string; bn: string };
+export type PermissionKey =
+  | BasePermissionKey
+  | `dashboard.tab.${string}`
+  | `dashboard.widget.${string}`;
+
+export type PermissionDef = { key: PermissionKey; en: string; bn: string; category?: string };
 export type PermissionGroup = { module: string; moduleEn: string; moduleBn: string; permissions: PermissionDef[] };
+
+// Dynamic dashboard tab permissions
+const dashboardTabPerms: PermissionDef[] = DASHBOARD_TABS.map((tab) => ({
+  key: `dashboard.tab.${tab.key}` as PermissionKey,
+  en: `View Tab: ${tab.title.en}`,
+  bn: `ট্যাব দেখুন: ${tab.title.bn}`,
+  category: "tabs",
+}));
+
+// Dynamic dashboard widget permissions
+const dashboardWidgetPerms: PermissionDef[] = Object.values(WIDGET_REGISTRY).map((w) => ({
+  key: `dashboard.widget.${w.key}` as PermissionKey,
+  en: `Widget: ${w.title.en}`,
+  bn: `উইজেট: ${w.title.bn}`,
+  category: w.category,
+}));
 
 export const PERMISSIONS: PermissionGroup[] = [
   {
-    module: "dashboard", moduleEn: "Dashboard", moduleBn: "ড্যাশবোর্ড",
-    permissions: [{ key: "dashboard.view", en: "View dashboard", bn: "ড্যাশবোর্ড দেখুন" }],
+    module: "dashboard",
+    moduleEn: "Dashboard & Executive Views",
+    moduleBn: "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+    permissions: [
+      { key: "dashboard.view", en: "View dashboard", bn: "ড্যাশবোর্ড দেখুন" },
+      { key: "dashboard.customize", en: "Customize own dashboard layout", bn: "নিজের ড্যাশবোর্ড কাস্টমাইজ করুন" },
+      { key: "dashboard.layout.manage", en: "Manage role default layouts", bn: "রোলের ডিফল্ট লেআউট পরিচালনা করুন" },
+      { key: "dashboard.export", en: "Export dashboard as PDF/PNG", bn: "ড্যাশবোর্ড এক্সপোর্ট (পিডিএফ/ছবি)" },
+      { key: "dashboard.settings.manage", en: "Manage dashboard settings & thresholds", bn: "ড্যাশবোর্ড সেটিংস ও থ্রেশহোল্ড পরিচালনা" },
+      ...dashboardTabPerms,
+      ...dashboardWidgetPerms,
+    ],
   },
   {
-    module: "partners", moduleEn: "Partners", moduleBn: "পার্টনার",
+    module: "partners",
+    moduleEn: "Partners",
+    moduleBn: "পার্টনার",
     permissions: [
       { key: "partners.view", en: "View partners", bn: "পার্টনার দেখুন" },
       { key: "partners.manage", en: "Manage partners", bn: "পার্টনার ব্যবস্থাপনা" },
@@ -30,7 +69,9 @@ export const PERMISSIONS: PermissionGroup[] = [
     ],
   },
   {
-    module: "treasury", moduleEn: "Treasury", moduleBn: "ট্রেজারি",
+    module: "treasury",
+    moduleEn: "Treasury",
+    moduleBn: "ট্রেজারি",
     permissions: [
       { key: "treasury.view", en: "View treasury", bn: "ট্রেজারি দেখুন" },
       { key: "treasury.bank.manage", en: "Manage bank accounts", bn: "ব্যাংক অ্যাকাউন্ট ব্যবস্থাপনা" },
@@ -39,7 +80,9 @@ export const PERMISSIONS: PermissionGroup[] = [
     ],
   },
   {
-    module: "projects", moduleEn: "Land Projects", moduleBn: "জমি প্রকল্প",
+    module: "projects",
+    moduleEn: "Land Projects",
+    moduleBn: "জমি প্রকল্প",
     permissions: [
       { key: "projects.view", en: "View projects", bn: "প্রকল্প দেখুন" },
       { key: "projects.create", en: "Create project", bn: "প্রকল্প তৈরি" },
@@ -49,7 +92,9 @@ export const PERMISSIONS: PermissionGroup[] = [
     ],
   },
   {
-    module: "expenses", moduleEn: "Expenses", moduleBn: "ব্যয়",
+    module: "expenses",
+    moduleEn: "Expenses",
+    moduleBn: "ব্যয়",
     permissions: [
       { key: "expenses.view", en: "View expenses", bn: "ব্যয় দেখুন" },
       { key: "expenses.create", en: "Create expense", bn: "ব্যয় তৈরি" },
@@ -58,7 +103,9 @@ export const PERMISSIONS: PermissionGroup[] = [
     ],
   },
   {
-    module: "sales", moduleEn: "Sales", moduleBn: "বিক্রয়",
+    module: "sales",
+    moduleEn: "Sales",
+    moduleBn: "বিক্রয়",
     permissions: [
       { key: "sales.view", en: "View sales", bn: "বিক্রয় দেখুন" },
       { key: "sales.create", en: "Create sale / booking", bn: "বিক্রয় তৈরি" },
@@ -67,14 +114,18 @@ export const PERMISSIONS: PermissionGroup[] = [
     ],
   },
   {
-    module: "profit", moduleEn: "Profit", moduleBn: "লাভ",
+    module: "profit",
+    moduleEn: "Profit",
+    moduleBn: "লাভ",
     permissions: [
       { key: "profit.view", en: "View PnL", bn: "লাভ-ক্ষতি দেখুন" },
       { key: "profit.distribute", en: "Distribute profit", bn: "লাভ বণ্টন" },
     ],
   },
   {
-    module: "reports", moduleEn: "Reports", moduleBn: "রিপোর্ট",
+    module: "reports",
+    moduleEn: "Reports",
+    moduleBn: "রিপোর্ট",
     permissions: [
       { key: "reports.view", en: "View reports", bn: "রিপোর্ট দেখুন" },
       { key: "reports.export", en: "Export reports", bn: "রিপোর্ট এক্সপোর্ট" },
@@ -86,7 +137,9 @@ export const PERMISSIONS: PermissionGroup[] = [
     ],
   },
   {
-    module: "admin", moduleEn: "Administration", moduleBn: "প্রশাসন",
+    module: "admin",
+    moduleEn: "Administration",
+    moduleBn: "প্রশাসন",
     permissions: [
       { key: "users.view", en: "View users", bn: "ইউজার দেখুন" },
       { key: "users.manage", en: "Manage users", bn: "ইউজার ব্যবস্থাপনা" },
