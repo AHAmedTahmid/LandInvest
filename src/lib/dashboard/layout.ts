@@ -134,21 +134,43 @@ export async function getEffectiveLayout(
   // 1. Try personal user layout
   let rawLayout: TabbedLayout | null = null;
   if (userId) {
-    const userLayoutRow = await prisma.dashboardLayout.findUnique({
-      where: { scope_scopeId: { scope: "USER", scopeId: userId } },
-    });
-    if (userLayoutRow?.layout) {
-      rawLayout = typeof userLayoutRow.layout === "string" ? JSON.parse(userLayoutRow.layout) : userLayoutRow.layout;
+    try {
+      if (prisma.dashboardLayout) {
+        const userLayoutRow = await prisma.dashboardLayout.findUnique({
+          where: { scope_scopeId: { scope: "USER", scopeId: userId } },
+        });
+        if (userLayoutRow?.layout) {
+          rawLayout = typeof userLayoutRow.layout === "string" ? JSON.parse(userLayoutRow.layout) : userLayoutRow.layout;
+        }
+      } else {
+        const rows: any = await prisma.$queryRaw`SELECT layout FROM dashboard_layouts WHERE scope = 'USER' AND scope_id = ${userId} LIMIT 1`;
+        if (rows && rows.length > 0 && rows[0].layout) {
+          rawLayout = typeof rows[0].layout === "string" ? JSON.parse(rows[0].layout) : rows[0].layout;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load user layout:", e);
     }
   }
 
   // 2. Try role default layout
   if (!rawLayout && user?.roleId) {
-    const roleLayoutRow = await prisma.dashboardLayout.findUnique({
-      where: { scope_scopeId: { scope: "ROLE", scopeId: user.roleId } },
-    });
-    if (roleLayoutRow?.layout) {
-      rawLayout = typeof roleLayoutRow.layout === "string" ? JSON.parse(roleLayoutRow.layout) : roleLayoutRow.layout;
+    try {
+      if (prisma.dashboardLayout) {
+        const roleLayoutRow = await prisma.dashboardLayout.findUnique({
+          where: { scope_scopeId: { scope: "ROLE", scopeId: user.roleId } },
+        });
+        if (roleLayoutRow?.layout) {
+          rawLayout = typeof roleLayoutRow.layout === "string" ? JSON.parse(roleLayoutRow.layout) : roleLayoutRow.layout;
+        }
+      } else {
+        const rows: any = await prisma.$queryRaw`SELECT layout FROM dashboard_layouts WHERE scope = 'ROLE' AND scope_id = ${user.roleId} LIMIT 1`;
+        if (rows && rows.length > 0 && rows[0].layout) {
+          rawLayout = typeof rows[0].layout === "string" ? JSON.parse(rows[0].layout) : rows[0].layout;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load role layout:", e);
     }
   }
 
@@ -222,3 +244,4 @@ export async function getEffectiveLayout(
 
   return { layout: effectiveLayout, visibleTabs };
 }
+

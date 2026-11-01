@@ -10,7 +10,7 @@ if (!globalForTenant.tenantClients) globalForTenant.tenantClients = new Map();
 
 export function getTenantClient(tenant: TenantInfo): PrismaClient {
   const cached = globalForTenant.tenantClients!.get(tenant.id);
-  if (cached) return cached;
+  if (cached && (cached as any).dashboardLayout) return cached;
   const url = `mysql://${tenant.dbUser}:@localhost:3306/${tenant.dbName}`;
   const client = new PrismaClient({ datasources: { db: { url } } } as any);
   globalForTenant.tenantClients!.set(tenant.id, client);

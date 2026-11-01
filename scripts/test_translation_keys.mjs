@@ -70,3 +70,4 @@ if (failed) {
 
 console.log("\nSUCCESS: All critical dashboard translation keys are fully localized in EN and BN.");
 process.exit(0);
+

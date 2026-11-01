@@ -653,3 +653,4 @@ export default function WidgetRenderer({
 
   return <div className="text-gray-400 text-xs py-4 text-center">Unsupported widget type</div>;
 }
+

@@ -19,7 +19,16 @@ export async function evaluateDashboardInsights(prisma: any): Promise<DashboardI
   const now = new Date();
 
   // 1. Load Settings / Thresholds from DB or defaults
-  const settingsRows = await prisma.dashboardSetting.findMany();
+  let settingsRows: any[] = [];
+  try {
+    if (prisma.dashboardSetting) {
+      settingsRows = await prisma.dashboardSetting.findMany();
+    } else {
+      settingsRows = await prisma.$queryRaw`SELECT setting_key as settingKey, setting_value as settingValue FROM dashboard_settings`;
+    }
+  } catch (e) {
+    console.warn("Could not load dashboard settings:", e);
+  }
   const settings: Record<string, any> = {};
   for (const s of settingsRows) {
     settings[s.settingKey] = typeof s.settingValue === "string" ? JSON.parse(s.settingValue) : s.settingValue;
@@ -270,3 +279,4 @@ export async function evaluateDashboardInsights(prisma: any): Promise<DashboardI
 
   return insights;
 }
+
