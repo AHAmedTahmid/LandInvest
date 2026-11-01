@@ -17,6 +17,31 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
   const result=await prisma.$transaction(async(tx:any)=>{
     const exp=await tx.projectExpense.findUnique({where:{id:recordId}});
     if(!exp) throw new Error("Not found");
+    if (action === "REACTIVATED") {
+      const updated = await tx.projectExpense.update({
+        where: { id: recordId },
+        data: { status: "PENDING", approvedBy: null },
+      });
+      if (exp.status === "APPROVED") {
+        const ledgers = await tx.treasuryLedger.findMany({
+          where: { referenceType: "EXPENSE", referenceId: recordId },
+        });
+        for (const tl of ledgers) {
+          await tx.treasuryLedger.delete({ where: { id: tl.id } });
+          await writeAudit(tx, "treasury_ledger", tl.id, "DELETE", userId, tl, null);
+        }
+        const partnerTxns = await tx.partnerTransaction.findMany({
+          where: { referenceId: recordId },
+        });
+        for (const pt of partnerTxns) {
+          await tx.partnerTransaction.delete({ where: { id: pt.id } });
+          await writeAudit(tx, "partner_transactions", pt.id, "DELETE", userId, pt, null);
+        }
+      }
+      await writeAudit(tx, "project_expenses", recordId, "UPDATE", userId, exp, { ...updated, reactivatedFrom: exp.status });
+      return updated;
+    }
+
     const targetStatus = action === "APPROVED" ? "APPROVED" : action === "CANCELLED" ? "CANCELLED" : "REJECTED";
     const updated=await tx.projectExpense.update({where:{id:recordId},data:{status:targetStatus,approvedBy:userId}});
     await writeAudit(tx,"project_expenses",recordId,"UPDATE",userId,exp,updated);
