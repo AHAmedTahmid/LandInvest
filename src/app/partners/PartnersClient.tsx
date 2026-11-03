@@ -2,7 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { PlusCircle, Search, Edit2, Lock, Plus, History, X, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  PlusCircle,
+  Search,
+  Edit2,
+  Lock,
+  Plus,
+  History,
+  X,
+  CheckCircle2,
+  AlertCircle,
+  Building2,
+  Power,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { formatBDT, formatDate } from "@/lib/format";
 
 export type PartnerRow = {
@@ -10,6 +24,12 @@ export type PartnerRow = {
   name: string;
   phone: string;
   nidNumber?: string | null;
+  bankName?: string | null;
+  bankAccountName?: string | null;
+  bankAccountNumber?: string | null;
+  bankBranch?: string | null;
+  bankRoutingNumber?: string | null;
+  isActive: boolean;
   openingBalance: number;
   liveBalance: number;
   transactions: Array<{
@@ -25,17 +45,23 @@ export default function PartnersClient({
   partners,
   createAction,
   updateAction,
+  toggleStatusAction,
 }: {
   partners: PartnerRow[];
   createAction: (formData: FormData) => Promise<{ success?: boolean; error?: string }>;
   updateAction: (formData: FormData) => Promise<{ success?: boolean; error?: string }>;
+  toggleStatusAction?: (id: string, nextStatus: boolean) => Promise<{ success?: boolean; error?: string }>;
 }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddBankDetails, setShowAddBankDetails] = useState(false);
   const [editingPartner, setEditingPartner] = useState<PartnerRow | null>(null);
   const [inspectPartner, setInspectPartner] = useState<PartnerRow | null>(null);
+  const [viewingBankDetails, setViewingBankDetails] = useState<PartnerRow | null>(null);
   const [toast, setToast] = useState<{ text: string; error?: boolean } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const showToast = (text: string, error = false) => {
     setToast({ text, error });
@@ -43,11 +69,16 @@ export default function PartnersClient({
   };
 
   const filteredPartners = partners.filter((p) => {
+    if (statusFilter === "ACTIVE" && !p.isActive) return false;
+    if (statusFilter === "INACTIVE" && p.isActive) return false;
+
     const q = searchTerm.toLowerCase();
     return (
       p.name.toLowerCase().includes(q) ||
       p.phone.toLowerCase().includes(q) ||
-      (p.nidNumber && p.nidNumber.toLowerCase().includes(q))
+      (p.nidNumber && p.nidNumber.toLowerCase().includes(q)) ||
+      (p.bankName && p.bankName.toLowerCase().includes(q)) ||
+      (p.bankAccountNumber && p.bankAccountNumber.toLowerCase().includes(q))
     );
   });
 
@@ -62,6 +93,7 @@ export default function PartnersClient({
     } else {
       showToast("✓ Partner successfully created!");
       setShowAddForm(false);
+      setShowAddBankDetails(false);
       (e.target as HTMLFormElement).reset();
     }
   };
@@ -77,6 +109,23 @@ export default function PartnersClient({
     } else {
       showToast("✓ Partner details successfully updated!");
       setEditingPartner(null);
+    }
+  };
+
+  const handleToggleStatus = async (partner: PartnerRow) => {
+    if (!toggleStatusAction) return;
+    const nextStatus = !partner.isActive;
+    const actionLabel = nextStatus ? "activate" : "deactivate";
+    if (!confirm(`Are you sure you want to ${actionLabel} ${partner.name}?`)) return;
+
+    setTogglingId(partner.id);
+    const res = await toggleStatusAction(partner.id, nextStatus);
+    setTogglingId(null);
+
+    if (res.error) {
+      showToast(res.error, true);
+    } else {
+      showToast(`✓ ${partner.name} is now ${nextStatus ? "Active" : "Inactive"}`);
     }
   };
 
@@ -99,7 +148,7 @@ export default function PartnersClient({
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Partners Directory</h1>
           <p className="text-sm text-slate-500">
-            Manage partner profiles, contact information, opening capital, and view real-time live balances.
+            Manage partner profiles, contact info, bank details, and active status.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -123,7 +172,13 @@ export default function PartnersClient({
         <div className="bg-white p-5 rounded-xl shadow-sm border border-blue-200 bg-blue-50/20">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Register New Partner</h2>
-            <button onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-slate-600">
+            <button
+              onClick={() => {
+                setShowAddForm(false);
+                setShowAddBankDetails(false);
+              }}
+              className="text-slate-400 hover:text-slate-600"
+            >
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -169,6 +224,69 @@ export default function PartnersClient({
               </div>
             </div>
 
+            {/* Non-mandatory Bank Details Section */}
+            <div className="border border-slate-200 rounded-lg bg-white p-3 space-y-3">
+              <button
+                type="button"
+                onClick={() => setShowAddBankDetails(!showAddBankDetails)}
+                className="flex items-center justify-between w-full text-left text-xs font-semibold text-slate-700 hover:text-blue-600"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4 text-slate-500" />
+                  Partner Bank Account Details
+                  <span className="text-[11px] font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                    Non-mandatory / Optional
+                  </span>
+                </span>
+                {showAddBankDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+
+              {showAddBankDetails && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2 border-t border-slate-100 animate-fade-in">
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Bank Name</label>
+                    <input
+                      name="bankName"
+                      placeholder="e.g. Dutch-Bangla Bank"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Account Title / Name</label>
+                    <input
+                      name="bankAccountName"
+                      placeholder="e.g. Akter Hossain"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Account Number</label>
+                    <input
+                      name="bankAccountNumber"
+                      placeholder="e.g. 110.120.34567"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Branch Name</label>
+                    <input
+                      name="bankBranch"
+                      placeholder="e.g. Mirpur-10 Branch"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Routing Number</label>
+                    <input
+                      name="bankRoutingNumber"
+                      placeholder="e.g. 090271234"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center justify-between pt-2 border-t border-slate-200/80">
               <p className="text-xs text-amber-700 flex items-center gap-1.5 font-medium">
                 <Lock className="w-3.5 h-3.5" /> Note: Opening balance is set once at registration and cannot be edited later.
@@ -186,19 +304,49 @@ export default function PartnersClient({
       )}
 
       {/* Search & Filter Bar */}
-      <div className="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-        <Search className="w-4 h-4 text-slate-400 ml-1" />
-        <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search partners by name, phone number, or NID..."
-          className="w-full text-sm bg-transparent outline-none placeholder:text-slate-400"
-        />
-        {searchTerm && (
-          <button onClick={() => setSearchTerm("")} className="text-xs text-slate-400 hover:text-slate-600 px-2">
-            Clear
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+        <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
+          <Search className="w-4 h-4 text-slate-400 ml-1" />
+          <input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search partners by name, phone, NID, or bank account..."
+            className="w-full text-sm bg-transparent outline-none placeholder:text-slate-400"
+          />
+          {searchTerm && (
+            <button onClick={() => setSearchTerm("")} className="text-xs text-slate-400 hover:text-slate-600 px-2">
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* Quick status tabs */}
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-medium w-full sm:w-auto justify-center">
+          <button
+            onClick={() => setStatusFilter("ALL")}
+            className={`px-3 py-1 rounded-md transition ${
+              statusFilter === "ALL" ? "bg-white text-slate-900 shadow-xs font-semibold" : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            All ({partners.length})
           </button>
-        )}
+          <button
+            onClick={() => setStatusFilter("ACTIVE")}
+            className={`px-3 py-1 rounded-md transition ${
+              statusFilter === "ACTIVE" ? "bg-white text-emerald-700 shadow-xs font-semibold" : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Active ({partners.filter((p) => p.isActive).length})
+          </button>
+          <button
+            onClick={() => setStatusFilter("INACTIVE")}
+            className={`px-3 py-1 rounded-md transition ${
+              statusFilter === "INACTIVE" ? "bg-white text-rose-700 shadow-xs font-semibold" : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Inactive ({partners.filter((p) => !p.isActive).length})
+          </button>
+        </div>
       </div>
 
       {/* Partners List Table */}
@@ -209,28 +357,61 @@ export default function PartnersClient({
               <tr>
                 <th className="p-3">Partner Name</th>
                 <th>Phone Number</th>
-                <th>NID Number</th>
+                <th>Status</th>
+                <th>Bank Details</th>
                 <th className="text-right">Opening Balance</th>
-                <th className="text-right">Live Current Balance</th>
+                <th className="text-right">Live Balance</th>
                 <th className="p-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredPartners.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-400">
+                  <td colSpan={7} className="p-8 text-center text-slate-400">
                     No partners found matching your search.
                   </td>
                 </tr>
               )}
               {filteredPartners.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50/50">
+                <tr key={p.id} className={`hover:bg-slate-50/50 ${!p.isActive ? "bg-slate-50/40 text-slate-400" : ""}`}>
                   <td className="p-3">
-                    <span className="font-semibold text-slate-900 block">{p.name}</span>
-                    <span className="text-[11px] text-slate-400 font-mono">ID: {p.id.slice(0, 8)}...</span>
+                    <span className={`font-semibold block ${p.isActive ? "text-slate-900" : "text-slate-500"}`}>
+                      {p.name}
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {p.nidNumber ? `NID: ${p.nidNumber}` : `ID: ${p.id.slice(0, 8)}...`}
+                    </span>
                   </td>
                   <td className="text-slate-700 text-xs font-mono">{p.phone}</td>
-                  <td className="text-slate-600 text-xs font-mono">{p.nidNumber || "-"}</td>
+                  <td>
+                    {p.isActive ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        Inactive
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    {p.bankAccountNumber ? (
+                      <button
+                        onClick={() => setViewingBankDetails(p)}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded border border-slate-200 transition"
+                      >
+                        <Building2 className="w-3 h-3 text-blue-600" />
+                        <span>{p.bankName || "Bank"}</span>
+                        <span className="text-[11px] text-slate-400 font-mono">
+                          (..{p.bankAccountNumber.slice(-4)})
+                        </span>
+                      </button>
+                    ) : (
+                      <span className="text-xs text-slate-400 italic">None</span>
+                    )}
+                  </td>
                   <td className="text-right font-mono text-slate-600 text-xs">
                     <span className="inline-flex items-center gap-1">
                       <Lock className="w-3 h-3 text-slate-400" />
@@ -238,27 +419,48 @@ export default function PartnersClient({
                     </span>
                   </td>
                   <td className="text-right">
-                    <span className="font-bold font-mono text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 text-xs">
+                    <span
+                      className={`font-bold font-mono px-2.5 py-1 rounded-md border text-xs ${
+                        p.isActive
+                          ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+                          : "text-slate-600 bg-slate-100 border-slate-200"
+                      }`}
+                    >
                       {formatBDT(p.liveBalance)}
                     </span>
                   </td>
                   <td className="p-3 text-right">
-                    <div className="inline-flex items-center gap-2">
+                    <div className="inline-flex items-center gap-1.5">
+                      {/* Active / Inactive Action Button */}
+                      <button
+                        onClick={() => handleToggleStatus(p)}
+                        disabled={togglingId === p.id}
+                        title={p.isActive ? "Deactivate Partner" : "Activate Partner"}
+                        className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded transition border ${
+                          p.isActive
+                            ? "text-amber-700 bg-amber-50 hover:bg-amber-100 border-amber-200"
+                            : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200"
+                        }`}
+                      >
+                        <Power className="w-3 h-3" />
+                        {togglingId === p.id ? "..." : p.isActive ? "Deactivate" : "Activate"}
+                      </button>
+
                       <button
                         onClick={() => setEditingPartner(p)}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded transition"
+                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
                       >
                         <Edit2 className="w-3 h-3" /> Edit
                       </button>
                       <Link
                         href={`/partners/capital?partnerId=${p.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded border border-emerald-200 transition"
+                        className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded border border-emerald-200 transition"
                       >
                         <Plus className="w-3 h-3" /> Deposit
                       </Link>
                       <button
                         onClick={() => setInspectPartner(p)}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded transition"
+                        className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition"
                       >
                         <History className="w-3 h-3" /> Ledger
                       </button>
@@ -271,10 +473,10 @@ export default function PartnersClient({
         </div>
       </div>
 
-      {/* Edit Partner Modal (Opening balance is non-editable) */}
+      {/* Edit Partner Modal */}
       {editingPartner && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 animate-scale-up">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 animate-scale-up max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Edit2 className="w-4 h-4 text-blue-600" /> Edit Partner Profile
@@ -287,34 +489,103 @@ export default function PartnersClient({
             <form onSubmit={handleUpdate} className="space-y-4 mt-4">
               <input type="hidden" name="id" value={editingPartner.id} />
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Partner Full Name *</label>
-                <input
-                  name="name"
-                  defaultValue={editingPartner.name}
-                  required
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Partner Full Name *</label>
+                  <input
+                    name="name"
+                    defaultValue={editingPartner.name}
+                    required
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number *</label>
+                  <input
+                    name="phone"
+                    defaultValue={editingPartner.phone}
+                    required
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">National ID (NID)</label>
+                  <input
+                    name="nidNumber"
+                    defaultValue={editingPartner.nidNumber || ""}
+                    placeholder="e.g. 1985123456789"
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
 
+              {/* Status Selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number *</label>
-                <input
-                  name="phone"
-                  defaultValue={editingPartner.phone}
-                  required
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Partner Status</label>
+                <select
+                  name="isActive"
+                  defaultValue={editingPartner.isActive ? "true" : "false"}
+                  className="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="true">Active (Can invest and receive payouts)</option>
+                  <option value="false">Inactive (Suspended / Inactive)</option>
+                </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">National ID (NID)</label>
-                <input
-                  name="nidNumber"
-                  defaultValue={editingPartner.nidNumber || ""}
-                  placeholder="e.g. 1985123456789"
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              {/* Bank Details in Edit Modal */}
+              <div className="border border-slate-200 rounded-lg p-3 bg-slate-50/50 space-y-3">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-blue-600" /> Bank Details (Non-mandatory)
+                </h3>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Bank Name</label>
+                    <input
+                      name="bankName"
+                      defaultValue={editingPartner.bankName || ""}
+                      placeholder="e.g. Dutch-Bangla Bank"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Account Title</label>
+                    <input
+                      name="bankAccountName"
+                      defaultValue={editingPartner.bankAccountName || ""}
+                      placeholder="e.g. Akter Hossain"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Account Number</label>
+                    <input
+                      name="bankAccountNumber"
+                      defaultValue={editingPartner.bankAccountNumber || ""}
+                      placeholder="e.g. 110.120.34567"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Branch Name</label>
+                    <input
+                      name="bankBranch"
+                      defaultValue={editingPartner.bankBranch || ""}
+                      placeholder="e.g. Mirpur-10"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Routing Number</label>
+                    <input
+                      name="bankRoutingNumber"
+                      defaultValue={editingPartner.bankRoutingNumber || ""}
+                      placeholder="e.g. 090271234"
+                      className="w-full border rounded px-3 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* NON-EDITABLE OPENING BALANCE */}
@@ -353,13 +624,94 @@ export default function PartnersClient({
         </div>
       )}
 
+      {/* View Bank Details Modal */}
+      {viewingBankDetails && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 animate-scale-up">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-blue-600" /> Bank Account Details
+              </h2>
+              <button onClick={() => setViewingBankDetails(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-lg">
+                <p className="text-xs text-slate-500">Partner</p>
+                <p className="text-sm font-bold text-slate-900">{viewingBankDetails.name}</p>
+                <p className="text-xs text-slate-500 font-mono">{viewingBankDetails.phone}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span className="text-slate-400 block text-[11px]">Bank Name</span>
+                  <span className="font-semibold text-slate-800">{viewingBankDetails.bankName || "—"}</span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span className="text-slate-400 block text-[11px]">Account Title</span>
+                  <span className="font-semibold text-slate-800">{viewingBankDetails.bankAccountName || "—"}</span>
+                </div>
+                <div className="col-span-2 p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span className="text-slate-400 block text-[11px]">Account Number</span>
+                  <span className="font-mono font-bold text-slate-900 text-sm">
+                    {viewingBankDetails.bankAccountNumber || "—"}
+                  </span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span className="text-slate-400 block text-[11px]">Branch</span>
+                  <span className="font-semibold text-slate-800">{viewingBankDetails.bankBranch || "—"}</span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span className="text-slate-400 block text-[11px]">Routing Number</span>
+                  <span className="font-mono font-semibold text-slate-800">
+                    {viewingBankDetails.bankRoutingNumber || "—"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-4">
+              <button
+                onClick={() => {
+                  const p = viewingBankDetails;
+                  setViewingBankDetails(null);
+                  setEditingPartner(p);
+                }}
+                className="text-xs font-semibold text-blue-600 hover:underline"
+              >
+                Edit Bank Details
+              </button>
+              <button
+                onClick={() => setViewingBankDetails(null)}
+                className="px-4 py-1.5 border rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Inspect Partner Ledger Drawer / Modal */}
       {inspectPartner && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full p-6 max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h2 className="text-base font-bold text-slate-900">{inspectPartner.name} — Capital Ledger</h2>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  {inspectPartner.name} — Capital Ledger
+                  {inspectPartner.isActive ? (
+                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                      Inactive
+                    </span>
+                  )}
+                </h2>
                 <p className="text-xs text-slate-500 font-mono">
                   Live Balance: <span className="font-bold text-emerald-700">{formatBDT(inspectPartner.liveBalance)}</span> | Opening: {formatBDT(inspectPartner.openingBalance)}
                 </p>

@@ -41,6 +41,12 @@ export default async function PartnersPage() {
       name: p.name,
       phone: p.phone,
       nidNumber: p.nidNumber,
+      bankName: p.bankName,
+      bankAccountName: p.bankAccountName,
+      bankAccountNumber: p.bankAccountNumber,
+      bankBranch: p.bankBranch,
+      bankRoutingNumber: p.bankRoutingNumber,
+      isActive: p.isActive ?? true,
       openingBalance: opening,
       liveBalance: live,
       transactions: (p.partnerTransactions || []).map((t: any) => ({
@@ -65,6 +71,13 @@ export default async function PartnersPage() {
     const nid = ((formData.get("nidNumber") as string) || "").trim();
     const opening = parseFloat(formData.get("opening_balance") as string) || 0;
 
+    // Non-mandatory bank details
+    const bankName = ((formData.get("bankName") as string) || "").trim() || null;
+    const bankAccountName = ((formData.get("bankAccountName") as string) || "").trim() || null;
+    const bankAccountNumber = ((formData.get("bankAccountNumber") as string) || "").trim() || null;
+    const bankBranch = ((formData.get("bankBranch") as string) || "").trim() || null;
+    const bankRoutingNumber = ((formData.get("bankRoutingNumber") as string) || "").trim() || null;
+
     if (!name || !phone) return { error: "Name and phone number are required." };
 
     const prisma2: any = await getTenantClientFromSession();
@@ -80,6 +93,12 @@ export default async function PartnersPage() {
             name,
             phone,
             nidNumber: nid || null,
+            bankName,
+            bankAccountName,
+            bankAccountNumber,
+            bankBranch,
+            bankRoutingNumber,
+            isActive: true,
             openingBalance: opening,
           },
         });
@@ -113,6 +132,17 @@ export default async function PartnersPage() {
     const phone = ((formData.get("phone") as string) || "").trim();
     const nid = ((formData.get("nidNumber") as string) || "").trim();
 
+    // Bank details (non-mandatory)
+    const bankName = ((formData.get("bankName") as string) || "").trim() || null;
+    const bankAccountName = ((formData.get("bankAccountName") as string) || "").trim() || null;
+    const bankAccountNumber = ((formData.get("bankAccountNumber") as string) || "").trim() || null;
+    const bankBranch = ((formData.get("bankBranch") as string) || "").trim() || null;
+    const bankRoutingNumber = ((formData.get("bankRoutingNumber") as string) || "").trim() || null;
+
+    // Status
+    const isActiveRaw = formData.get("isActive");
+    const isActive = isActiveRaw !== null ? isActiveRaw === "true" || isActiveRaw === "on" : undefined;
+
     if (!id || !name || !phone) return { error: "ID, name, and phone are required." };
 
     const prisma2: any = await getTenantClientFromSession();
@@ -124,14 +154,24 @@ export default async function PartnersPage() {
         const prev = await tx.partner.findUnique({ where: { id } });
         if (!prev) throw new Error("Partner not found");
 
+        const updateData: any = {
+          name,
+          phone,
+          nidNumber: nid || null,
+          bankName,
+          bankAccountName,
+          bankAccountNumber,
+          bankBranch,
+          bankRoutingNumber,
+        };
+        if (isActive !== undefined) {
+          updateData.isActive = isActive;
+        }
+
         // CRITICAL: Opening balance is NOT updated here to preserve financial integrity!
         const updated = await tx.partner.update({
           where: { id },
-          data: {
-            name,
-            phone,
-            nidNumber: nid || null,
-          },
+          data: updateData,
         });
         await writeAudit(tx, "partners", id, "UPDATE", userId, prev, updated);
       });
@@ -151,12 +191,45 @@ export default async function PartnersPage() {
     return { success: true };
   }
 
+  async function toggleStatusAction(id: string, nextStatus: boolean) {
+    "use server";
+    const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
+    if (!(await (await import("@/lib/rbac")).can(s, "partners.manage"))) {
+      return { error: "Forbidden: partners.manage" };
+    }
+
+    const prisma2: any = await getTenantClientFromSession();
+    const { writeAudit } = await import("@/lib/tenantRules");
+    const userId = (s!.user as any).id;
+
+    try {
+      await prisma2.$transaction(async (tx: any) => {
+        const prev = await tx.partner.findUnique({ where: { id } });
+        if (!prev) throw new Error("Partner not found");
+
+        const updated = await tx.partner.update({
+          where: { id },
+          data: { isActive: nextStatus },
+        });
+        await writeAudit(tx, "partners", id, "UPDATE", userId, prev, updated);
+      });
+    } catch (e: any) {
+      return { error: e.message || "Failed to change partner status" };
+    }
+
+    revalidatePath("/partners");
+    revalidatePath("/partners/dashboard");
+    revalidatePath("/partners/capital");
+    return { success: true };
+  }
+
   return (
     <div className="p-6">
       <PartnersClient
         partners={partnerRows}
         createAction={createPartnerAction}
         updateAction={updatePartnerAction}
+        toggleStatusAction={toggleStatusAction}
       />
     </div>
   );

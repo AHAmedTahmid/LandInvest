@@ -9,13 +9,19 @@ datasource db {
 }
 
 model Partner {
-  id             String   @id @db.Char(36)
-  globalUserId   String?  @map("global_user_id") @db.Char(36)
-  name           String   @db.VarChar(150)
-  phone          String   @unique @db.VarChar(20)
-  nidNumber      String?  @unique @map("nid_number") @db.VarChar(50)
-  openingBalance Decimal  @default(0.00) @map("opening_balance") @db.Decimal(15, 2)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  id                String   @id @db.Char(36)
+  globalUserId      String?  @map("global_user_id") @db.Char(36)
+  name              String   @db.VarChar(150)
+  phone             String   @unique @db.VarChar(20)
+  nidNumber         String?  @unique @map("nid_number") @db.VarChar(50)
+  bankName          String?  @map("bank_name") @db.VarChar(100)
+  bankAccountName   String?  @map("bank_account_name") @db.VarChar(150)
+  bankAccountNumber String?  @map("bank_account_number") @db.VarChar(50)
+  bankBranch        String?  @map("bank_branch") @db.VarChar(100)
+  bankRoutingNumber String?  @map("bank_routing_number") @db.VarChar(50)
+  isActive          Boolean  @default(true) @map("is_active")
+  openingBalance    Decimal  @default(0.00) @map("opening_balance") @db.Decimal(15, 2)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
   projectPartners     ProjectPartner[]
   partnerTransactions PartnerTransaction[]
@@ -92,6 +98,9 @@ model TreasuryLedger {
   createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
 
   @@index([bankAccountId])
+  @@index([txnDate])
+  @@index([accountType, txnDate])
+  @@index([referenceType, referenceId])
   @@map("treasury_ledger")
 }
 
@@ -107,6 +116,7 @@ model PartnerTransaction {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
   @@index([partnerId])
+  @@index([txnDate])
   @@map("partner_transactions")
 }
 
@@ -132,6 +142,8 @@ model ProjectExpense {
   @@index([projectId])
   @@index([bankAccountId])
   @@index([paidByPartnerId])
+  @@index([expenseDate])
+  @@index([status, expenseDate])
   @@map("project_expenses")
 }
 
@@ -170,6 +182,8 @@ model LandSale {
 
   @@index([projectId])
   @@index([plotId])
+  @@index([saleDate])
+  @@index([status, saleDate])
   @@map("land_sales")
 }
 
@@ -182,6 +196,8 @@ model InstallmentSchedule {
   status    String   @default("UPCOMING") @db.VarChar(20)
 
   @@index([saleId])
+  @@index([dueDate])
+  @@index([status, dueDate])
   @@map("installment_schedule")
 }
 
@@ -198,6 +214,7 @@ model CustomerPayment {
   remarks       String?      @db.VarChar(255)
 
   @@index([saleId])
+  @@index([paymentDate])
   @@map("customer_payments")
 }
 
@@ -228,6 +245,9 @@ model AuditLog {
   newValues Json?    @map("new_values")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
+  @@index([createdAt])
+  @@index([tableName, createdAt])
+  @@index([changedBy])
   @@map("audit_log")
 }
 
@@ -263,4 +283,26 @@ model UserRole {
   assignedAt DateTime @default(now()) @map("assigned_at") @db.Timestamp(0)
 
   @@map("user_roles")
+}
+
+model DashboardLayout {
+  id        String   @id @db.Char(36)
+  scope     String   @db.VarChar(10)
+  scopeId   String   @map("scope_id") @db.Char(36)
+  layout    Json
+  updatedBy String?  @map("updated_by") @db.Char(36)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@unique([scope, scopeId])
+  @@map("dashboard_layouts")
+}
+
+model DashboardSetting {
+  id           String   @id @db.Char(36)
+  settingKey   String   @unique @map("setting_key") @db.VarChar(100)
+  settingValue Json     @map("setting_value")
+  updatedBy    String?  @map("updated_by") @db.Char(36)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("dashboard_settings")
 }

@@ -59,6 +59,7 @@ export default async function CapitalDepositPage({
     id: p.id,
     name: p.name,
     phone: p.phone,
+    isActive: p.isActive ?? true,
     liveBalance: calculateLiveBalance(toNum(p.openingBalance), p.partnerTransactions || []),
   }));
 
@@ -219,3 +220,4 @@ export default async function CapitalDepositPage({
     </div>
   );
 }
+

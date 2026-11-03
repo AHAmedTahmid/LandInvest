@@ -2574,6 +2574,12 @@ export namespace Prisma {
     name: string | null
     phone: string | null
     nidNumber: string | null
+    bankName: string | null
+    bankAccountName: string | null
+    bankAccountNumber: string | null
+    bankBranch: string | null
+    bankRoutingNumber: string | null
+    isActive: boolean | null
     openingBalance: Decimal | null
     createdAt: Date | null
   }
@@ -2584,6 +2590,12 @@ export namespace Prisma {
     name: string | null
     phone: string | null
     nidNumber: string | null
+    bankName: string | null
+    bankAccountName: string | null
+    bankAccountNumber: string | null
+    bankBranch: string | null
+    bankRoutingNumber: string | null
+    isActive: boolean | null
     openingBalance: Decimal | null
     createdAt: Date | null
   }
@@ -2594,6 +2606,12 @@ export namespace Prisma {
     name: number
     phone: number
     nidNumber: number
+    bankName: number
+    bankAccountName: number
+    bankAccountNumber: number
+    bankBranch: number
+    bankRoutingNumber: number
+    isActive: number
     openingBalance: number
     createdAt: number
     _all: number
@@ -2614,6 +2632,12 @@ export namespace Prisma {
     name?: true
     phone?: true
     nidNumber?: true
+    bankName?: true
+    bankAccountName?: true
+    bankAccountNumber?: true
+    bankBranch?: true
+    bankRoutingNumber?: true
+    isActive?: true
     openingBalance?: true
     createdAt?: true
   }
@@ -2624,6 +2648,12 @@ export namespace Prisma {
     name?: true
     phone?: true
     nidNumber?: true
+    bankName?: true
+    bankAccountName?: true
+    bankAccountNumber?: true
+    bankBranch?: true
+    bankRoutingNumber?: true
+    isActive?: true
     openingBalance?: true
     createdAt?: true
   }
@@ -2634,6 +2664,12 @@ export namespace Prisma {
     name?: true
     phone?: true
     nidNumber?: true
+    bankName?: true
+    bankAccountName?: true
+    bankAccountNumber?: true
+    bankBranch?: true
+    bankRoutingNumber?: true
+    isActive?: true
     openingBalance?: true
     createdAt?: true
     _all?: true
@@ -2731,6 +2767,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber: string | null
+    bankName: string | null
+    bankAccountName: string | null
+    bankAccountNumber: string | null
+    bankBranch: string | null
+    bankRoutingNumber: string | null
+    isActive: boolean
     openingBalance: Decimal
     createdAt: Date
     _count: PartnerCountAggregateOutputType | null
@@ -2760,6 +2802,12 @@ export namespace Prisma {
     name?: boolean
     phone?: boolean
     nidNumber?: boolean
+    bankName?: boolean
+    bankAccountName?: boolean
+    bankAccountNumber?: boolean
+    bankBranch?: boolean
+    bankRoutingNumber?: boolean
+    isActive?: boolean
     openingBalance?: boolean
     createdAt?: boolean
     projectPartners?: boolean | Partner$projectPartnersArgs<ExtArgs>
@@ -2777,11 +2825,17 @@ export namespace Prisma {
     name?: boolean
     phone?: boolean
     nidNumber?: boolean
+    bankName?: boolean
+    bankAccountName?: boolean
+    bankAccountNumber?: boolean
+    bankBranch?: boolean
+    bankRoutingNumber?: boolean
+    isActive?: boolean
     openingBalance?: boolean
     createdAt?: boolean
   }
 
-  export type PartnerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "globalUserId" | "name" | "phone" | "nidNumber" | "openingBalance" | "createdAt", ExtArgs["result"]["partner"]>
+  export type PartnerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "globalUserId" | "name" | "phone" | "nidNumber" | "bankName" | "bankAccountName" | "bankAccountNumber" | "bankBranch" | "bankRoutingNumber" | "isActive" | "openingBalance" | "createdAt", ExtArgs["result"]["partner"]>
   export type PartnerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     projectPartners?: boolean | Partner$projectPartnersArgs<ExtArgs>
     partnerTransactions?: boolean | Partner$partnerTransactionsArgs<ExtArgs>
@@ -2804,6 +2858,12 @@ export namespace Prisma {
       name: string
       phone: string
       nidNumber: string | null
+      bankName: string | null
+      bankAccountName: string | null
+      bankAccountNumber: string | null
+      bankBranch: string | null
+      bankRoutingNumber: string | null
+      isActive: boolean
       openingBalance: Prisma.Decimal
       createdAt: Date
     }, ExtArgs["result"]["partner"]>
@@ -3184,6 +3244,12 @@ export namespace Prisma {
     readonly name: FieldRef<"Partner", 'String'>
     readonly phone: FieldRef<"Partner", 'String'>
     readonly nidNumber: FieldRef<"Partner", 'String'>
+    readonly bankName: FieldRef<"Partner", 'String'>
+    readonly bankAccountName: FieldRef<"Partner", 'String'>
+    readonly bankAccountNumber: FieldRef<"Partner", 'String'>
+    readonly bankBranch: FieldRef<"Partner", 'String'>
+    readonly bankRoutingNumber: FieldRef<"Partner", 'String'>
+    readonly isActive: FieldRef<"Partner", 'Boolean'>
     readonly openingBalance: FieldRef<"Partner", 'Decimal'>
     readonly createdAt: FieldRef<"Partner", 'DateTime'>
   }
@@ -20660,6 +20726,12 @@ export namespace Prisma {
     name: 'name',
     phone: 'phone',
     nidNumber: 'nidNumber',
+    bankName: 'bankName',
+    bankAccountName: 'bankAccountName',
+    bankAccountNumber: 'bankAccountNumber',
+    bankBranch: 'bankBranch',
+    bankRoutingNumber: 'bankRoutingNumber',
+    isActive: 'isActive',
     openingBalance: 'openingBalance',
     createdAt: 'createdAt'
   };
@@ -20931,7 +21003,12 @@ export namespace Prisma {
     globalUserId: 'globalUserId',
     name: 'name',
     phone: 'phone',
-    nidNumber: 'nidNumber'
+    nidNumber: 'nidNumber',
+    bankName: 'bankName',
+    bankAccountName: 'bankAccountName',
+    bankAccountNumber: 'bankAccountNumber',
+    bankBranch: 'bankBranch',
+    bankRoutingNumber: 'bankRoutingNumber'
   };
 
   export type PartnerOrderByRelevanceFieldEnum = (typeof PartnerOrderByRelevanceFieldEnum)[keyof typeof PartnerOrderByRelevanceFieldEnum]
@@ -21152,6 +21229,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -21162,13 +21246,6 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -21205,6 +21282,12 @@ export namespace Prisma {
     name?: StringFilter<"Partner"> | string
     phone?: StringFilter<"Partner"> | string
     nidNumber?: StringNullableFilter<"Partner"> | string | null
+    bankName?: StringNullableFilter<"Partner"> | string | null
+    bankAccountName?: StringNullableFilter<"Partner"> | string | null
+    bankAccountNumber?: StringNullableFilter<"Partner"> | string | null
+    bankBranch?: StringNullableFilter<"Partner"> | string | null
+    bankRoutingNumber?: StringNullableFilter<"Partner"> | string | null
+    isActive?: BoolFilter<"Partner"> | boolean
     openingBalance?: DecimalFilter<"Partner"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"Partner"> | Date | string
     projectPartners?: ProjectPartnerListRelationFilter
@@ -21219,6 +21302,12 @@ export namespace Prisma {
     name?: SortOrder
     phone?: SortOrder
     nidNumber?: SortOrderInput | SortOrder
+    bankName?: SortOrderInput | SortOrder
+    bankAccountName?: SortOrderInput | SortOrder
+    bankAccountNumber?: SortOrderInput | SortOrder
+    bankBranch?: SortOrderInput | SortOrder
+    bankRoutingNumber?: SortOrderInput | SortOrder
+    isActive?: SortOrder
     openingBalance?: SortOrder
     createdAt?: SortOrder
     projectPartners?: ProjectPartnerOrderByRelationAggregateInput
@@ -21237,6 +21326,12 @@ export namespace Prisma {
     NOT?: PartnerWhereInput | PartnerWhereInput[]
     globalUserId?: StringNullableFilter<"Partner"> | string | null
     name?: StringFilter<"Partner"> | string
+    bankName?: StringNullableFilter<"Partner"> | string | null
+    bankAccountName?: StringNullableFilter<"Partner"> | string | null
+    bankAccountNumber?: StringNullableFilter<"Partner"> | string | null
+    bankBranch?: StringNullableFilter<"Partner"> | string | null
+    bankRoutingNumber?: StringNullableFilter<"Partner"> | string | null
+    isActive?: BoolFilter<"Partner"> | boolean
     openingBalance?: DecimalFilter<"Partner"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"Partner"> | Date | string
     projectPartners?: ProjectPartnerListRelationFilter
@@ -21251,6 +21346,12 @@ export namespace Prisma {
     name?: SortOrder
     phone?: SortOrder
     nidNumber?: SortOrderInput | SortOrder
+    bankName?: SortOrderInput | SortOrder
+    bankAccountName?: SortOrderInput | SortOrder
+    bankAccountNumber?: SortOrderInput | SortOrder
+    bankBranch?: SortOrderInput | SortOrder
+    bankRoutingNumber?: SortOrderInput | SortOrder
+    isActive?: SortOrder
     openingBalance?: SortOrder
     createdAt?: SortOrder
     _count?: PartnerCountOrderByAggregateInput
@@ -21269,6 +21370,12 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Partner"> | string
     phone?: StringWithAggregatesFilter<"Partner"> | string
     nidNumber?: StringNullableWithAggregatesFilter<"Partner"> | string | null
+    bankName?: StringNullableWithAggregatesFilter<"Partner"> | string | null
+    bankAccountName?: StringNullableWithAggregatesFilter<"Partner"> | string | null
+    bankAccountNumber?: StringNullableWithAggregatesFilter<"Partner"> | string | null
+    bankBranch?: StringNullableWithAggregatesFilter<"Partner"> | string | null
+    bankRoutingNumber?: StringNullableWithAggregatesFilter<"Partner"> | string | null
+    isActive?: BoolWithAggregatesFilter<"Partner"> | boolean
     openingBalance?: DecimalWithAggregatesFilter<"Partner"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeWithAggregatesFilter<"Partner"> | Date | string
   }
@@ -22500,6 +22607,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerCreateNestedManyWithoutPartnerInput
@@ -22514,6 +22627,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerUncheckedCreateNestedManyWithoutPartnerInput
@@ -22528,6 +22647,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUpdateManyWithoutPartnerNestedInput
@@ -22542,6 +22667,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUncheckedUpdateManyWithoutPartnerNestedInput
@@ -22556,6 +22687,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
   }
@@ -22566,6 +22703,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22576,6 +22719,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23884,6 +24033,11 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type DecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -23963,6 +24117,12 @@ export namespace Prisma {
     name?: SortOrder
     phone?: SortOrder
     nidNumber?: SortOrder
+    bankName?: SortOrder
+    bankAccountName?: SortOrder
+    bankAccountNumber?: SortOrder
+    bankBranch?: SortOrder
+    bankRoutingNumber?: SortOrder
+    isActive?: SortOrder
     openingBalance?: SortOrder
     createdAt?: SortOrder
   }
@@ -23977,6 +24137,12 @@ export namespace Prisma {
     name?: SortOrder
     phone?: SortOrder
     nidNumber?: SortOrder
+    bankName?: SortOrder
+    bankAccountName?: SortOrder
+    bankAccountNumber?: SortOrder
+    bankBranch?: SortOrder
+    bankRoutingNumber?: SortOrder
+    isActive?: SortOrder
     openingBalance?: SortOrder
     createdAt?: SortOrder
   }
@@ -23987,6 +24153,12 @@ export namespace Prisma {
     name?: SortOrder
     phone?: SortOrder
     nidNumber?: SortOrder
+    bankName?: SortOrder
+    bankAccountName?: SortOrder
+    bankAccountNumber?: SortOrder
+    bankBranch?: SortOrder
+    bankRoutingNumber?: SortOrder
+    isActive?: SortOrder
     openingBalance?: SortOrder
     createdAt?: SortOrder
   }
@@ -24031,6 +24203,14 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -24059,11 +24239,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type TreasuryLedgerListRelationFilter = {
@@ -24125,14 +24300,6 @@ export namespace Prisma {
 
   export type BankAccountSumOrderByAggregateInput = {
     currentBalance?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type ProjectPlotListRelationFilter = {
@@ -25092,6 +25259,10 @@ export namespace Prisma {
     set?: string | null
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type DecimalFieldUpdateOperationsInput = {
     set?: Decimal | DecimalJsLike | number | string
     increment?: Decimal | DecimalJsLike | number | string
@@ -25256,10 +25427,6 @@ export namespace Prisma {
     connectOrCreate?: CustomerPaymentCreateOrConnectWithoutBankAccountInput | CustomerPaymentCreateOrConnectWithoutBankAccountInput[]
     createMany?: CustomerPaymentCreateManyBankAccountInputEnvelope
     connect?: CustomerPaymentWhereUniqueInput | CustomerPaymentWhereUniqueInput[]
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type TreasuryLedgerUpdateManyWithoutBankAccountNestedInput = {
@@ -26046,6 +26213,11 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -26126,6 +26298,14 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -26154,19 +26334,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -26970,6 +27137,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     partnerTransactions?: PartnerTransactionCreateNestedManyWithoutPartnerInput
@@ -26983,6 +27156,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     partnerTransactions?: PartnerTransactionUncheckedCreateNestedManyWithoutPartnerInput
@@ -27063,6 +27242,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     partnerTransactions?: PartnerTransactionUpdateManyWithoutPartnerNestedInput
@@ -27076,6 +27261,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     partnerTransactions?: PartnerTransactionUncheckedUpdateManyWithoutPartnerNestedInput
@@ -27149,6 +27340,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerCreateNestedManyWithoutPartnerInput
@@ -27162,6 +27359,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerUncheckedCreateNestedManyWithoutPartnerInput
@@ -27191,6 +27394,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUpdateManyWithoutPartnerNestedInput
@@ -27204,6 +27413,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUncheckedUpdateManyWithoutPartnerNestedInput
@@ -27289,6 +27504,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerCreateNestedManyWithoutPartnerInput
@@ -27302,6 +27523,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerUncheckedCreateNestedManyWithoutPartnerInput
@@ -27415,6 +27642,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUpdateManyWithoutPartnerNestedInput
@@ -27428,6 +27661,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUncheckedUpdateManyWithoutPartnerNestedInput
@@ -28095,6 +28334,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerCreateNestedManyWithoutPartnerInput
@@ -28108,6 +28353,12 @@ export namespace Prisma {
     name: string
     phone: string
     nidNumber?: string | null
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankRoutingNumber?: string | null
+    isActive?: boolean
     openingBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     projectPartners?: ProjectPartnerUncheckedCreateNestedManyWithoutPartnerInput
@@ -28188,6 +28439,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUpdateManyWithoutPartnerNestedInput
@@ -28201,6 +28458,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     nidNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountName?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    bankBranch?: NullableStringFieldUpdateOperationsInput | string | null
+    bankRoutingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projectPartners?: ProjectPartnerUncheckedUpdateManyWithoutPartnerNestedInput

@@ -10,6 +10,7 @@ export type PartnerOption = {
   name: string;
   phone: string;
   liveBalance: number;
+  isActive?: boolean;
 };
 
 export type BankOption = {
@@ -127,7 +128,7 @@ export default function CapitalDepositForm({
             >
               {partners.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} — Current Live Balance: {formatBDT(p.liveBalance)}
+                  {p.name} {p.isActive === false ? "(Inactive) " : ""}— Current Live Balance: {formatBDT(p.liveBalance)}
                 </option>
               ))}
             </select>
@@ -285,3 +286,4 @@ export default function CapitalDepositForm({
     </div>
   );
 }
+

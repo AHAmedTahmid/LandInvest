@@ -127,6 +127,12 @@ exports.Prisma.PartnerScalarFieldEnum = {
   name: 'name',
   phone: 'phone',
   nidNumber: 'nidNumber',
+  bankName: 'bankName',
+  bankAccountName: 'bankAccountName',
+  bankAccountNumber: 'bankAccountNumber',
+  bankBranch: 'bankBranch',
+  bankRoutingNumber: 'bankRoutingNumber',
+  isActive: 'isActive',
   openingBalance: 'openingBalance',
   createdAt: 'createdAt'
 };
@@ -332,7 +338,12 @@ exports.Prisma.PartnerOrderByRelevanceFieldEnum = {
   globalUserId: 'globalUserId',
   name: 'name',
   phone: 'phone',
-  nidNumber: 'nidNumber'
+  nidNumber: 'nidNumber',
+  bankName: 'bankName',
+  bankAccountName: 'bankAccountName',
+  bankAccountNumber: 'bankAccountNumber',
+  bankBranch: 'bankBranch',
+  bankRoutingNumber: 'bankRoutingNumber'
 };
 
 exports.Prisma.BankAccountOrderByRelevanceFieldEnum = {

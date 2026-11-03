@@ -14,6 +14,9 @@ export async function GET() {
       id: true,
       name: true,
       phone: true,
+      isActive: true,
+      bankName: true,
+      bankAccountNumber: true,
     },
   });
 
