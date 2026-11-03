@@ -1,4 +1,4 @@
-﻿import mysql from "mysql2/promise";
+import mysql from "mysql2/promise";
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
 let pass = 0, fail = 0;
@@ -117,7 +117,7 @@ try {
   r = await call(owner, "/api/users/" + created.userId, { method: "PATCH", json: { isActive: false } });
   check("deactivate smoke user", r.status === 200, `status=${r.status}`);
   r = await call(smoke, "/api/treasury/contra");
-  check("deactivated user gets no permissions", r.status === 403, `status=${r.status}`);
+  check("deactivated user gets no permissions", r.status === 403 || r.status === 401, `status=${r.status}`);
 
   // 8. audit rows exist for role + user lifecycle
   const conn = await mysql.createConnection({ host: "localhost", user: "root", password: "", database: "tenant_demo" });

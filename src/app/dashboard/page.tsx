@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   if (!(await can(session, "dashboard.view"))) {
     return (
       <div className="p-8 text-center text-red-600 font-semibold bg-white rounded-2xl border border-red-200 m-6 shadow-xs">
-        <h2 className="text-lg font-bold mb-1">Access Restricted</h2>
+        <h2 className="text-lg font-bold mb-1">Forbidden: viewDashboard</h2>
         <p className="text-xs text-gray-500">
           You do not have permission to access the Executive Dashboard.
         </p>

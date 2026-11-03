@@ -38,7 +38,6 @@ export const DEFAULT_ROLES: { name: string; description: string; isSystem: boole
       "dashboard.widget.quick_actions",
       "expenses.view",
       "expenses.create",
-      "expenses.approve",
       "sales.view",
       "sales.collect",
       "receipts.print",
@@ -89,8 +88,16 @@ export async function seedDefaultRoles(prisma: any, createdBy: string | null) {
     }
 
     if (!r.isSystem) {
-      // Ensure role has current keys
+      // Synchronize role permissions
       const existingPerms = await prisma.rolePermission.findMany({ where: { roleId: role.id } });
+      const targetKeys = new Set(r.keys);
+      for (const p of existingPerms) {
+        if (!targetKeys.has(p.permissionKey)) {
+          await prisma.rolePermission.delete({
+            where: { roleId_permissionKey: { roleId: role.id, permissionKey: p.permissionKey } },
+          });
+        }
+      }
       const existingSet = new Set(existingPerms.map((p: any) => p.permissionKey));
       for (const k of r.keys) {
         if (!existingSet.has(k)) {
