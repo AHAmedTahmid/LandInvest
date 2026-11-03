@@ -2,87 +2,162 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { getTenantClientFromSession } from "@/lib/tenant";
 import { can } from "@/lib/rbac";
-import { formatBDT, toNum } from "@/lib/format";
+import { toNum } from "@/lib/format";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
-import PartnersForm from "./PartnersForm";
-import T from "@/components/T";
+import PartnersClient, { PartnerRow } from "./PartnersClient";
 
-function getPartnerBalance(opening: number, txs: any[]) {
+function calculateLiveBalance(opening: number, txs: any[]): number {
   let bal = opening;
   for (const t of txs) {
     const a = toNum(t.amount);
-    if (["DEPOSIT","DIRECT_EXPENSE","PROFIT_CREDIT"].includes(t.txnType)) bal += a;
+    if (["DEPOSIT", "DIRECT_EXPENSE", "PROFIT_CREDIT"].includes(t.txnType)) bal += a;
     else if (t.txnType === "WITHDRAWAL") bal -= a;
   }
   return bal;
 }
 
-export default async function PartnersPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+export default async function PartnersPage() {
   const session = await getServerSession(authOptions);
-  const role: any = (session?.user as any)?.role;
-  if (!(await can(session, "partners.manage"))) return <div className="p-8 text-red-600">Forbidden: managePartners</div>;
-  const prisma: any = await getTenantClientFromSession();
-  const partners = await prisma.partner.findMany({ include: { partnerTransactions: true }, orderBy: { createdAt: "desc" } });
-  const sp = await searchParams;
-  const viewId = sp.view;
-  const viewPartner = viewId ? await prisma.partner.findUnique({ where: { id: viewId } }) : null;
-  const viewTxs = viewId ? await prisma.partnerTransaction.findMany({ where: { partnerId: viewId }, orderBy: { txnDate: "desc" } }) : [];
+  if (!(await can(session, "partners.manage")) && !(await can(session, "partners.view"))) {
+    return <div className="p-8 text-red-600">Forbidden: managePartners</div>;
+  }
 
-  async function upsert(_prev: string | null, formData: FormData): Promise<string | null> {
+  const prisma: any = await getTenantClientFromSession();
+  const partnersRaw = await prisma.partner.findMany({
+    include: {
+      partnerTransactions: {
+        orderBy: { txnDate: "desc" },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const partnerRows: PartnerRow[] = partnersRaw.map((p: any) => {
+    const opening = toNum(p.openingBalance);
+    const live = calculateLiveBalance(opening, p.partnerTransactions || []);
+    return {
+      id: p.id,
+      name: p.name,
+      phone: p.phone,
+      nidNumber: p.nidNumber,
+      openingBalance: opening,
+      liveBalance: live,
+      transactions: (p.partnerTransactions || []).map((t: any) => ({
+        id: t.id,
+        txnType: t.txnType,
+        amount: toNum(t.amount),
+        txnDate: new Date(t.txnDate).toISOString(),
+        notes: t.notes,
+      })),
+    };
+  });
+
+  async function createPartnerAction(formData: FormData) {
     "use server";
-    const prisma2: any = await getTenantClientFromSession();
-    const rawId = ((formData.get("id") as string) || "").trim();
+    const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
+    if (!(await (await import("@/lib/rbac")).can(s, "partners.manage"))) {
+      return { error: "Forbidden: partners.manage" };
+    }
+
     const name = ((formData.get("name") as string) || "").trim();
     const phone = ((formData.get("phone") as string) || "").trim();
     const nid = ((formData.get("nidNumber") as string) || "").trim();
     const opening = parseFloat(formData.get("opening_balance") as string) || 0;
-    if (!name || !phone) return "✗ Name and phone are required";
+
+    if (!name || !phone) return { error: "Name and phone number are required." };
+
+    const prisma2: any = await getTenantClientFromSession();
+    const { writeAudit } = await import("@/lib/tenantRules");
+    const userId = (s!.user as any).id;
+    const partnerId = randomUUID();
+
     try {
-      if (rawId) {
-        const exists = await prisma2.partner.findUnique({ where: { id: rawId } });
-        if (exists) {
-          await prisma2.partner.update({ where: { id: rawId }, data: { name, phone, nidNumber: nid || null, openingBalance: opening } });
-        } else {
-          return `✗ No partner found with ID "${rawId}" — leave ID blank to create a new partner (ID is auto-generated and unique)`;
-        }
-      } else {
-        await prisma2.partner.create({ data: { id: randomUUID(), name, phone, nidNumber: nid || null, openingBalance: opening } });
-      }
+      await prisma2.$transaction(async (tx: any) => {
+        const partner = await tx.partner.create({
+          data: {
+            id: partnerId,
+            name,
+            phone,
+            nidNumber: nid || null,
+            openingBalance: opening,
+          },
+        });
+        await writeAudit(tx, "partners", partnerId, "CREATE", userId, null, partner);
+      });
     } catch (e: any) {
       if (e.code === "P2002") {
         const t = e.meta?.target as string[] | string | undefined;
-        const s = Array.isArray(t) ? t.join(",") : String(t ?? "");
-        if (s.includes("phone")) return `✗ Phone "${phone}" already exists — use a different number`;
-        if (s.includes("nid")) return `✗ NID "${nid}" already exists — each partner must have a unique NID`;
+        const str = Array.isArray(t) ? t.join(",") : String(t ?? "");
+        if (str.includes("phone")) return { error: `Phone number "${phone}" is already registered.` };
+        if (str.includes("nid")) return { error: `NID "${nid}" is already in use by another partner.` };
       }
-      return `✗ ${e.message || "Failed to save partner"}`;
+      return { error: e.message || "Failed to create partner" };
     }
+
     revalidatePath("/partners");
-    return `✓ Partner "${name}" saved`;
+    revalidatePath("/partners/dashboard");
+    revalidatePath("/partners/capital");
+    return { success: true };
+  }
+
+  async function updatePartnerAction(formData: FormData) {
+    "use server";
+    const s = await (await import("next-auth")).getServerSession((await import("@/auth")).authOptions);
+    if (!(await (await import("@/lib/rbac")).can(s, "partners.manage"))) {
+      return { error: "Forbidden: partners.manage" };
+    }
+
+    const id = ((formData.get("id") as string) || "").trim();
+    const name = ((formData.get("name") as string) || "").trim();
+    const phone = ((formData.get("phone") as string) || "").trim();
+    const nid = ((formData.get("nidNumber") as string) || "").trim();
+
+    if (!id || !name || !phone) return { error: "ID, name, and phone are required." };
+
+    const prisma2: any = await getTenantClientFromSession();
+    const { writeAudit } = await import("@/lib/tenantRules");
+    const userId = (s!.user as any).id;
+
+    try {
+      await prisma2.$transaction(async (tx: any) => {
+        const prev = await tx.partner.findUnique({ where: { id } });
+        if (!prev) throw new Error("Partner not found");
+
+        // CRITICAL: Opening balance is NOT updated here to preserve financial integrity!
+        const updated = await tx.partner.update({
+          where: { id },
+          data: {
+            name,
+            phone,
+            nidNumber: nid || null,
+          },
+        });
+        await writeAudit(tx, "partners", id, "UPDATE", userId, prev, updated);
+      });
+    } catch (e: any) {
+      if (e.code === "P2002") {
+        const t = e.meta?.target as string[] | string | undefined;
+        const str = Array.isArray(t) ? t.join(",") : String(t ?? "");
+        if (str.includes("phone")) return { error: `Phone number "${phone}" is already registered.` };
+        if (str.includes("nid")) return { error: `NID "${nid}" is already in use by another partner.` };
+      }
+      return { error: e.message || "Failed to update partner" };
+    }
+
+    revalidatePath("/partners");
+    revalidatePath("/partners/dashboard");
+    revalidatePath("/partners/capital");
+    return { success: true };
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold"><T k="partners" /></h1>
-      <PartnersForm action={upsert} />
-
-      <table className="w-full text-sm bg-white rounded-xl shadow border">
-        <thead><tr className="border-b text-left"><th className="p-2"><T k="name" /></th><th><T k="phone" /></th><th><T k="nid" /></th><th><T k="opening" /></th><th><T k="liveBalance" /></th><th><T k="ledger" /></th></tr></thead>
-        <tbody>{partners.map((p: any) => {
-          const bal = getPartnerBalance(toNum(p.openingBalance), p.partnerTransactions);
-          return <tr key={p.id} className="border-b"><td className="p-2">{p.name}</td><td>{p.phone}</td><td>{p.nidNumber||"-"}</td><td>{formatBDT(toNum(p.openingBalance))}</td><td className="font-bold">{formatBDT(bal)}</td><td><a href={`/partners?view=${p.id}`} className="text-blue-600 underline">View</a></td></tr>;
-        })}</tbody>
-      </table>
-
-      {viewId && (
-        <div className="bg-white p-4 rounded-xl shadow border">
-          <h2 className="font-semibold mb-2"><T k="capitalLedger" /> {viewPartner?.name ?? viewId}</h2>
-          <table className="w-full text-sm"><thead><tr className="border-b text-left"><th><T k="date" /></th><th><T k="type" /></th><th><T k="amount" /></th><th><T k="notes" /></th></tr></thead>
-            <tbody>{viewTxs.map((t: any) => <tr key={t.id} className="border-b"><td>{new Date(t.txnDate).toLocaleDateString()}</td><td>{t.txnType}</td><td>{formatBDT(toNum(t.amount))}</td><td>{t.notes||"-"}</td></tr>)}</tbody>
-          </table>
-        </div>
-      )}
+    <div className="p-6">
+      <PartnersClient
+        partners={partnerRows}
+        createAction={createPartnerAction}
+        updateAction={updatePartnerAction}
+      />
     </div>
   );
 }

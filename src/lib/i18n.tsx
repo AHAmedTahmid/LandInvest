@@ -7,6 +7,9 @@ const Ctx = createContext<{ lang: Lang; t: (k: string) => string; toggle: () => 
 const DICT: Record<string, { en: string; bn: string }> = {
   dashboard: { en: "Dashboard", bn: "ড্যাশবোর্ড" },
   partners: { en: "Partners & Capital", bn: "পার্টনার ও মূলধন" },
+  partners_dashboard: { en: "Overview & Analytics", bn: "ওভারভিউ ও অ্যানালিটিক্স" },
+  partners_list: { en: "Partners Directory", bn: "পার্টনার তালিকা" },
+  partners_capital: { en: "Add Capital / Investment", bn: "মূলধন জমা / বিনিয়োগ" },
   treasury: { en: "Cash & Bank Ledger", bn: "ক্যাশ ও ব্যাংক লেজার" },
   projects: { en: "Land & Acquisition", bn: "জমি ও অধিগ্রহণ" },
   expenses: { en: "Project Expenses", bn: "প্রকল্প ব্যয়" },

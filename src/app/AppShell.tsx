@@ -2,13 +2,34 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Users, Wallet, Map, Receipt, FileCheck, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, Map, Receipt, FileCheck, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound, LogOut, ChevronDown } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useLang } from "@/lib/i18n";
 
-const NAV = [
+type NavItem = {
+  href?: string;
+  key: string;
+  icon: any;
+  perm: string | readonly string[];
+  children?: Array<{
+    href: string;
+    key: string;
+    perm: string | readonly string[];
+  }>;
+};
+
+const NAV: NavItem[] = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard, perm: "dashboard.view" },
-  { href: "/partners", key: "partners", icon: Users, perm: "partners.view" },
+  {
+    key: "partners",
+    icon: Users,
+    perm: ["partners.view", "partners.manage"],
+    children: [
+      { href: "/partners/dashboard", key: "partners_dashboard", perm: ["partners.view", "partners.manage"] },
+      { href: "/partners", key: "partners_list", perm: ["partners.view", "partners.manage"] },
+      { href: "/partners/capital", key: "partners_capital", perm: ["partners.capital.deposit", "partners.manage", "partners.view"] },
+    ],
+  },
   { href: "/treasury", key: "treasury", icon: Wallet, perm: "treasury.view" },
   { href: "/projects", key: "projects", icon: Map, perm: "projects.view" },
   { href: "/expenses", key: "expenses", icon: Receipt, perm: ["expenses.view", "expenses.create"] },
@@ -16,7 +37,7 @@ const NAV = [
   { href: "/sales", key: "sales", icon: BadgeDollarSign, perm: ["sales.view", "sales.collect"] },
   { href: "/reports", key: "reports", icon: PieChart, perm: ["reports.view", "profit.view", "reports.financial.view", "reports.partners.view", "reports.projects.view", "reports.sales.view", "reports.audit.view"] },
   { href: "/audit", key: "audit", icon: ShieldCheck, perm: "audit.view" },
-] as const;
+];
 
 // Administration section: manage roles (permissions) and users (name + password + role)
 const ADMIN_NAV = [
@@ -26,6 +47,8 @@ const ADMIN_NAV = [
 
 const TITLES: Record<string, string> = {
   "/dashboard": "executive",
+  "/partners/dashboard": "partners_dashboard",
+  "/partners/capital": "partners_capital",
   "/partners": "partners",
   "/treasury": "treasury",
   "/projects": "projects",
@@ -45,6 +68,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname === "/forgot-password" || pathname?.startsWith("/invite") || pathname?.startsWith("/reset-password");
   const [perms, setPerms] = useState<string[] | null>(null);
   const [me, setMe] = useState<{ fullName: string | null; email: string | null } | null>(null);
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ partners: true });
 
   // load my permissions once; hide menu items I may not open, force password change when required
   useEffect(() => {
@@ -80,11 +104,63 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div><h1 className="text-sm font-bold text-white tracking-wide">LANDINVEST</h1><p className="text-[11px] text-slate-400">Partnership ERP Suite</p></div>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {NAV.filter(({ perm }) => has(perm)).map(({ href, key, icon: Icon }) => {
-            const active = pathname === href || pathname?.startsWith(href + "/");
+          {NAV.filter(({ perm }) => has(perm)).map((item) => {
+            if (item.children) {
+              const visibleChildren = item.children.filter((c) => has(c.perm));
+              if (visibleChildren.length === 0) return null;
+              const isChildActive = visibleChildren.some((c) => pathname === c.href);
+              const isOpen = openMenus[item.key] ?? true;
+
+              return (
+                <div key={item.key} className="space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setOpenMenus((prev) => ({ ...prev, [item.key]: !isOpen }))}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      isChildActive ? "text-white bg-slate-800" : "text-slate-400 hover:text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon className="w-4 h-4" />
+                      <span>{t(item.key)}</span>
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 text-slate-400 ${isOpen ? "rotate-180 text-white" : ""}`} />
+                  </button>
+
+                  {isOpen && (
+                    <div className="pl-6 pr-1 py-0.5 space-y-0.5 border-l-2 border-slate-800 ml-5 my-1">
+                      {visibleChildren.map((child) => {
+                        const active = pathname === child.href;
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={`block px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                              active
+                                ? "bg-brand-700 text-white font-semibold shadow-sm"
+                                : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                            }`}
+                          >
+                            {t(child.key)}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            const active = pathname === item.href || (item.href && pathname?.startsWith(item.href + "/"));
             return (
-              <Link key={href} href={href} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}>
-                <Icon className="w-4 h-4" /> {t(key)}
+              <Link
+                key={item.href}
+                href={item.href!}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                  active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <item.icon className="w-4 h-4" /> {t(item.key)}
               </Link>
             );
           })}
