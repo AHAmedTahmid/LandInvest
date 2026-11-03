@@ -30,15 +30,12 @@ export default function ExpensesPage() {
         fetch("/api/expenses"),
         fetch("/api/projects"),
         fetch("/api/partners"),
-        fetch("/api/treasury/contra"),
+        fetch("/api/banks"),
       ]);
       if (expRes.ok) setExpenses(await expRes.json());
       if (projRes.ok) setProjects(await projRes.json());
       if (partRes.ok) setPartners(await partRes.json());
-      if (bankRes.ok) {
-        const data = await bankRes.json();
-        setBanks(data.banks ?? []);
-      }
+      if (bankRes.ok) setBanks(await bankRes.json());
     } finally {
       setLoading(false);
     }
@@ -119,25 +116,37 @@ export default function ExpensesPage() {
 
       <h2 className="font-semibold">Approval Queue (PENDING)</h2>
       <table className="w-full text-sm bg-white rounded-xl shadow border">
-        <thead><tr className="border-b"><th className="p-2">Category</th><th>Amount</th><th>Channel</th><th>Status</th><th>Action</th></tr></thead>
+        <thead>
+          <tr className="border-b text-left">
+            <th className="p-2">Project</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Channel</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
         <tbody>
-          {pending.length === 0 && <tr><td colSpan={5} className="p-4 text-center text-slate-400">No pending expenses</td></tr>}
+          {pending.length === 0 && <tr><td colSpan={6} className="p-4 text-center text-slate-400">No pending expenses</td></tr>}
           {pending.map((e) => (
             <tr key={e.id} className="border-b">
-              <td className="p-2">{e.expenseCategory}</td>
-              <td>{formatBDT(Number(e.amount))}</td>
+              <td className="p-2 font-medium">
+                {projects.find((p) => p.id === e.projectId)?.projectName || (e.projectId ? "Specific Project" : "General")}
+              </td>
+              <td>{e.expenseCategory}</td>
+              <td className="font-semibold">{formatBDT(Number(e.amount))}</td>
               <td>{e.paymentChannel}</td>
-              <td>{e.status}</td>
-                <td className="p-2 flex gap-2">
-                  <button onClick={() => approve(e.id)} disabled={approving === e.id}
-                    className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white px-3 py-1 rounded text-xs flex items-center gap-1">
-                    {approving === e.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Approve"}
-                  </button>
-                  <button onClick={() => reject(e.id)} disabled={approving === e.id}
-                    className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white px-3 py-1 rounded text-xs">
-                    Reject
-                  </button>
-                </td>
+              <td><span className="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800 font-medium">{e.status}</span></td>
+              <td className="p-2 flex gap-2">
+                <button onClick={() => approve(e.id)} disabled={approving === e.id}
+                  className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white px-3 py-1 rounded text-xs flex items-center gap-1">
+                  {approving === e.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Approve"}
+                </button>
+                <button onClick={() => reject(e.id)} disabled={approving === e.id}
+                  className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white px-3 py-1 rounded text-xs">
+                  Reject
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -145,12 +154,12 @@ export default function ExpensesPage() {
 
       <h2 className="font-semibold">Project-wise Cost Breakdown</h2>
       <table className="w-full text-sm bg-white rounded-xl shadow border">
-        <thead><tr className="border-b"><th className="p-2">Project</th><th>Total Cost</th></tr></thead>
+        <thead><tr className="border-b"><th className="p-2 text-left">Project</th><th className="text-right p-2">Total Cost</th></tr></thead>
         <tbody>
           {Object.entries(breakdown).map(([k, v]) => (
             <tr key={k} className="border-b">
-              <td className="p-2">{projects.find((p) => p.id === k)?.projectName || k}</td>
-              <td>{formatBDT(Number(v))}</td>
+              <td className="p-2 font-medium">{projects.find((p) => p.id === k)?.projectName || (k === "General" ? "General / Overhead" : k)}</td>
+              <td className="text-right p-2 font-semibold">{formatBDT(Number(v))}</td>
             </tr>
           ))}
         </tbody>
@@ -177,26 +186,38 @@ function ExpenseForm({ projects, banks, partners }: { projects: any[]; banks: an
 
   return (
     <form onSubmit={onSubmit} className="bg-white p-4 rounded-xl shadow border grid grid-cols-2 gap-3">
-      <select name="project_id" className="border rounded px-3 py-2">
-        <option value="">No Project</option>
-        {projects.map((p) => <option key={p.id} value={p.id}>{p.projectName}</option>)}
+      <select name="project_id" className="border rounded px-3 py-2 bg-white">
+        <option value="">No Project (General Overhead)</option>
+        {projects.map((p) => (
+          <option key={p.id} value={p.id}>
+            {p.projectName} {p.mouza ? `(${p.mouza})` : ""}
+          </option>
+        ))}
       </select>
       <input name="category" placeholder="Category" required className="border rounded px-3 py-2" />
       <input name="amount" type="number" step="0.01" placeholder="Amount" required className="border rounded px-3 py-2" />
-      <select name="payment_channel" className="border rounded px-3 py-2">
+      <select name="payment_channel" className="border rounded px-3 py-2 bg-white">
         <option>CASH</option><option>BANK</option><option>PAID_BY_PARTNER</option>
       </select>
-      <select name="bank_account" className="border rounded px-3 py-2">
-        <option value="">Bank Account</option>
-        {banks.map((b) => <option key={b.id} value={b.id}>{b.bankName}-{b.accountNumber}</option>)}
+      <select name="bank_account" className="border rounded px-3 py-2 bg-white">
+        <option value="">Bank Account (for Bank Payments)</option>
+        {banks.map((b) => (
+          <option key={b.id} value={b.id}>
+            {b.bankName} - {b.accountNumber}
+          </option>
+        ))}
       </select>
-      <select name="paid_by_partner" className="border rounded px-3 py-2">
-        <option value="">Paid By Partner</option>
-        {partners.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+      <select name="paid_by_partner" className="border rounded px-3 py-2 bg-white">
+        <option value="">Paid By Partner (if applicable)</option>
+        {partners.map((p) => (
+          <option key={p.id} value={p.id}>
+            {p.name} {p.phone ? `(${p.phone})` : ""}
+          </option>
+        ))}
       </select>
       <input name="voucher" type="file" className="border rounded px-3 py-2" />
       <input name="description" placeholder="Description" className="border rounded px-3 py-2 col-span-2" />
-      <button disabled={busy} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded px-4 py-2 col-span-2 flex items-center justify-center gap-2">
+      <button disabled={busy} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded px-4 py-2 col-span-2 flex items-center justify-center gap-2 font-medium">
         {busy && <Loader2 className="w-4 h-4 animate-spin" />} Create Expense
       </button>
     </form>
