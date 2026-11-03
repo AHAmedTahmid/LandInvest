@@ -114,8 +114,17 @@ async function seedBase() {
     plots: ["00000000-0000-0000-0000-0000acce0301", "00000000-0000-0000-0000-0000acce0302"],
   };
 
-  await prisma.partner.upsert({ where: { id: ids.partnerA }, update: {}, create: { id: ids.partnerA, name: "Akter Hossain", phone: "01711000001", openingBalance: 50000 } });
-  await prisma.partner.upsert({ where: { id: ids.partnerB }, update: {}, create: { id: ids.partnerB, name: "Nasrin Akter", phone: "01711000002", openingBalance: 30000 } });
+  for (const [key, name, phone, openBal] of [
+    ["partnerA", "Akter Hossain", "01711000001", 50000],
+    ["partnerB", "Nasrin Akter", "01711000002", 30000],
+  ]) {
+    const existing = await prisma.partner.findFirst({ where: { OR: [{ id: ids[key] }, { phone }] } });
+    if (existing) {
+      ids[key] = existing.id;
+    } else {
+      await prisma.partner.create({ data: { id: ids[key], name, phone, openingBalance: openBal } });
+    }
+  }
 
   await prisma.landProject.upsert({
     where: { id: ids.project },
@@ -157,6 +166,11 @@ async function seedBase() {
     salePlotId = randomUUID();
     await prisma.projectPlot.create({ data: { id: salePlotId, projectId: ids.project, plotNumber: `A-${n}`, plotSizeShotok: 25, askingPrice: 250000, status: "AVAILABLE" } });
   }
+
+  // Clear any previous profit distribution state so Phase 2 distribution executes freshly and writes audit logs + partner txns
+  await prisma.partnerTransaction.deleteMany({ where: { txnType: "PROFIT_CREDIT" } });
+  await prisma.profitDistribution.deleteMany({});
+  await prisma.auditLog.deleteMany({ where: { tableName: "profit_distributions" } });
 
   const counts = {
     partners: await prisma.partner.count(),
@@ -299,7 +313,7 @@ async function phase3Audit(ids) {
 /* ---------------- Phase 4: RBAC - every role, every feature ---------------- */
 
 const MATRIX = {
-  viewDashboard: ["super_admin", "managing_partner"],
+  viewDashboard: ["super_admin", "managing_partner", "site_manager", "accountant"],
   managePartners: ["super_admin", "managing_partner"], // dynamic roles: Managing Partner holds partners.manage
   addLand: ["super_admin", "managing_partner", "site_manager"],
   createExpense: ["super_admin", "managing_partner", "site_manager", "accountant"],
@@ -335,7 +349,7 @@ async function phase4Rbac(ids, ctx) {
   const invoiceId = inv?.id ?? randomUUID();
 
   const probes = [
-    { feature: "viewDashboard", kind: "api", run: (s) => call(s, "/api/reports/pnl") },
+    { feature: "viewDashboard", kind: "api", run: (s) => call(s, "/api/dashboard/layout") },
     { feature: "viewDashboard", kind: "page", path: "/dashboard", marker: "Forbidden: viewDashboard" },
     { feature: "managePartners", kind: "page", path: "/partners", marker: "Forbidden: managePartners" },
     { feature: "addLand", kind: "page", path: "/projects", marker: "Forbidden: projects.view" },

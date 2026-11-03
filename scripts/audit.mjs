@@ -168,7 +168,16 @@ section("6. Financial logic (mutates data)");
 {
   const a = await db("tenant_alpha");
   const owner = await login("owner@alpha.com", "123456");
-  const [plot] = await q(a, "SELECT id, project_id FROM project_plots WHERE status='AVAILABLE' LIMIT 1");
+  let plot = (await q(a, "SELECT id, project_id FROM project_plots WHERE status='AVAILABLE' LIMIT 1"))[0];
+  if (!plot) {
+    const proj = (await q(a, "SELECT id FROM land_projects LIMIT 1"))[0];
+    if (proj) {
+      const { randomUUID } = await import("crypto");
+      const pid = randomUUID();
+      await a.query("INSERT INTO project_plots (id, project_id, plot_number, plot_size_shotok, asking_price, status) VALUES (?, ?, 'AUDIT-P1', 10, 1000000, 'AVAILABLE')", [pid, proj.id]);
+      plot = { id: pid, project_id: proj.id };
+    }
+  }
   const [partner] = await q(a, "SELECT id FROM partners LIMIT 1");
   const TOTAL = 1000000, ADV = 200000;
   const saleRes = await api(owner.cookie, "/api/sales", { method: "POST", json: {

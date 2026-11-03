@@ -10,6 +10,16 @@ async function seed() {
     database: "tenant_demo",
   });
 
+  const ACTOR_ID = "00000000-0000-0000-0000-000000000001";
+
+  async function audit(table, recordId, action = "INSERT", data = null) {
+    await conn.query(
+      `INSERT INTO audit_log (id, table_name, record_id, action, changed_by, new_values, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+      [randomUUID(), table, recordId, action, ACTOR_ID, data ? JSON.stringify(data) : null]
+    );
+  }
+
   // 1. Clean existing transactional tables while keeping roles & users
   console.log("Cleaning old tables...");
   const tables = [
@@ -25,6 +35,7 @@ async function seed() {
     "partners",
     "bank_accounts",
     "dashboard_settings",
+    "audit_log",
   ];
 
   await conn.query("SET FOREIGN_KEY_CHECKS = 0;");
@@ -52,10 +63,10 @@ async function seed() {
 
   // 3. Partners & Capital
   console.log("Creating syndicate partners...");
-  const p1 = { id: randomUUID(), name: "Engr. Rafiqul Islam", phone: "01711000001", nid: "1982269123456", openBal: 5000000.00 };
-  const p2 = { id: randomUUID(), name: "Barrister Tariq Ahmed", phone: "01811000002", nid: "1985269654321", openBal: 3500000.00 };
-  const p3 = { id: randomUUID(), name: "Haji Abdul Gafur", phone: "01911000003", nid: "1978269789012", openBal: 2500000.00 };
-  const p4 = { id: randomUUID(), name: "Dr. Nusrat Jahan", phone: "01611000004", nid: "1989269345678", openBal: 2000000.00 };
+  const p1 = { id: randomUUID(), name: "Engr. Rafiqul Islam", phone: "01713000001", nid: "1982269123456", openBal: 5000000.00 };
+  const p2 = { id: randomUUID(), name: "Barrister Tariq Ahmed", phone: "01814000002", nid: "1985269654321", openBal: 3500000.00 };
+  const p3 = { id: randomUUID(), name: "Haji Abdul Gafur", phone: "01915000003", nid: "1978269789012", openBal: 2500000.00 };
+  const p4 = { id: randomUUID(), name: "Dr. Nusrat Jahan", phone: "01616000004", nid: "1989269345678", openBal: 2000000.00 };
 
   for (const p of [p1, p2, p3, p4]) {
     await conn.query(
@@ -63,10 +74,10 @@ async function seed() {
       [p.id, p.name, p.phone, p.nid, p.openBal]
     );
 
-    // Initial partner deposit in partner_transactions
+    const ptId = randomUUID();
     await conn.query(
       `INSERT INTO partner_transactions (id, partner_id, txn_type, amount, txn_date, notes, created_at) VALUES (?, ?, 'DEPOSIT', ?, '2026-07-05', 'Initial syndicate equity deposit', NOW())`,
-      [randomUUID(), p.id, p.openBal]
+      [ptId, p.id, p.openBal]
     );
   }
 
@@ -138,21 +149,18 @@ async function seed() {
   // 5. Plots
   console.log("Generating plots for projects...");
   const plotsList = [];
-  // Proj 1: 10 plots (5 shotok each, asking price 22 Lakh)
   for (let i = 1; i <= 10; i++) {
     const status = i <= 6 ? "BOOKED" : i === 7 ? "SOLD" : "AVAILABLE";
     const plotId = randomUUID();
     plotsList.push({ id: plotId, projId: proj1.id, num: `GV-${String(i).padStart(2, "0")}`, shotok: 5.0, price: 2200000.00, status });
   }
 
-  // Proj 2: 12 plots (5 shotok each, asking price 25 Lakh)
   for (let i = 1; i <= 12; i++) {
     const status = i <= 4 ? "BOOKED" : i === 5 ? "SOLD" : "AVAILABLE";
     const plotId = randomUUID();
     plotsList.push({ id: plotId, projId: proj2.id, num: `RV-${String(i).padStart(2, "0")}`, shotok: 5.0, price: 2500000.00, status });
   }
 
-  // Proj 3: 8 plots (5 shotok each, available)
   for (let i = 1; i <= 8; i++) {
     const plotId = randomUUID();
     plotsList.push({ id: plotId, projId: proj3.id, num: `LG-${String(i).padStart(2, "0")}`, shotok: 5.0, price: 2100000.00, status: "AVAILABLE" });
@@ -166,7 +174,7 @@ async function seed() {
   }
 
   // 6. Sales, Installments & Customer Payments
-  console.log("Creating realistic plot sales and payment records...");
+  console.log("Creating realistic plot sales and payment records with audit logs...");
   const buyers = [
     { name: "Mohammad Shahidullah", phone: "01720111222", nid: "5501234981" },
     { name: "Farhana Yasmin", phone: "01820222333", nid: "5502345872" },
@@ -200,36 +208,38 @@ async function seed() {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [saleId, pl.projId, pl.id, buyer.name, buyer.phone, buyer.nid, saleDate, agreedPrice, bookingAdvance, remaining, pl.status]
     );
+    await audit("land_sales", saleId, "INSERT", { buyerName: buyer.name, totalAgreedPrice: agreedPrice });
 
     // Initial Booking Payment
     const receiptNo = `RCT-2026-${String(i + 1).padStart(4, "0")}`;
+    const pmtId = randomUUID();
     await conn.query(
       `INSERT INTO customer_payments (id, sale_id, payment_date, amount_paid, payment_method, bank_account_id, receiptNo, remarks)
        VALUES (?, ?, ?, ?, 'BANK', ?, ?, 'Plot advance booking deposit')`,
-      [randomUUID(), saleId, saleDate, bookingAdvance, bank1.id, receiptNo]
+      [pmtId, saleId, saleDate, bookingAdvance, bank1.id, receiptNo]
     );
+    await audit("customer_payments", pmtId, "INSERT", { amountPaid: bookingAdvance, receiptNo });
 
     // Installment Schedules (Monthly)
     for (let m = 1; m <= installmentCount; m++) {
       const scheduleId = randomUUID();
-      // Month calculation
       const dueDate = new Date(2026, 7 + m, 10);
       const isPast = dueDate <= new Date();
       let status = "UPCOMING";
 
       if (isPast) {
         if (i % 3 === 0) {
-          // Overdue
           status = "OVERDUE";
         } else {
-          // Paid
           status = "PAID";
           const instReceipt = `RCT-INST-${String(i + 1)}-${m}`;
+          const instPmtId = randomUUID();
           await conn.query(
             `INSERT INTO customer_payments (id, sale_id, payment_date, amount_paid, payment_method, bank_account_id, receiptNo, remarks)
              VALUES (?, ?, ?, ?, 'BANK', ?, ?, 'Installment payment')`,
-            [randomUUID(), saleId, dueDate.toISOString().slice(0, 10), monthlyDue, bank2.id, instReceipt]
+            [instPmtId, saleId, dueDate.toISOString().slice(0, 10), monthlyDue, bank2.id, instReceipt]
           );
+          await audit("customer_payments", instPmtId, "INSERT", { amountPaid: monthlyDue, receiptNo: instReceipt });
         }
       }
 
@@ -242,7 +252,7 @@ async function seed() {
   }
 
   // 7. Project Expenses & Vouchers
-  console.log("Recording project development expenses and vouchers...");
+  console.log("Recording project development expenses, vouchers & audit records...");
   const expenseCategories = [
     { cat: "Registration", amt: 350000.00, pur: "Sub-registry stamp duty & document drafting" },
     { cat: "Mutation", amt: 120000.00, pur: "AC Land office official mutation fees" },
@@ -255,36 +265,53 @@ async function seed() {
     const expId = randomUUID();
     await conn.query(
       `INSERT INTO project_expenses (id, project_id, expense_category, amount, expense_date, payment_channel, description, status, created_by, created_at)
-       VALUES (?, ?, ?, ?, '2026-09-20', 'CASH', ?, 'APPROVED', 'system', NOW())`,
-      [expId, proj1.id, exp.cat, exp.amt, exp.pur]
+       VALUES (?, ?, ?, ?, '2026-09-20', 'CASH', ?, 'APPROVED', ?, NOW())`,
+      [expId, proj1.id, exp.cat, exp.amt, exp.pur, ACTOR_ID]
     );
+    await audit("project_expenses", expId, "INSERT", { amount: exp.amt, category: exp.cat });
 
     // Ledger entry
+    const ledId = randomUUID();
     await conn.query(
       `INSERT INTO treasury_ledger (id, txn_date, account_type, flow_type, amount, purpose, reference_type, reference_id, created_by, created_at)
-       VALUES (?, '2026-09-20', 'CASH', 'OUT', ?, ?, 'EXPENSE', ?, 'system', NOW())`,
-      [randomUUID(), exp.amt, exp.pur, expId]
+       VALUES (?, '2026-09-20', 'CASH', 'OUT', ?, ?, 'EXPENSE', ?, ?, NOW())`,
+      [ledId, exp.amt, exp.pur, expId, ACTOR_ID]
     );
+    await audit("treasury_ledger", ledId, "INSERT", { amount: exp.amt, flowType: "OUT" });
   }
 
-  // Add 3 Pending Vouchers to trigger approval metrics & insights
-  await conn.query(
-    `INSERT INTO project_expenses (id, project_id, expense_category, amount, expense_date, payment_channel, description, status, created_by, created_at) VALUES
-     (?, ?, 'Labor', 185000.00, '2026-10-25', 'CASH', 'Earth filling contractor 2nd bill', 'PENDING', 'system', DATE_SUB(NOW(), INTERVAL 5 DAY)),
-     (?, ?, 'Misc', 45000.00, '2026-10-28', 'CASH', 'Site security guard monthly honorarium', 'PENDING', 'system', DATE_SUB(NOW(), INTERVAL 4 DAY)),
-     (?, ?, 'Misc', 120000.00, '2026-10-29', 'BANK', 'Deep tube-well installation quotation', 'PENDING', 'system', DATE_SUB(NOW(), INTERVAL 2 DAY))`,
-    [randomUUID(), proj1.id, randomUUID(), proj2.id, randomUUID(), proj2.id]
-  );
+  // Add 3 Pending Vouchers
+  const pendingVouchers = [
+    { id: randomUUID(), prId: proj1.id, cat: "Labor", amt: 185000.00, desc: "Earth filling contractor 2nd bill", chan: "CASH", days: 5 },
+    { id: randomUUID(), prId: proj2.id, cat: "Misc", amt: 45000.00, desc: "Site security guard monthly honorarium", chan: "CASH", days: 4 },
+    { id: randomUUID(), prId: proj2.id, cat: "Misc", amt: 120000.00, desc: "Deep tube-well installation quotation", chan: "BANK", days: 2 },
+  ];
+
+  for (const pv of pendingVouchers) {
+    await conn.query(
+      `INSERT INTO project_expenses (id, project_id, expense_category, amount, expense_date, payment_channel, description, status, created_by, created_at)
+       VALUES (?, ?, ?, ?, '2026-10-25', ?, ?, 'PENDING', ?, DATE_SUB(NOW(), INTERVAL ? DAY))`,
+      [pv.id, pv.prId, pv.cat, pv.amt, pv.chan, pv.desc, ACTOR_ID, pv.days]
+    );
+    await audit("project_expenses", pv.id, "INSERT", { amount: pv.amt, status: "PENDING" });
+  }
 
   // 8. Treasury Ledger Inflows (Cash & Bank)
   console.log("Populating treasury ledger entries...");
-  await conn.query(
-    `INSERT INTO treasury_ledger (id, txn_date, account_type, flow_type, amount, purpose, reference_type, created_by, created_at) VALUES
-     (?, '2026-08-01', 'CASH', 'IN', 1500000.00, 'Cash in hand initial syndicate float', 'DEPOSIT', 'system', NOW()),
-     (?, '2026-09-01', 'CASH', 'IN', 500000.00, 'Plot booking advance cash receipt', 'SALE', 'system', NOW()),
-     (?, '2026-10-15', 'BANK', 'IN', 2850000.00, 'Customer installment collections batch', 'COLLECTION', 'system', NOW())`,
-    [randomUUID(), randomUUID(), randomUUID()]
-  );
+  const inflows = [
+    { id: randomUUID(), date: "2026-08-01", type: "CASH", amt: 1500000.00, pur: "Cash in hand initial syndicate float", ref: "DEPOSIT" },
+    { id: randomUUID(), date: "2026-09-01", type: "CASH", amt: 500000.00, pur: "Plot booking advance cash receipt", ref: "SALE" },
+    { id: randomUUID(), date: "2026-10-15", type: "BANK", amt: 2850000.00, pur: "Customer installment collections batch", ref: "COLLECTION" },
+  ];
+
+  for (const inf of inflows) {
+    await conn.query(
+      `INSERT INTO treasury_ledger (id, txn_date, account_type, flow_type, amount, purpose, reference_type, created_by, created_at)
+       VALUES (?, ?, ?, 'IN', ?, ?, ?, ?, NOW())`,
+      [inf.id, inf.date, inf.type, inf.amt, inf.pur, inf.ref, ACTOR_ID]
+    );
+    await audit("treasury_ledger", inf.id, "INSERT", { amount: inf.amt, flowType: "IN" });
+  }
 
   // 9. Dashboard Settings
   console.log("Configuring dashboard alert thresholds...");
@@ -298,7 +325,7 @@ async function seed() {
   );
 
   await conn.end();
-  console.log("✓ Realistic seed data successfully inserted into tenant_demo!");
+  console.log("✓ Realistic seed data successfully inserted with audit compliance!");
 }
 
 seed().catch((err) => {
