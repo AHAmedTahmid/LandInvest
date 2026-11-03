@@ -24,6 +24,20 @@ export async function POST(req:NextRequest){
     if(b.plot_id) sale=await sellPlot(tx,b.plot_id,saleData,userId);
     else { sale=await tx.landSale.create({data:saleData}); await writeAudit(tx,"land_sales",saleId,"CREATE",userId,null,saleData); }
     if(b.installments?.length){ for(const ins of b.installments){ const id=randomUUID(); const r=await tx.installmentSchedule.create({data:{id,saleId, dueDate:new Date(ins.dueDate), dueAmount:ins.dueAmount,status:"UPCOMING"}}); await writeAudit(tx,"installment_schedule",id,"CREATE",userId,null,r); }}
+    else if (b.installments_count && parseInt(b.installments_count, 10) > 0) {
+      const months = parseInt(b.installments_count, 10);
+      const remaining = Number(b.total_agreed_price) - Number(b.advance || 0);
+      const per = Math.round((remaining / months) * 100) / 100;
+      for (let i = 1; i <= months; i++) {
+        const due = new Date();
+        due.setMonth(due.getMonth() + i);
+        const rid = randomUUID();
+        const r = await tx.installmentSchedule.create({
+          data: { id: rid, saleId, dueDate: due, dueAmount: per, status: "UPCOMING" },
+        });
+        await writeAudit(tx, "installment_schedule", rid, "CREATE", userId, null, r);
+      }
+    }
     if(Number(b.advance)>0){
       const payId=randomUUID(); const cp=await tx.customerPayment.create({data:{id:payId,saleId,paymentDate:new Date(),amountPaid:b.advance,paymentMethod:b.payment_method||"CASH",bankAccountId:b.bank_account||null,receiptNo:`R-${Date.now()}`,remarks:"Advance"}});
       await writeAudit(tx,"customer_payments",payId,"CREATE",userId,null,cp);
