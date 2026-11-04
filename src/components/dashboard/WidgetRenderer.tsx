@@ -46,6 +46,44 @@ const CHART_PALETTE = [
   "#475569", // Slate
 ];
 
+const ACTION_THEMES: Record<string, {
+  container: string;
+  iconBg: string;
+  title: string;
+  subtitle: string;
+}> = {
+  amber: {
+    container: "border-amber-200/90 bg-linear-to-br from-amber-50/90 via-white to-orange-50/50 hover:border-amber-400 hover:shadow-md hover:shadow-amber-100/60",
+    iconBg: "bg-amber-500 text-white shadow-xs group-hover:scale-110",
+    title: "text-amber-950 group-hover:text-amber-800",
+    subtitle: "text-amber-700/80",
+  },
+  blue: {
+    container: "border-blue-200/90 bg-linear-to-br from-blue-50/90 via-white to-indigo-50/50 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/60",
+    iconBg: "bg-blue-600 text-white shadow-xs group-hover:scale-110",
+    title: "text-blue-950 group-hover:text-blue-800",
+    subtitle: "text-blue-700/80",
+  },
+  emerald: {
+    container: "border-emerald-200/90 bg-linear-to-br from-emerald-50/90 via-white to-teal-50/50 hover:border-emerald-400 hover:shadow-md hover:shadow-emerald-100/60",
+    iconBg: "bg-emerald-600 text-white shadow-xs group-hover:scale-110",
+    title: "text-emerald-950 group-hover:text-emerald-800",
+    subtitle: "text-emerald-700/80",
+  },
+  purple: {
+    container: "border-purple-200/90 bg-linear-to-br from-purple-50/90 via-white to-violet-50/50 hover:border-purple-400 hover:shadow-md hover:shadow-purple-100/60",
+    iconBg: "bg-purple-600 text-white shadow-xs group-hover:scale-110",
+    title: "text-purple-950 group-hover:text-purple-800",
+    subtitle: "text-purple-700/80",
+  },
+  teal: {
+    container: "border-teal-200/90 bg-linear-to-br from-teal-50/90 via-white to-cyan-50/50 hover:border-teal-400 hover:shadow-md hover:shadow-teal-100/60",
+    iconBg: "bg-teal-600 text-white shadow-xs group-hover:scale-110",
+    title: "text-teal-950 group-hover:text-teal-800",
+    subtitle: "text-teal-700/80",
+  },
+};
+
 const ICONS_MAP: Record<string, any> = {
   Receipt,
   FileText,
@@ -169,19 +207,35 @@ export default function WidgetRenderer({
   if (widget.type === "quick_actions") {
     const actions = data.actions || [];
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 h-full items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 h-full items-stretch py-1">
         {actions.map((act: any, i: number) => {
           const IconComp = ICONS_MAP[act.icon] || FileText;
+          const label = typeof act.label === "object" ? act.label[lang] || act.label.en : act.label;
+          const subtitle = typeof act.subtitle === "object" ? act.subtitle[lang] || act.subtitle.en : act.subtitle;
+          const theme = ACTION_THEMES[act.theme] || ACTION_THEMES.emerald;
+
           return (
             <Link
               key={i}
               href={act.url}
-              className="flex items-center gap-2 p-2.5 rounded-lg border border-gray-200 hover:border-olive-600 hover:bg-olive-50/50 transition-all text-xs font-semibold text-gray-800 shadow-2xs group"
+              className={`group flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 hover:-translate-y-0.5 ${theme.container}`}
             >
-              <div className="w-7 h-7 rounded-md bg-olive-100 text-olive-800 flex items-center justify-center shrink-0 group-hover:bg-olive-700 group-hover:text-white transition-colors">
-                <IconComp className="w-4 h-4" />
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 ${theme.iconBg}`}
+              >
+                <IconComp className="w-5 h-5" />
               </div>
-              <span className="truncate">{act.label}</span>
+              <div className="min-w-0 flex-1">
+                <div className={`text-xs font-bold leading-tight flex items-center justify-between gap-1 ${theme.title}`}>
+                  <span className="truncate">{label}</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
+                </div>
+                {subtitle && (
+                  <p className={`text-[11px] font-medium leading-tight mt-1 line-clamp-1 ${theme.subtitle}`}>
+                    {subtitle}
+                  </p>
+                )}
+              </div>
             </Link>
           );
         })}

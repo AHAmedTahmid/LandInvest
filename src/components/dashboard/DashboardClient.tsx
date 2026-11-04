@@ -171,6 +171,8 @@ export default function DashboardClient({
             if (widget.type === "kpi") {
               // 4 per row on desktop, 2 on tablet, 1 on mobile
               spanClass = "col-span-12 sm:col-span-6 lg:col-span-3";
+            } else if (widget.key === "quick_actions") {
+              spanClass = "col-span-12";
             } else if (widget.defaultSize.w <= 6) {
               spanClass = "col-span-12 lg:col-span-6";
             }

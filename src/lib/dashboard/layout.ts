@@ -25,8 +25,8 @@ export const EXECUTIVE_PRESET: TabbedLayout = {
     { key: "sales_month", x: 9, y: 2, w: 3, h: 2 },
     { key: "project_cost_share", x: 0, y: 4, w: 6, h: 4 },
     { key: "project_cost_vs_sales", x: 6, y: 4, w: 6, h: 4 },
-    { key: "quick_actions", x: 0, y: 8, w: 6, h: 2 },
-    { key: "net_profit", x: 6, y: 8, w: 6, h: 2 },
+    { key: "quick_actions", x: 0, y: 8, w: 12, h: 2 },
+    { key: "net_profit", x: 0, y: 10, w: 6, h: 2 },
   ],
   financial: [
     { key: "cash_balance", x: 0, y: 0, w: 3, h: 2 },
