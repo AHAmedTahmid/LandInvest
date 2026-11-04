@@ -46,6 +46,25 @@ export default async function TreasuryPage() {
   const canApprove = await can(session, "treasury.contra.approve");
   const canCreateContra = await can(session, "treasury.contra.create");
 
+  // Resolve buyer and plot details for SALE_PAYMENT transactions so raw UUIDs are not shown
+  const saleIds: string[] = Array.from(
+    new Set(
+      cashLedger
+        .filter((r: any) => r.referenceType === "SALE_PAYMENT" && r.referenceId)
+        .map((r: any) => r.referenceId as string)
+    )
+  );
+  const salesMap = new Map<string, { buyerName: string; plotNumber?: string | null }>();
+  if (saleIds.length > 0) {
+    const sales = await prisma.landSale.findMany({
+      where: { id: { in: saleIds } },
+      select: { id: true, buyerName: true, plot: { select: { plotNumber: true } } },
+    });
+    for (const s of sales) {
+      salesMap.set(s.id, { buyerName: s.buyerName, plotNumber: s.plot?.plotNumber ?? null });
+    }
+  }
+
   // Calculate physical cash balance
   const allCash = await prisma.treasuryLedger.findMany({ where: { accountType: "CASH" }, select: { flowType: true, amount: true } });
   let cashBalance = 0;
@@ -355,6 +374,15 @@ export default async function TreasuryPage() {
               )}
               {cashLedger.map((r: any) => {
                 const isInflow = r.flowType === "IN";
+                const saleInfo = r.referenceType === "SALE_PAYMENT" && r.referenceId ? salesMap.get(r.referenceId) : null;
+                let displayPurpose = r.purpose;
+                if (saleInfo) {
+                  const isAdvance = r.purpose?.toLowerCase().includes("advance");
+                  const plotSuffix = saleInfo.plotNumber ? ` (Plot ${saleInfo.plotNumber})` : "";
+                  displayPurpose = isAdvance
+                    ? `Plot Advance: ${saleInfo.buyerName}${plotSuffix}`
+                    : `Installment: ${saleInfo.buyerName}${plotSuffix}`;
+                }
                 return (
                   <tr key={r.id} className="hover:bg-slate-50/50">
                     <td className="p-3 text-xs font-mono text-slate-500 whitespace-nowrap">{formatDate(r.txnDate)}</td>
@@ -368,7 +396,7 @@ export default async function TreasuryPage() {
                         {isInflow ? "INFLOW" : "OUTFLOW"}
                       </span>
                     </td>
-                    <td className="text-xs text-slate-700 font-medium">{r.purpose}</td>
+                    <td className="text-xs text-slate-700 font-medium">{displayPurpose}</td>
                     <td className="text-xs font-mono text-slate-500">
                       <span className="bg-slate-100 px-2 py-0.5 rounded text-[11px] font-semibold text-slate-700">
                         {r.referenceType}

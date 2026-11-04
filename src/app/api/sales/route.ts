@@ -41,7 +41,7 @@ export async function POST(req:NextRequest){
     if(Number(b.advance)>0){
       const payId=randomUUID(); const cp=await tx.customerPayment.create({data:{id:payId,saleId,paymentDate:new Date(),amountPaid:b.advance,paymentMethod:b.payment_method||"CASH",bankAccountId:b.bank_account||null,receiptNo:`R-${Date.now()}`,remarks:"Advance"}});
       await writeAudit(tx,"customer_payments",payId,"CREATE",userId,null,cp);
-      const tl=await tx.treasuryLedger.create({data:{id:randomUUID(),txnDate:new Date(),accountType:b.bank_account?"BANK":"CASH",bankAccountId:b.bank_account||null,flowType:"IN",amount:b.advance,purpose:`Advance sale ${saleId}`,referenceType:"SALE_PAYMENT",referenceId:saleId,createdBy:userId}});
+      const tl=await tx.treasuryLedger.create({data:{id:randomUUID(),txnDate:new Date(),accountType:b.bank_account?"BANK":"CASH",bankAccountId:b.bank_account||null,flowType:"IN",amount:b.advance,purpose:`Plot Advance: ${b.buyer_name || "Buyer"}`,referenceType:"SALE_PAYMENT",referenceId:saleId,createdBy:userId}});
       await writeAudit(tx,"treasury_ledger",tl.id,"CREATE",userId,null,tl);
     }
     return sale;

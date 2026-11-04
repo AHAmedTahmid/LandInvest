@@ -52,7 +52,7 @@ export async function collectPayment(tx: any, args: CollectArgs) {
       bankAccountId: args.bankAccountId,
       flowType: "IN",
       amount: amt,
-      purpose: `Payment sale ${args.saleId}`,
+      purpose: `Installment: ${sale.buyerName || "Buyer"}${args.remarks && args.remarks !== "Installment" ? ` (${args.remarks})` : ""}`,
       referenceType: "SALE_PAYMENT",
       referenceId: args.saleId,
       createdBy: args.userId,
