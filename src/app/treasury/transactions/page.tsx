@@ -42,26 +42,80 @@ export default async function TreasuryTransactionsPage({
         .map((r: any) => r.referenceId as string)
     )
   );
-  const salesMap = new Map<string, { buyerName: string; plotNumber?: string | null }>();
+  const salesMap = new Map<string, any>();
   if (saleIds.length > 0) {
     const sales = await prisma.landSale.findMany({
       where: { id: { in: saleIds } },
-      select: { id: true, buyerName: true, plot: { select: { plotNumber: true } } },
+      select: {
+        id: true,
+        buyerName: true,
+        buyerPhone: true,
+        totalAgreedPrice: true,
+        currentDueAmount: true,
+        status: true,
+        plot: {
+          select: {
+            plotNumber: true,
+            project: { select: { projectName: true } },
+          },
+        },
+      },
     });
     for (const s of sales) {
-      salesMap.set(s.id, { buyerName: s.buyerName, plotNumber: s.plot?.plotNumber ?? null });
+      salesMap.set(s.id, {
+        id: s.id,
+        buyerName: s.buyerName,
+        buyerPhone: s.buyerPhone,
+        plotNumber: s.plot?.plotNumber ?? null,
+        projectName: s.plot?.project?.projectName ?? null,
+        totalAgreedPrice: toNum(s.totalAgreedPrice),
+        currentDueAmount: toNum(s.currentDueAmount),
+        status: s.status,
+      });
+    }
+  }
+
+  // Resolve expense details if referenceType === "EXPENSE"
+  const expenseIds: string[] = Array.from(
+    new Set(
+      ledgerRows
+        .filter((r: any) => r.referenceType === "EXPENSE" && r.referenceId)
+        .map((r: any) => r.referenceId as string)
+    )
+  );
+  const expensesMap = new Map<string, any>();
+  if (expenseIds.length > 0) {
+    const expenses = await prisma.projectExpense.findMany({
+      where: { id: { in: expenseIds } },
+      select: {
+        id: true,
+        expenseCategory: true,
+        description: true,
+        project: { select: { projectName: true } },
+      },
+    });
+    for (const exp of expenses) {
+      expensesMap.set(exp.id, {
+        id: exp.id,
+        expenseCategory: exp.expenseCategory,
+        description: exp.description,
+        projectName: exp.project?.projectName ?? null,
+      });
     }
   }
 
   const transactions: LedgerTransaction[] = ledgerRows.map((r: any) => {
+    const saleInfo = r.referenceType === "SALE_PAYMENT" && r.referenceId ? salesMap.get(r.referenceId) : null;
+    const expenseInfo = r.referenceType === "EXPENSE" && r.referenceId ? expensesMap.get(r.referenceId) : null;
     let purpose = r.purpose;
-    if (r.referenceType === "SALE_PAYMENT" && r.referenceId && salesMap.has(r.referenceId)) {
-      const sale = salesMap.get(r.referenceId)!;
+    if (saleInfo) {
       const isAdvance = purpose?.toLowerCase().includes("advance");
-      const plotSuffix = sale.plotNumber ? ` (Plot ${sale.plotNumber})` : "";
+      const plotSuffix = saleInfo.plotNumber ? ` (Plot ${saleInfo.plotNumber})` : "";
       purpose = isAdvance
-        ? `Plot Advance: ${sale.buyerName}${plotSuffix}`
-        : `Installment: ${sale.buyerName}${plotSuffix}`;
+        ? `Plot Advance: ${saleInfo.buyerName}${plotSuffix}`
+        : `Installment: ${saleInfo.buyerName}${plotSuffix}`;
+    } else if (expenseInfo) {
+      purpose = `${expenseInfo.expenseCategory}${expenseInfo.projectName ? ` - ${expenseInfo.projectName}` : ""}`;
     }
     return {
       id: r.id,
@@ -77,6 +131,8 @@ export default async function TreasuryTransactionsPage({
       referenceType: r.referenceType,
       referenceId: r.referenceId,
       createdBy: r.createdBy,
+      saleDetails: saleInfo || null,
+      expenseDetails: expenseInfo || null,
     };
   });
 
