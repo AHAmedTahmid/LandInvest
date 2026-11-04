@@ -31,15 +31,20 @@ model Partner {
 }
 
 model BankAccount {
-  id              String  @id @db.Char(36)
-  bankName        String  @map("bank_name") @db.VarChar(100)
-  accountNumber   String  @unique @map("account_number") @db.VarChar(50)
-  branchName      String? @map("branch_name") @db.VarChar(100)
-  currentBalance  Decimal @default(0.00) @map("current_balance") @db.Decimal(15, 2)
-  isActive        Boolean @default(true) @map("is_active")
+  id             String   @id @db.Char(36)
+  accountType    String   @default("BANK") @map("account_type") @db.VarChar(20)
+  bankName       String   @map("bank_name") @db.VarChar(100)
+  accountName    String?  @map("account_name") @db.VarChar(150)
+  accountNumber  String   @unique @map("account_number") @db.VarChar(50)
+  branchName     String?  @map("branch_name") @db.VarChar(100)
+  routingNumber  String?  @map("routing_number") @db.VarChar(50)
+  openingBalance Decimal  @default(0.00) @map("opening_balance") @db.Decimal(15, 2)
+  currentBalance Decimal  @default(0.00) @map("current_balance") @db.Decimal(15, 2)
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
-  treasuryLedgers TreasuryLedger[]
-  expenses        ProjectExpense[]
+  treasuryLedgers  TreasuryLedger[]
+  expenses         ProjectExpense[]
   customerPayments CustomerPayment[]
 
   @@map("bank_accounts")

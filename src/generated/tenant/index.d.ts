@@ -3722,75 +3722,109 @@ export namespace Prisma {
   }
 
   export type BankAccountAvgAggregateOutputType = {
+    openingBalance: Decimal | null
     currentBalance: Decimal | null
   }
 
   export type BankAccountSumAggregateOutputType = {
+    openingBalance: Decimal | null
     currentBalance: Decimal | null
   }
 
   export type BankAccountMinAggregateOutputType = {
     id: string | null
+    accountType: string | null
     bankName: string | null
+    accountName: string | null
     accountNumber: string | null
     branchName: string | null
+    routingNumber: string | null
+    openingBalance: Decimal | null
     currentBalance: Decimal | null
     isActive: boolean | null
+    createdAt: Date | null
   }
 
   export type BankAccountMaxAggregateOutputType = {
     id: string | null
+    accountType: string | null
     bankName: string | null
+    accountName: string | null
     accountNumber: string | null
     branchName: string | null
+    routingNumber: string | null
+    openingBalance: Decimal | null
     currentBalance: Decimal | null
     isActive: boolean | null
+    createdAt: Date | null
   }
 
   export type BankAccountCountAggregateOutputType = {
     id: number
+    accountType: number
     bankName: number
+    accountName: number
     accountNumber: number
     branchName: number
+    routingNumber: number
+    openingBalance: number
     currentBalance: number
     isActive: number
+    createdAt: number
     _all: number
   }
 
 
   export type BankAccountAvgAggregateInputType = {
+    openingBalance?: true
     currentBalance?: true
   }
 
   export type BankAccountSumAggregateInputType = {
+    openingBalance?: true
     currentBalance?: true
   }
 
   export type BankAccountMinAggregateInputType = {
     id?: true
+    accountType?: true
     bankName?: true
+    accountName?: true
     accountNumber?: true
     branchName?: true
+    routingNumber?: true
+    openingBalance?: true
     currentBalance?: true
     isActive?: true
+    createdAt?: true
   }
 
   export type BankAccountMaxAggregateInputType = {
     id?: true
+    accountType?: true
     bankName?: true
+    accountName?: true
     accountNumber?: true
     branchName?: true
+    routingNumber?: true
+    openingBalance?: true
     currentBalance?: true
     isActive?: true
+    createdAt?: true
   }
 
   export type BankAccountCountAggregateInputType = {
     id?: true
+    accountType?: true
     bankName?: true
+    accountName?: true
     accountNumber?: true
     branchName?: true
+    routingNumber?: true
+    openingBalance?: true
     currentBalance?: true
     isActive?: true
+    createdAt?: true
     _all?: true
   }
 
@@ -3882,11 +3916,16 @@ export namespace Prisma {
 
   export type BankAccountGroupByOutputType = {
     id: string
+    accountType: string
     bankName: string
+    accountName: string | null
     accountNumber: string
     branchName: string | null
+    routingNumber: string | null
+    openingBalance: Decimal
     currentBalance: Decimal
     isActive: boolean
+    createdAt: Date
     _count: BankAccountCountAggregateOutputType | null
     _avg: BankAccountAvgAggregateOutputType | null
     _sum: BankAccountSumAggregateOutputType | null
@@ -3910,11 +3949,16 @@ export namespace Prisma {
 
   export type BankAccountSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    accountType?: boolean
     bankName?: boolean
+    accountName?: boolean
     accountNumber?: boolean
     branchName?: boolean
+    routingNumber?: boolean
+    openingBalance?: boolean
     currentBalance?: boolean
     isActive?: boolean
+    createdAt?: boolean
     treasuryLedgers?: boolean | BankAccount$treasuryLedgersArgs<ExtArgs>
     expenses?: boolean | BankAccount$expensesArgs<ExtArgs>
     customerPayments?: boolean | BankAccount$customerPaymentsArgs<ExtArgs>
@@ -3925,14 +3969,19 @@ export namespace Prisma {
 
   export type BankAccountSelectScalar = {
     id?: boolean
+    accountType?: boolean
     bankName?: boolean
+    accountName?: boolean
     accountNumber?: boolean
     branchName?: boolean
+    routingNumber?: boolean
+    openingBalance?: boolean
     currentBalance?: boolean
     isActive?: boolean
+    createdAt?: boolean
   }
 
-  export type BankAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bankName" | "accountNumber" | "branchName" | "currentBalance" | "isActive", ExtArgs["result"]["bankAccount"]>
+  export type BankAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "accountType" | "bankName" | "accountName" | "accountNumber" | "branchName" | "routingNumber" | "openingBalance" | "currentBalance" | "isActive" | "createdAt", ExtArgs["result"]["bankAccount"]>
   export type BankAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     treasuryLedgers?: boolean | BankAccount$treasuryLedgersArgs<ExtArgs>
     expenses?: boolean | BankAccount$expensesArgs<ExtArgs>
@@ -3949,11 +3998,16 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      accountType: string
       bankName: string
+      accountName: string | null
       accountNumber: string
       branchName: string | null
+      routingNumber: string | null
+      openingBalance: Prisma.Decimal
       currentBalance: Prisma.Decimal
       isActive: boolean
+      createdAt: Date
     }, ExtArgs["result"]["bankAccount"]>
     composites: {}
   }
@@ -4327,11 +4381,16 @@ export namespace Prisma {
    */
   interface BankAccountFieldRefs {
     readonly id: FieldRef<"BankAccount", 'String'>
+    readonly accountType: FieldRef<"BankAccount", 'String'>
     readonly bankName: FieldRef<"BankAccount", 'String'>
+    readonly accountName: FieldRef<"BankAccount", 'String'>
     readonly accountNumber: FieldRef<"BankAccount", 'String'>
     readonly branchName: FieldRef<"BankAccount", 'String'>
+    readonly routingNumber: FieldRef<"BankAccount", 'String'>
+    readonly openingBalance: FieldRef<"BankAccount", 'Decimal'>
     readonly currentBalance: FieldRef<"BankAccount", 'Decimal'>
     readonly isActive: FieldRef<"BankAccount", 'Boolean'>
+    readonly createdAt: FieldRef<"BankAccount", 'DateTime'>
   }
     
 
@@ -20741,11 +20800,16 @@ export namespace Prisma {
 
   export const BankAccountScalarFieldEnum: {
     id: 'id',
+    accountType: 'accountType',
     bankName: 'bankName',
+    accountName: 'accountName',
     accountNumber: 'accountNumber',
     branchName: 'branchName',
+    routingNumber: 'routingNumber',
+    openingBalance: 'openingBalance',
     currentBalance: 'currentBalance',
-    isActive: 'isActive'
+    isActive: 'isActive',
+    createdAt: 'createdAt'
   };
 
   export type BankAccountScalarFieldEnum = (typeof BankAccountScalarFieldEnum)[keyof typeof BankAccountScalarFieldEnum]
@@ -21016,9 +21080,12 @@ export namespace Prisma {
 
   export const BankAccountOrderByRelevanceFieldEnum: {
     id: 'id',
+    accountType: 'accountType',
     bankName: 'bankName',
+    accountName: 'accountName',
     accountNumber: 'accountNumber',
-    branchName: 'branchName'
+    branchName: 'branchName',
+    routingNumber: 'routingNumber'
   };
 
   export type BankAccountOrderByRelevanceFieldEnum = (typeof BankAccountOrderByRelevanceFieldEnum)[keyof typeof BankAccountOrderByRelevanceFieldEnum]
@@ -21385,11 +21452,16 @@ export namespace Prisma {
     OR?: BankAccountWhereInput[]
     NOT?: BankAccountWhereInput | BankAccountWhereInput[]
     id?: StringFilter<"BankAccount"> | string
+    accountType?: StringFilter<"BankAccount"> | string
     bankName?: StringFilter<"BankAccount"> | string
+    accountName?: StringNullableFilter<"BankAccount"> | string | null
     accountNumber?: StringFilter<"BankAccount"> | string
     branchName?: StringNullableFilter<"BankAccount"> | string | null
+    routingNumber?: StringNullableFilter<"BankAccount"> | string | null
+    openingBalance?: DecimalFilter<"BankAccount"> | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFilter<"BankAccount"> | Decimal | DecimalJsLike | number | string
     isActive?: BoolFilter<"BankAccount"> | boolean
+    createdAt?: DateTimeFilter<"BankAccount"> | Date | string
     treasuryLedgers?: TreasuryLedgerListRelationFilter
     expenses?: ProjectExpenseListRelationFilter
     customerPayments?: CustomerPaymentListRelationFilter
@@ -21397,11 +21469,16 @@ export namespace Prisma {
 
   export type BankAccountOrderByWithRelationInput = {
     id?: SortOrder
+    accountType?: SortOrder
     bankName?: SortOrder
+    accountName?: SortOrderInput | SortOrder
     accountNumber?: SortOrder
     branchName?: SortOrderInput | SortOrder
+    routingNumber?: SortOrderInput | SortOrder
+    openingBalance?: SortOrder
     currentBalance?: SortOrder
     isActive?: SortOrder
+    createdAt?: SortOrder
     treasuryLedgers?: TreasuryLedgerOrderByRelationAggregateInput
     expenses?: ProjectExpenseOrderByRelationAggregateInput
     customerPayments?: CustomerPaymentOrderByRelationAggregateInput
@@ -21414,10 +21491,15 @@ export namespace Prisma {
     AND?: BankAccountWhereInput | BankAccountWhereInput[]
     OR?: BankAccountWhereInput[]
     NOT?: BankAccountWhereInput | BankAccountWhereInput[]
+    accountType?: StringFilter<"BankAccount"> | string
     bankName?: StringFilter<"BankAccount"> | string
+    accountName?: StringNullableFilter<"BankAccount"> | string | null
     branchName?: StringNullableFilter<"BankAccount"> | string | null
+    routingNumber?: StringNullableFilter<"BankAccount"> | string | null
+    openingBalance?: DecimalFilter<"BankAccount"> | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFilter<"BankAccount"> | Decimal | DecimalJsLike | number | string
     isActive?: BoolFilter<"BankAccount"> | boolean
+    createdAt?: DateTimeFilter<"BankAccount"> | Date | string
     treasuryLedgers?: TreasuryLedgerListRelationFilter
     expenses?: ProjectExpenseListRelationFilter
     customerPayments?: CustomerPaymentListRelationFilter
@@ -21425,11 +21507,16 @@ export namespace Prisma {
 
   export type BankAccountOrderByWithAggregationInput = {
     id?: SortOrder
+    accountType?: SortOrder
     bankName?: SortOrder
+    accountName?: SortOrderInput | SortOrder
     accountNumber?: SortOrder
     branchName?: SortOrderInput | SortOrder
+    routingNumber?: SortOrderInput | SortOrder
+    openingBalance?: SortOrder
     currentBalance?: SortOrder
     isActive?: SortOrder
+    createdAt?: SortOrder
     _count?: BankAccountCountOrderByAggregateInput
     _avg?: BankAccountAvgOrderByAggregateInput
     _max?: BankAccountMaxOrderByAggregateInput
@@ -21442,11 +21529,16 @@ export namespace Prisma {
     OR?: BankAccountScalarWhereWithAggregatesInput[]
     NOT?: BankAccountScalarWhereWithAggregatesInput | BankAccountScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"BankAccount"> | string
+    accountType?: StringWithAggregatesFilter<"BankAccount"> | string
     bankName?: StringWithAggregatesFilter<"BankAccount"> | string
+    accountName?: StringNullableWithAggregatesFilter<"BankAccount"> | string | null
     accountNumber?: StringWithAggregatesFilter<"BankAccount"> | string
     branchName?: StringNullableWithAggregatesFilter<"BankAccount"> | string | null
+    routingNumber?: StringNullableWithAggregatesFilter<"BankAccount"> | string | null
+    openingBalance?: DecimalWithAggregatesFilter<"BankAccount"> | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalWithAggregatesFilter<"BankAccount"> | Decimal | DecimalJsLike | number | string
     isActive?: BoolWithAggregatesFilter<"BankAccount"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"BankAccount"> | Date | string
   }
 
   export type LandProjectWhereInput = {
@@ -22731,11 +22823,16 @@ export namespace Prisma {
 
   export type BankAccountCreateInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     treasuryLedgers?: TreasuryLedgerCreateNestedManyWithoutBankAccountInput
     expenses?: ProjectExpenseCreateNestedManyWithoutBankAccountInput
     customerPayments?: CustomerPaymentCreateNestedManyWithoutBankAccountInput
@@ -22743,11 +22840,16 @@ export namespace Prisma {
 
   export type BankAccountUncheckedCreateInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     treasuryLedgers?: TreasuryLedgerUncheckedCreateNestedManyWithoutBankAccountInput
     expenses?: ProjectExpenseUncheckedCreateNestedManyWithoutBankAccountInput
     customerPayments?: CustomerPaymentUncheckedCreateNestedManyWithoutBankAccountInput
@@ -22755,11 +22857,16 @@ export namespace Prisma {
 
   export type BankAccountUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     treasuryLedgers?: TreasuryLedgerUpdateManyWithoutBankAccountNestedInput
     expenses?: ProjectExpenseUpdateManyWithoutBankAccountNestedInput
     customerPayments?: CustomerPaymentUpdateManyWithoutBankAccountNestedInput
@@ -22767,11 +22874,16 @@ export namespace Prisma {
 
   export type BankAccountUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     treasuryLedgers?: TreasuryLedgerUncheckedUpdateManyWithoutBankAccountNestedInput
     expenses?: ProjectExpenseUncheckedUpdateManyWithoutBankAccountNestedInput
     customerPayments?: CustomerPaymentUncheckedUpdateManyWithoutBankAccountNestedInput
@@ -22779,29 +22891,44 @@ export namespace Prisma {
 
   export type BankAccountCreateManyInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
   }
 
   export type BankAccountUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BankAccountUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type LandProjectCreateInput = {
@@ -24269,36 +24396,53 @@ export namespace Prisma {
 
   export type BankAccountCountOrderByAggregateInput = {
     id?: SortOrder
+    accountType?: SortOrder
     bankName?: SortOrder
+    accountName?: SortOrder
     accountNumber?: SortOrder
     branchName?: SortOrder
+    routingNumber?: SortOrder
+    openingBalance?: SortOrder
     currentBalance?: SortOrder
     isActive?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type BankAccountAvgOrderByAggregateInput = {
+    openingBalance?: SortOrder
     currentBalance?: SortOrder
   }
 
   export type BankAccountMaxOrderByAggregateInput = {
     id?: SortOrder
+    accountType?: SortOrder
     bankName?: SortOrder
+    accountName?: SortOrder
     accountNumber?: SortOrder
     branchName?: SortOrder
+    routingNumber?: SortOrder
+    openingBalance?: SortOrder
     currentBalance?: SortOrder
     isActive?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type BankAccountMinOrderByAggregateInput = {
     id?: SortOrder
+    accountType?: SortOrder
     bankName?: SortOrder
+    accountName?: SortOrder
     accountNumber?: SortOrder
     branchName?: SortOrder
+    routingNumber?: SortOrder
+    openingBalance?: SortOrder
     currentBalance?: SortOrder
     isActive?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type BankAccountSumOrderByAggregateInput = {
+    openingBalance?: SortOrder
     currentBalance?: SortOrder
   }
 
@@ -27276,22 +27420,32 @@ export namespace Prisma {
 
   export type BankAccountCreateWithoutTreasuryLedgersInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     expenses?: ProjectExpenseCreateNestedManyWithoutBankAccountInput
     customerPayments?: CustomerPaymentCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateWithoutTreasuryLedgersInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     expenses?: ProjectExpenseUncheckedCreateNestedManyWithoutBankAccountInput
     customerPayments?: CustomerPaymentUncheckedCreateNestedManyWithoutBankAccountInput
   }
@@ -27314,22 +27468,32 @@ export namespace Prisma {
 
   export type BankAccountUpdateWithoutTreasuryLedgersInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expenses?: ProjectExpenseUpdateManyWithoutBankAccountNestedInput
     customerPayments?: CustomerPaymentUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateWithoutTreasuryLedgersInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expenses?: ProjectExpenseUncheckedUpdateManyWithoutBankAccountNestedInput
     customerPayments?: CustomerPaymentUncheckedUpdateManyWithoutBankAccountNestedInput
   }
@@ -27473,22 +27637,32 @@ export namespace Prisma {
 
   export type BankAccountCreateWithoutExpensesInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     treasuryLedgers?: TreasuryLedgerCreateNestedManyWithoutBankAccountInput
     customerPayments?: CustomerPaymentCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateWithoutExpensesInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     treasuryLedgers?: TreasuryLedgerUncheckedCreateNestedManyWithoutBankAccountInput
     customerPayments?: CustomerPaymentUncheckedCreateNestedManyWithoutBankAccountInput
   }
@@ -27605,22 +27779,32 @@ export namespace Prisma {
 
   export type BankAccountUpdateWithoutExpensesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     treasuryLedgers?: TreasuryLedgerUpdateManyWithoutBankAccountNestedInput
     customerPayments?: CustomerPaymentUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateWithoutExpensesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     treasuryLedgers?: TreasuryLedgerUncheckedUpdateManyWithoutBankAccountNestedInput
     customerPayments?: CustomerPaymentUncheckedUpdateManyWithoutBankAccountNestedInput
   }
@@ -28184,22 +28368,32 @@ export namespace Prisma {
 
   export type BankAccountCreateWithoutCustomerPaymentsInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     treasuryLedgers?: TreasuryLedgerCreateNestedManyWithoutBankAccountInput
     expenses?: ProjectExpenseCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateWithoutCustomerPaymentsInput = {
     id: string
+    accountType?: string
     bankName: string
+    accountName?: string | null
     accountNumber: string
     branchName?: string | null
+    routingNumber?: string | null
+    openingBalance?: Decimal | DecimalJsLike | number | string
     currentBalance?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
     treasuryLedgers?: TreasuryLedgerUncheckedCreateNestedManyWithoutBankAccountInput
     expenses?: ProjectExpenseUncheckedCreateNestedManyWithoutBankAccountInput
   }
@@ -28263,22 +28457,32 @@ export namespace Prisma {
 
   export type BankAccountUpdateWithoutCustomerPaymentsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     treasuryLedgers?: TreasuryLedgerUpdateManyWithoutBankAccountNestedInput
     expenses?: ProjectExpenseUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateWithoutCustomerPaymentsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    accountType?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
+    accountName?: NullableStringFieldUpdateOperationsInput | string | null
     accountNumber?: StringFieldUpdateOperationsInput | string
     branchName?: NullableStringFieldUpdateOperationsInput | string | null
+    routingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    openingBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     treasuryLedgers?: TreasuryLedgerUncheckedUpdateManyWithoutBankAccountNestedInput
     expenses?: ProjectExpenseUncheckedUpdateManyWithoutBankAccountNestedInput
   }

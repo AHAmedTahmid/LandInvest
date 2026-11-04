@@ -139,11 +139,16 @@ exports.Prisma.PartnerScalarFieldEnum = {
 
 exports.Prisma.BankAccountScalarFieldEnum = {
   id: 'id',
+  accountType: 'accountType',
   bankName: 'bankName',
+  accountName: 'accountName',
   accountNumber: 'accountNumber',
   branchName: 'branchName',
+  routingNumber: 'routingNumber',
+  openingBalance: 'openingBalance',
   currentBalance: 'currentBalance',
-  isActive: 'isActive'
+  isActive: 'isActive',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.LandProjectScalarFieldEnum = {
@@ -348,9 +353,12 @@ exports.Prisma.PartnerOrderByRelevanceFieldEnum = {
 
 exports.Prisma.BankAccountOrderByRelevanceFieldEnum = {
   id: 'id',
+  accountType: 'accountType',
   bankName: 'bankName',
+  accountName: 'accountName',
   accountNumber: 'accountNumber',
-  branchName: 'branchName'
+  branchName: 'branchName',
+  routingNumber: 'routingNumber'
 };
 
 exports.Prisma.LandProjectOrderByRelevanceFieldEnum = {
