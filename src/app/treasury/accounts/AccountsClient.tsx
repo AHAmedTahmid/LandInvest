@@ -145,7 +145,7 @@ export default function AccountsClient({
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Bank & MFS Accounts</h1>
           <p className="text-sm text-slate-500">
-            Open commercial banks and mobile financial services (bKash, Nagad, Rocket) with fixed opening balances.
+            Open commercial banks and mobile financial services with fixed opening balances.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -369,8 +369,8 @@ export default function AccountsClient({
                     required
                     className="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
                   >
-                    <option value="BANK">Commercial Bank (e.g. Dutch-Bangla, City Bank, BRAC Bank)</option>
-                    <option value="MBANKING">Mobile Banking / MFS (e.g. bKash, Nagad, Rocket, Upay)</option>
+                    <option value="BANK">Commercial Bank</option>
+                    <option value="MBANKING">Mobile Banking / MFS</option>
                   </select>
                 </div>
 
