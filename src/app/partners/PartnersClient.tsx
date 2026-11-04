@@ -224,7 +224,7 @@ export default function PartnersClient({
               </div>
             </div>
 
-            {/* Non-mandatory Bank Details Section */}
+            {/* Bank Details Section */}
             <div className="border border-slate-200 rounded-lg bg-white p-3 space-y-3">
               <button
                 type="button"
@@ -234,9 +234,6 @@ export default function PartnersClient({
                 <span className="flex items-center gap-1.5">
                   <Building2 className="w-4 h-4 text-slate-500" />
                   Partner Bank Account Details
-                  <span className="text-[11px] font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                    Non-mandatory / Optional
-                  </span>
                 </span>
                 {showAddBankDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
@@ -537,7 +534,7 @@ export default function PartnersClient({
               {/* Bank Details in Edit Modal */}
               <div className="border border-slate-200 rounded-lg p-3 bg-slate-50/50 space-y-3">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-blue-600" /> Bank Details (Non-mandatory)
+                  <Building2 className="w-3.5 h-3.5 text-blue-600" /> Bank Details
                 </h3>
                 <div className="grid grid-cols-2 gap-2.5">
                   <div>
