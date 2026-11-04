@@ -22,6 +22,7 @@ import {
   Layers,
 } from "lucide-react";
 import ContraTransferForm from "./ContraTransferForm";
+import RecentCashMovements, { CashMovementItem } from "./RecentCashMovements";
 
 export default async function TreasuryPage() {
   const session = await getServerSession(authOptions);
@@ -54,16 +55,94 @@ export default async function TreasuryPage() {
         .map((r: any) => r.referenceId as string)
     )
   );
-  const salesMap = new Map<string, { buyerName: string; plotNumber?: string | null }>();
+  const salesMap = new Map<string, any>();
   if (saleIds.length > 0) {
     const sales = await prisma.landSale.findMany({
       where: { id: { in: saleIds } },
-      select: { id: true, buyerName: true, plot: { select: { plotNumber: true } } },
+      select: {
+        id: true,
+        buyerName: true,
+        buyerPhone: true,
+        totalAgreedPrice: true,
+        currentDueAmount: true,
+        status: true,
+        plot: {
+          select: {
+            plotNumber: true,
+            project: { select: { projectName: true } },
+          },
+        },
+      },
     });
     for (const s of sales) {
-      salesMap.set(s.id, { buyerName: s.buyerName, plotNumber: s.plot?.plotNumber ?? null });
+      salesMap.set(s.id, {
+        id: s.id,
+        buyerName: s.buyerName,
+        buyerPhone: s.buyerPhone,
+        plotNumber: s.plot?.plotNumber ?? null,
+        projectName: s.plot?.project?.projectName ?? null,
+        totalAgreedPrice: toNum(s.totalAgreedPrice),
+        currentDueAmount: toNum(s.currentDueAmount),
+        status: s.status,
+      });
     }
   }
+
+  // Resolve expense details if referenceType === "EXPENSE"
+  const expenseIds: string[] = Array.from(
+    new Set(
+      cashLedger
+        .filter((r: any) => r.referenceType === "EXPENSE" && r.referenceId)
+        .map((r: any) => r.referenceId as string)
+    )
+  );
+  const expensesMap = new Map<string, any>();
+  if (expenseIds.length > 0) {
+    const expenses = await prisma.projectExpense.findMany({
+      where: { id: { in: expenseIds } },
+      select: {
+        id: true,
+        expenseCategory: true,
+        description: true,
+        project: { select: { projectName: true } },
+      },
+    });
+    for (const exp of expenses) {
+      expensesMap.set(exp.id, {
+        id: exp.id,
+        expenseCategory: exp.expenseCategory,
+        description: exp.description,
+        projectName: exp.project?.projectName ?? null,
+      });
+    }
+  }
+
+  const formattedMovements: CashMovementItem[] = cashLedger.map((r: any) => {
+    const saleInfo = r.referenceType === "SALE_PAYMENT" && r.referenceId ? salesMap.get(r.referenceId) : null;
+    const expenseInfo = r.referenceType === "EXPENSE" && r.referenceId ? expensesMap.get(r.referenceId) : null;
+    let displayPurpose = r.purpose;
+    if (saleInfo) {
+      const isAdvance = r.purpose?.toLowerCase().includes("advance");
+      const plotSuffix = saleInfo.plotNumber ? ` (Plot ${saleInfo.plotNumber})` : "";
+      displayPurpose = isAdvance
+        ? `Plot Advance: ${saleInfo.buyerName}${plotSuffix}`
+        : `Installment: ${saleInfo.buyerName}${plotSuffix}`;
+    } else if (expenseInfo) {
+      displayPurpose = `${expenseInfo.expenseCategory}${expenseInfo.projectName ? ` - ${expenseInfo.projectName}` : ""}`;
+    }
+    return {
+      id: r.id,
+      txnDate: new Date(r.txnDate).toISOString(),
+      flowType: r.flowType as "IN" | "OUT",
+      amount: toNum(r.amount),
+      purpose: r.purpose,
+      displayPurpose,
+      referenceType: r.referenceType,
+      referenceId: r.referenceId,
+      saleDetails: saleInfo || null,
+      expenseDetails: expenseInfo || null,
+    };
+  });
 
   // Calculate physical cash balance
   const allCash = await prisma.treasuryLedger.findMany({ where: { accountType: "CASH" }, select: { flowType: true, amount: true } });
@@ -341,82 +420,8 @@ export default async function TreasuryPage() {
         </div>
       )}
 
-      {/* Recent Cash in Hand Activity Table */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Recent Cash in Hand Movements</h2>
-            <p className="text-xs text-slate-500">Latest physical cash inflows and outflows</p>
-          </div>
-          <Link href="/treasury/transactions?accountId=CASH" className="text-xs font-semibold text-blue-600 hover:underline">
-            View All Cash Transactions →
-          </Link>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 text-xs uppercase">
-              <tr>
-                <th className="p-3">Date</th>
-                <th>Flow</th>
-                <th>Purpose / Description</th>
-                <th>Reference</th>
-                <th className="p-3 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {cashLedger.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="p-6 text-center text-slate-400">
-                    No cash in hand transactions recorded yet.
-                  </td>
-                </tr>
-              )}
-              {cashLedger.map((r: any) => {
-                const isInflow = r.flowType === "IN";
-                const saleInfo = r.referenceType === "SALE_PAYMENT" && r.referenceId ? salesMap.get(r.referenceId) : null;
-                let displayPurpose = r.purpose;
-                if (saleInfo) {
-                  const isAdvance = r.purpose?.toLowerCase().includes("advance");
-                  const plotSuffix = saleInfo.plotNumber ? ` (Plot ${saleInfo.plotNumber})` : "";
-                  displayPurpose = isAdvance
-                    ? `Plot Advance: ${saleInfo.buyerName}${plotSuffix}`
-                    : `Installment: ${saleInfo.buyerName}${plotSuffix}`;
-                }
-                return (
-                  <tr key={r.id} className="hover:bg-slate-50/50">
-                    <td className="p-3 text-xs font-mono text-slate-500 whitespace-nowrap">{formatDate(r.txnDate)}</td>
-                    <td>
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                          isInflow ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-700 border border-rose-200"
-                        }`}
-                      >
-                        {isInflow ? <ArrowDownLeft className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
-                        {isInflow ? "INFLOW" : "OUTFLOW"}
-                      </span>
-                    </td>
-                    <td className="text-xs text-slate-700 font-medium">{displayPurpose}</td>
-                    <td className="text-xs font-mono text-slate-500">
-                      <span className="bg-slate-100 px-2 py-0.5 rounded text-[11px] font-semibold text-slate-700">
-                        {r.referenceType}
-                      </span>
-                    </td>
-                    <td
-                      className={`p-3 text-right font-mono font-bold text-xs ${
-                        isInflow ? "text-emerald-700" : "text-rose-700"
-                      }`}
-                    >
-                      {isInflow ? "+" : "-"}
-                      {formatBDT(toNum(r.amount))}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Recent Cash in Hand Activity Table with View Action */}
+      <RecentCashMovements movements={formattedMovements} />
     </div>
   );
 }
