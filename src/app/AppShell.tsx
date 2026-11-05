@@ -43,7 +43,17 @@ const NAV: NavItem[] = [
       { href: "/treasury/approvals", key: "treasury_approvals", perm: ["treasury.contra.approve", "treasury.view"] },
     ],
   },
-  { href: "/projects", key: "projects", icon: Map, perm: "projects.view" },
+  {
+    href: "/projects",
+    key: "projects",
+    icon: Map,
+    perm: "projects.view",
+    children: [
+      { href: "/projects/new", key: "projects_new", perm: ["projects.create", "projects.view"] },
+      { href: "/projects/plots", key: "projects_plots", perm: "projects.view" },
+      { href: "/projects", key: "projects_all", perm: "projects.view" },
+    ],
+  },
   { href: "/expenses", key: "expenses", icon: Receipt, perm: ["expenses.view", "expenses.create"] },
   { href: "/vouchers", key: "vouchers", icon: FileCheck, perm: ["expenses.view", "expenses.approve"] },
   { href: "/sales", key: "sales", icon: BadgeDollarSign, perm: ["sales.view", "sales.collect"] },
@@ -67,7 +77,9 @@ const TITLES: Record<string, string> = {
   "/treasury/transactions": "treasury_transactions",
   "/treasury/approvals": "treasury_approvals",
   "/treasury": "treasury",
-  "/projects": "projects",
+  "/projects/new": "projects_new",
+  "/projects/plots": "projects_plots",
+  "/projects": "projects_all",
   "/expenses": "expenses",
   "/vouchers": "vouchers",
   "/sales": "sales",
@@ -84,7 +96,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname === "/forgot-password" || pathname?.startsWith("/invite") || pathname?.startsWith("/reset-password");
   const [perms, setPerms] = useState<string[] | null>(null);
   const [me, setMe] = useState<{ fullName: string | null; email: string | null } | null>(null);
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ partners: true, treasury: true });
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ partners: true, treasury: true, projects: true });
 
   // load my permissions once; hide menu items I may not open, force password change when required
   useEffect(() => {
