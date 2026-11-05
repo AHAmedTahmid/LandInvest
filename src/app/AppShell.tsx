@@ -126,7 +126,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0">
+      <aside className="w-[270px] bg-slate-900 text-slate-300 flex flex-col flex-shrink-0">
         <div className="h-16 px-6 flex items-center gap-3 border-b border-slate-800 bg-slate-950">
           <div className="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-lg">L</div>
           <div><h1 className="text-sm font-bold text-white tracking-wide">LANDINVEST</h1><p className="text-[11px] text-slate-400">Partnership ERP Suite</p></div>
@@ -144,15 +144,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <button
                     type="button"
                     onClick={() => setOpenMenus((prev) => ({ ...prev, [item.key]: !isOpen }))}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-medium transition ${
                       isChildActive ? "text-white bg-slate-800" : "text-slate-400 hover:text-white hover:bg-slate-800"
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <item.icon className="w-4 h-4" />
-                      <span>{t(item.key)}</span>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <item.icon className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap truncate">{t(item.key)}</span>
                     </div>
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 text-slate-400 ${isOpen ? "rotate-180 text-white" : ""}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 text-slate-400 ${isOpen ? "rotate-180 text-white" : ""}`} />
                   </button>
 
                   {isOpen && (
@@ -163,7 +163,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                           <Link
                             key={child.href}
                             href={child.href}
-                            className={`block px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                            className={`block px-3 py-1.5 rounded-md text-xs font-medium transition whitespace-nowrap truncate ${
                               active
                                 ? "bg-brand-700 text-white font-semibold shadow-sm"
                                 : "text-slate-400 hover:text-white hover:bg-slate-800/60"
@@ -184,11 +184,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href!}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition ${
                   active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"
                 }`}
               >
-                <item.icon className="w-4 h-4" /> {t(item.key)}
+                <item.icon className="w-4 h-4 shrink-0" />
+                <span className="whitespace-nowrap truncate">{t(item.key)}</span>
               </Link>
             );
           })}
@@ -198,8 +199,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               {adminLinks.map(({ href, key, icon: Icon }) => {
                 const active = pathname === href || pathname?.startsWith(href + "/");
                 return (
-                  <Link key={href} href={href} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}>
-                    <Icon className="w-4 h-4" /> {t(key)}
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition ${
+                      active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="whitespace-nowrap truncate">{t(key)}</span>
                   </Link>
                 );
               })}
