@@ -54,7 +54,18 @@ const NAV: NavItem[] = [
       { href: "/projects", key: "projects_all", perm: "projects.view" },
     ],
   },
-  { href: "/expenses", key: "expenses", icon: Receipt, perm: ["expenses.view", "expenses.create"] },
+  {
+    href: "/expenses",
+    key: "expenses",
+    icon: Receipt,
+    perm: ["expenses.view", "expenses.create"],
+    children: [
+      { href: "/expenses/dashboard", key: "expenses_dashboard", perm: "expenses.view" },
+      { href: "/expenses", key: "expenses_all", perm: "expenses.view" },
+      { href: "/expenses/approvals", key: "expenses_approvals", perm: ["expenses.approve", "expenses.view"] },
+      { href: "/expenses/breakdown", key: "expenses_breakdown", perm: "expenses.view" },
+    ],
+  },
   { href: "/vouchers", key: "vouchers", icon: FileCheck, perm: ["expenses.view", "expenses.approve"] },
   { href: "/sales", key: "sales", icon: BadgeDollarSign, perm: ["sales.view", "sales.collect"] },
   { href: "/reports", key: "reports", icon: PieChart, perm: ["reports.view", "profit.view", "reports.financial.view", "reports.partners.view", "reports.projects.view", "reports.sales.view", "reports.audit.view"] },
@@ -80,7 +91,10 @@ const TITLES: Record<string, string> = {
   "/projects/new": "projects_new",
   "/projects/plots": "projects_plots",
   "/projects": "projects_all",
-  "/expenses": "expenses",
+  "/expenses/dashboard": "expenses_dashboard",
+  "/expenses/approvals": "expenses_approvals",
+  "/expenses/breakdown": "expenses_breakdown",
+  "/expenses": "expenses_all",
   "/vouchers": "vouchers",
   "/sales": "sales",
   "/reports": "reports",
@@ -96,7 +110,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname === "/forgot-password" || pathname?.startsWith("/invite") || pathname?.startsWith("/reset-password");
   const [perms, setPerms] = useState<string[] | null>(null);
   const [me, setMe] = useState<{ fullName: string | null; email: string | null } | null>(null);
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ partners: true, treasury: true, projects: true });
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ partners: true, treasury: true, projects: true, expenses: true });
 
   // load my permissions once; hide menu items I may not open, force password change when required
   useEffect(() => {
