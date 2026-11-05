@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Building2,
@@ -95,6 +95,19 @@ export default function ProjectDetailClient({
   const [isAddPlotOpen, setIsAddPlotOpen] = useState(false);
   const [isBatchOpen, setIsBatchOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Keyboard shortcut: Escape closes active modals
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setEditingPlot(null);
+        setIsAddPlotOpen(false);
+        setIsBatchOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Financial aggregates
   const totalCost =
@@ -337,8 +350,18 @@ export default function ProjectDetailClient({
                 placeholder="Search plot number, status, buyer..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 bg-white"
+                className="w-full pl-9 pr-8 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 bg-white"
               />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                  aria-label="Clear search query"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -383,10 +406,33 @@ export default function ProjectDetailClient({
                 <tbody className="divide-y divide-slate-100">
                   {filteredPlots.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="p-8 text-center text-slate-400">
-                        {project.plots.length === 0
-                          ? "No plots created yet for this project. Use '+ Add Plot' or 'Batch Generate' above."
-                          : "No plots match the selected search criteria."}
+                      <td colSpan={7} className="p-8 text-center text-slate-500">
+                        {project.plots.length === 0 ? (
+                          <div className="space-y-2">
+                            <p className="text-sm">No plots created yet for this project.</p>
+                            {canManagePlots && (
+                              <button
+                                onClick={() => setIsAddPlotOpen(true)}
+                                className="text-xs font-bold text-brand-700 hover:underline"
+                              >
+                                + Add first plot
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="space-y-1">
+                            <p className="text-sm">No plots match the selected search criteria.</p>
+                            <button
+                              onClick={() => {
+                                setSearchTerm("");
+                                setStatusFilter("ALL");
+                              }}
+                              className="text-xs font-semibold text-brand-700 hover:underline"
+                            >
+                              Reset filters
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   )}
@@ -687,7 +733,12 @@ export default function ProjectDetailClient({
 
       {/* MODAL: EDIT PLOT */}
       {editingPlot && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingPlot(null);
+          }}
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+        >
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
@@ -798,7 +849,12 @@ export default function ProjectDetailClient({
 
       {/* MODAL: ADD INDIVIDUAL PLOT */}
       {isAddPlotOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsAddPlotOpen(false);
+          }}
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+        >
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
@@ -905,7 +961,12 @@ export default function ProjectDetailClient({
 
       {/* MODAL: BATCH GENERATE PLOTS */}
       {isBatchOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsBatchOpen(false);
+          }}
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+        >
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
@@ -1001,3 +1062,4 @@ export default function ProjectDetailClient({
     </div>
   );
 }
+

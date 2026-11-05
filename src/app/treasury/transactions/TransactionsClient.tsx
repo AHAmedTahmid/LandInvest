@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -68,6 +68,17 @@ export default function TransactionsClient({
   const [accountFilter, setAccountFilter] = useState<string>(initialAccountId || "ALL");
   const [flowFilter, setFlowFilter] = useState<"ALL" | "IN" | "OUT">("ALL");
   const [selectedTxn, setSelectedTxn] = useState<LedgerTransaction | null>(null);
+
+  // Keyboard shortcut: Escape closes modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedTxn(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const filtered = transactions.filter((t) => {
     // Flow filter
@@ -193,8 +204,18 @@ export default function TransactionsClient({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by purpose, reference, bank, or ID..."
-              className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-9 pr-8 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                aria-label="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Account Filter */}
@@ -247,8 +268,20 @@ export default function TransactionsClient({
             <tbody className="divide-y divide-slate-100">
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">
-                    No transactions found matching your criteria.
+                  <td colSpan={7} className="p-8 text-center text-slate-500">
+                    <p className="text-sm">No transactions found matching your criteria.</p>
+                    {(searchTerm || accountFilter !== "ALL" || flowFilter !== "ALL") && (
+                      <button
+                        onClick={() => {
+                          setSearchTerm("");
+                          setAccountFilter("ALL");
+                          setFlowFilter("ALL");
+                        }}
+                        className="mt-2 text-xs font-semibold text-emerald-700 hover:underline"
+                      >
+                        Reset all filters
+                      </button>
+                    )}
                   </td>
                 </tr>
               )}
@@ -341,7 +374,12 @@ export default function TransactionsClient({
 
       {/* Transaction Voucher Detail Modal */}
       {selectedTxn && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedTxn(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4"
+        >
           <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">

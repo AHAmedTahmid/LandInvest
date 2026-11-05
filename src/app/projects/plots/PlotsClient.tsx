@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Grid3X3,
@@ -93,6 +93,18 @@ export default function PlotsClient({
 
   // Toast
   const [toast, setToast] = useState<string | null>(null);
+
+  // Keyboard shortcut: Escape closes active modals
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setEditingPlot(null);
+        setShowAddModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -262,8 +274,18 @@ export default function PlotsClient({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by plot number, project name, or buyer..."
-              className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-9 pr-8 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                aria-label="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Project Filter */}
@@ -316,8 +338,20 @@ export default function PlotsClient({
             <tbody className="divide-y divide-slate-100">
               {filteredPlots.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">
-                    No plots match your selected filters.
+                  <td colSpan={7} className="p-8 text-center text-slate-500">
+                    <p className="text-sm">No plots match your selected filters.</p>
+                    {(searchTerm || projectFilter !== "ALL" || statusFilter !== "ALL") && (
+                      <button
+                        onClick={() => {
+                          setSearchTerm("");
+                          setProjectFilter("ALL");
+                          setStatusFilter("ALL");
+                        }}
+                        className="mt-2 text-xs font-semibold text-emerald-700 hover:underline"
+                      >
+                        Reset all filters
+                      </button>
+                    )}
                   </td>
                 </tr>
               )}
@@ -404,7 +438,12 @@ export default function PlotsClient({
 
       {/* Edit Plot Modal (Set Custom Price & Size) */}
       {editingPlot && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingPlot(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4"
+        >
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2">
@@ -525,7 +564,12 @@ export default function PlotsClient({
 
       {/* Add New Plot Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowAddModal(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4"
+        >
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2">

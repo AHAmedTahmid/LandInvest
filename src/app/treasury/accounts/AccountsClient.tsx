@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Building2,
@@ -61,6 +61,19 @@ export default function AccountsClient({
   const [toast, setToast] = useState<{ text: string; error?: boolean } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  // Keyboard shortcut: Escape closes active modals
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowAddModal(false);
+        setEditingAccount(null);
+        setInspectAccount(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const showToast = (text: string, error = false) => {
     setToast({ text, error });
@@ -349,7 +362,12 @@ export default function AccountsClient({
 
       {/* Open Account Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowAddModal(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+        >
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 animate-scale-up">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -471,7 +489,12 @@ export default function AccountsClient({
 
       {/* Edit Account Modal (Opening Balance Strictly Locked) */}
       {editingAccount && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingAccount(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+        >
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 animate-scale-up">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -596,7 +619,12 @@ export default function AccountsClient({
 
       {/* Account Ledger Drawer / Modal */}
       {inspectAccount && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setInspectAccount(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+        >
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full p-6 max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>

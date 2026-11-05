@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   PieChart,
   Grid,
+  X,
 } from "lucide-react";
 import { formatBDT } from "@/lib/format";
 
@@ -169,8 +170,18 @@ export default function ProjectsDirectoryClient({
             placeholder="Search by project, mouza, DAG, khatian..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 bg-white"
+            className="w-full pl-9 pr-8 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 bg-white"
           />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -215,8 +226,19 @@ export default function ProjectsDirectoryClient({
             <tbody className="divide-y divide-slate-100">
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">
-                    No land projects match the selected criteria.
+                  <td colSpan={7} className="p-8 text-center text-slate-500">
+                    <p className="text-sm">No land projects match the selected criteria.</p>
+                    {(searchTerm || statusFilter !== "ALL") && (
+                      <button
+                        onClick={() => {
+                          setSearchTerm("");
+                          setStatusFilter("ALL");
+                        }}
+                        className="mt-2 text-xs font-semibold text-brand-700 hover:underline"
+                      >
+                        Reset filters
+                      </button>
+                    )}
                   </td>
                 </tr>
               )}

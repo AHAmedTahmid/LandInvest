@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Eye,
@@ -53,6 +53,17 @@ export default function RecentCashMovements({
   movements: CashMovementItem[];
 }) {
   const [selectedTxn, setSelectedTxn] = useState<CashMovementItem | null>(null);
+
+  // Keyboard shortcut: Escape closes modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedTxn(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handlePrint = () => {
     window.print();
@@ -164,7 +175,12 @@ export default function RecentCashMovements({
 
       {/* Cash Voucher Detail Modal */}
       {selectedTxn && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedTxn(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4"
+        >
           <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
