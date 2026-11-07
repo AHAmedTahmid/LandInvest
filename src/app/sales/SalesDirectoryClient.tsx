@@ -117,7 +117,8 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
   // New Sale Modal State
   const [isNewSaleOpen, setIsNewSaleOpen] = useState(false);
   const [formProjectId, setFormProjectId] = useState(data.projects[0]?.id || "");
-  const [formPlotId, setFormPlotId] = useState("");
+  const [saleScope, setSaleScope] = useState<"PLOTS" | "WHOLE_PROJECT">("PLOTS");
+  const [selectedPlotIds, setSelectedPlotIds] = useState<string[]>([]);
   const [formBuyerName, setFormBuyerName] = useState("");
   const [formBuyerPhone, setFormBuyerPhone] = useState("");
   const [formBuyerNid, setFormBuyerNid] = useState("");
@@ -166,20 +167,48 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
   // Handle project change in form
   const handleProjectSelect = (projId: string) => {
     setFormProjectId(projId);
-    setFormPlotId("");
+    setSelectedPlotIds([]);
     setFormTotalPrice("");
+    setSaleError(null);
   };
 
-  // Handle plot change in form
-  const handlePlotSelect = (plotId: string) => {
-    setFormPlotId(plotId);
-    if (!plotId) {
+  // Toggle plot in multi-plot selection
+  const togglePlotSelection = (plotId: string) => {
+    const newSelection = selectedPlotIds.includes(plotId)
+      ? selectedPlotIds.filter((id) => id !== plotId)
+      : [...selectedPlotIds, plotId];
+    setSelectedPlotIds(newSelection);
+
+    // Calculate sum of asking prices for selected plots
+    const sum = availablePlots
+      .filter((p) => newSelection.includes(p.id))
+      .reduce((acc, p) => acc + p.askingPrice, 0);
+    setFormTotalPrice(sum > 0 ? String(sum) : "");
+  };
+
+  // Select or Deselect all plots
+  const handleSelectAllPlots = () => {
+    if (selectedPlotIds.length === availablePlots.length) {
+      setSelectedPlotIds([]);
       setFormTotalPrice("");
-      return;
+    } else {
+      const allIds = availablePlots.map((p) => p.id);
+      setSelectedPlotIds(allIds);
+      const sum = availablePlots.reduce((acc, p) => acc + p.askingPrice, 0);
+      setFormTotalPrice(sum > 0 ? String(sum) : "");
     }
-    const found = availablePlots.find((pl) => pl.id === plotId);
-    if (found) {
-      setFormTotalPrice(String(found.askingPrice));
+  };
+
+  // Handle scope change
+  const handleScopeChange = (scope: "PLOTS" | "WHOLE_PROJECT") => {
+    setSaleScope(scope);
+    if (scope === "WHOLE_PROJECT") {
+      setSelectedPlotIds([]);
+      const sum = availablePlots.reduce((acc, p) => acc + p.askingPrice, 0);
+      setFormTotalPrice(sum > 0 ? String(sum) : "");
+    } else {
+      setSelectedPlotIds([]);
+      setFormTotalPrice("");
     }
   };
 
@@ -190,6 +219,12 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
       setSaleError("Please select a land project.");
       return;
     }
+
+    if (saleScope === "PLOTS" && selectedPlotIds.length === 0) {
+      setSaleError("Please select at least one plot to record sale.");
+      return;
+    }
+
     const agreed = parseFloat(formTotalPrice);
     if (!agreed || agreed <= 0) {
       setSaleError("Please enter a valid total agreed price.");
@@ -200,21 +235,31 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
     setSaleError(null);
 
     try {
+      const payload: any = {
+        project_id: formProjectId,
+        buyer_name: formBuyerName,
+        buyer_phone: formBuyerPhone,
+        buyer_nid: formBuyerNid || null,
+        total_agreed_price: agreed,
+        advance: parseFloat(formAdvance) || 0,
+        installments_count: parseInt(formInstallmentsCount, 10) || 0,
+        payment_method: formPaymentMethod === "CASH" ? "CASH" : "BANK",
+        bank_account: formPaymentMethod !== "CASH" ? formBankAccountId : null,
+      };
+
+      if (saleScope === "WHOLE_PROJECT") {
+        payload.is_whole_project = true;
+        payload.plot_id = null;
+        payload.plot_ids = availablePlots.map((p) => p.id);
+      } else {
+        payload.plot_ids = selectedPlotIds;
+        payload.plot_id = selectedPlotIds[0] || null;
+      }
+
       const res = await fetch("/api/sales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          project_id: formProjectId,
-          plot_id: formPlotId || null,
-          buyer_name: formBuyerName,
-          buyer_phone: formBuyerPhone,
-          buyer_nid: formBuyerNid || null,
-          total_agreed_price: agreed,
-          advance: parseFloat(formAdvance) || 0,
-          installments_count: parseInt(formInstallmentsCount, 10) || 0,
-          payment_method: formPaymentMethod === "CASH" ? "CASH" : "BANK",
-          bank_account: formPaymentMethod !== "CASH" ? formBankAccountId : null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -226,6 +271,15 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
       const advancePaid = parseFloat(formAdvance) || 0;
       const initialDue = agreed - advancePaid;
       const newStatus = initialDue <= 0 ? "PAID_IN_FULL" : advancePaid > 0 ? "PARTIAL" : "BOOKED";
+
+      const selectedPlotsData = availablePlots.filter((p) => selectedPlotIds.includes(p.id));
+      const plotDisplayNumber =
+        saleScope === "WHOLE_PROJECT"
+          ? null
+          : selectedPlotsData.length === 1
+          ? selectedPlotsData[0].plotNumber
+          : selectedPlotsData.map((p) => p.plotNumber).join(", ");
+      const totalSelectedShotok = selectedPlotsData.reduce((s, p) => s + p.plotSizeShotok, 0);
 
       const newItem: SaleDirectoryItem = {
         id: created.id,
@@ -247,11 +301,11 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
               totalAreaShotok: 0,
             }
           : null,
-        plot: formPlotId
+        plot: plotDisplayNumber
           ? {
-              id: formPlotId,
-              plotNumber: availablePlots.find((p) => p.id === formPlotId)?.plotNumber || "Plot",
-              plotSizeShotok: availablePlots.find((p) => p.id === formPlotId)?.plotSizeShotok || 0,
+              id: selectedPlotIds[0] || "multi",
+              plotNumber: plotDisplayNumber,
+              plotSizeShotok: totalSelectedShotok,
               askingPrice: agreed,
             }
           : null,
@@ -277,7 +331,7 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
       setFormBuyerName("");
       setFormBuyerPhone("");
       setFormBuyerNid("");
-      setFormPlotId("");
+      setSelectedPlotIds([]);
       setFormTotalPrice("");
       setFormAdvance("");
     } catch (err: any) {
@@ -855,7 +909,7 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
       {isNewSaleOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div
-            className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]"
+            className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -866,7 +920,7 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">Record New Plot Sale</h3>
-                  <p className="text-xs text-slate-500">Sell an available plot or complete land project</p>
+                  <p className="text-xs text-slate-500">Sell an available plot, multi-select plots, or complete land project</p>
                 </div>
               </div>
               <button
@@ -886,43 +940,156 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
                 </div>
               )}
 
-              {/* Project & Plot Selection */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Select Project <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={formProjectId}
-                    onChange={(e) => handleProjectSelect(e.target.value)}
-                    required
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  >
-                    {data.projects.map((proj) => (
-                      <option key={proj.id} value={proj.id}>
-                        {proj.projectName}
-                      </option>
-                    ))}
-                  </select>
+              {/* Project & Scope Selection */}
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Select Project <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      value={formProjectId}
+                      onChange={(e) => handleProjectSelect(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    >
+                      {data.projects.map((proj) => (
+                        <option key={proj.id} value={proj.id}>
+                          {proj.projectName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Sale Scope
+                    </label>
+                    <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-lg text-xs font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => handleScopeChange("PLOTS")}
+                        className={`flex-1 py-1.5 rounded-md transition ${
+                          saleScope === "PLOTS"
+                            ? "bg-white text-slate-900 shadow-sm"
+                            : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Select Plots
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleScopeChange("WHOLE_PROJECT")}
+                        className={`flex-1 py-1.5 rounded-md transition ${
+                          saleScope === "WHOLE_PROJECT"
+                            ? "bg-purple-600 text-white shadow-sm"
+                            : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Entire Project
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Select Plot <span className="text-slate-400 font-normal">(Leave empty for whole project)</span>
-                  </label>
-                  <select
-                    value={formPlotId}
-                    onChange={(e) => handlePlotSelect(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  >
-                    <option value="">Whole Project / Unassigned</option>
-                    {availablePlots.map((plot) => (
-                      <option key={plot.id} value={plot.id}>
-                        Plot #{plot.plotNumber} — {plot.plotSizeShotok} shotok (৳{formatBDT(plot.askingPrice)})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {/* Multi-Plot Selection Grid */}
+                {saleScope === "PLOTS" ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <label className="font-semibold text-slate-700">
+                        Select Plot(s) <span className="text-rose-500">*</span>
+                        <span className="ml-1.5 text-slate-500 font-normal">
+                          ({selectedPlotIds.length} of {availablePlots.length} selected)
+                        </span>
+                      </label>
+                      {availablePlots.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={handleSelectAllPlots}
+                            className="text-[11px] font-semibold text-brand-600 hover:text-brand-800 hover:underline"
+                          >
+                            {selectedPlotIds.length === availablePlots.length ? "Deselect All" : "Select All"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {availablePlots.length === 0 ? (
+                      <div className="p-4 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500 bg-slate-50">
+                        No plots currently marked AVAILABLE in this project.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-200 rounded-xl bg-slate-50/50">
+                        {availablePlots.map((plot) => {
+                          const isSelected = selectedPlotIds.includes(plot.id);
+                          return (
+                            <div
+                              key={plot.id}
+                              onClick={() => togglePlotSelection(plot.id)}
+                              className={`p-2.5 rounded-lg border cursor-pointer select-none transition ${
+                                isSelected
+                                  ? "bg-brand-50 border-brand-500 ring-1 ring-brand-500 text-brand-900"
+                                  : "bg-white border-slate-200 hover:border-slate-300 text-slate-800"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold text-xs">{plot.plotNumber}</span>
+                                <div
+                                  className={`w-4 h-4 rounded flex items-center justify-center text-[10px] ${
+                                    isSelected
+                                      ? "bg-brand-600 text-white"
+                                      : "border border-slate-300 bg-white"
+                                  }`}
+                                >
+                                  {isSelected && <Check className="w-3 h-3" />}
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+                                <span>{plot.plotSizeShotok} shotok</span>
+                                <span className="font-semibold text-slate-900">৳{formatBDT(plot.askingPrice)}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {selectedPlotIds.length > 0 && (
+                      <div className="p-2.5 rounded-lg bg-brand-50 border border-brand-200 flex items-center justify-between text-xs text-brand-900">
+                        <span>
+                          Selected <strong>{selectedPlotIds.length} plot(s)</strong> (
+                          {availablePlots
+                            .filter((p) => selectedPlotIds.includes(p.id))
+                            .reduce((sum, p) => sum + p.plotSizeShotok, 0)}{" "}
+                          shotok)
+                        </span>
+                        <span>
+                          Total Asking:{" "}
+                          <strong>
+                            ৳
+                            {formatBDT(
+                              availablePlots
+                                .filter((p) => selectedPlotIds.includes(p.id))
+                                .reduce((sum, p) => sum + p.askingPrice, 0)
+                            )}
+                          </strong>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 space-y-1">
+                    <div className="font-bold flex items-center gap-1.5">
+                      <Building className="w-4 h-4 text-purple-600" />
+                      Entire Project Sale
+                    </div>
+                    <p className="text-purple-700">
+                      All {availablePlots.length} available plot(s) in this project will be reserved under this deal (
+                      {availablePlots.reduce((sum, p) => sum + p.plotSizeShotok, 0)} shotok total).
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Buyer Details */}
