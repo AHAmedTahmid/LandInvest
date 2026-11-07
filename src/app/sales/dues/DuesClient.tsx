@@ -83,7 +83,7 @@ export interface DuesPageData {
     id: string;
     bankName: string;
     accountNumber: string;
-    branch: string | null;
+    branchName?: string | null;
   }>;
   canCollect: boolean;
   metrics: {

@@ -66,7 +66,7 @@ export default async function DuesPage() {
         id: true,
         bankName: true,
         accountNumber: true,
-        branch: true,
+        branchName: true,
       },
     }),
   ]);
