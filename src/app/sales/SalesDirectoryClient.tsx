@@ -231,6 +231,14 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
       return;
     }
 
+    const advance = parseFloat(formAdvance) || 0;
+    if (advance > agreed) {
+      setSaleError(
+        `Advance payment (৳${formatBDT(advance)}) cannot exceed the total agreed price (৳${formatBDT(agreed)}).`
+      );
+      return;
+    }
+
     setIsSubmittingSale(true);
     setSaleError(null);
 
@@ -1153,18 +1161,36 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Advance Payment (৳)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      Advance Payment (৳)
+                    </label>
+                    {parseFloat(formTotalPrice) > 0 && (
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        Max: ৳{formatBDT(parseFloat(formTotalPrice))}
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="number"
                     min="0"
+                    max={parseFloat(formTotalPrice) > 0 ? parseFloat(formTotalPrice) : undefined}
                     step="0.01"
                     value={formAdvance}
                     onChange={(e) => setFormAdvance(e.target.value)}
                     placeholder="e.g. 300000"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className={`w-full px-3 py-2 rounded-lg border text-xs text-slate-800 focus:outline-none focus:ring-2 ${
+                      parseFloat(formAdvance) > (parseFloat(formTotalPrice) || 0) && parseFloat(formTotalPrice) > 0
+                        ? "border-rose-400 bg-rose-50/30 text-rose-900 focus:ring-rose-500"
+                        : "border-slate-300 focus:ring-brand-500"
+                    }`}
                   />
+                  {parseFloat(formAdvance) > (parseFloat(formTotalPrice) || 0) && parseFloat(formTotalPrice) > 0 && (
+                    <p className="mt-1 text-[11px] font-semibold text-rose-600 flex items-center gap-1 animate-in fade-in">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-rose-600" />
+                      Advance payment cannot exceed agreed price of ৳{formatBDT(parseFloat(formTotalPrice))}!
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1225,28 +1251,49 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
 
               {/* Real-time Calculation Summary */}
               {formTotalPrice && parseFloat(formTotalPrice) > 0 && (
-                <div className="p-3.5 bg-brand-50/70 border border-brand-200 rounded-xl flex items-center justify-between text-xs">
-                  <div>
-                    <span className="text-slate-600">Remaining Balance:</span>
-                    <span className="font-extrabold text-rose-700 ml-2">
-                      ৳{formatBDT(Math.max(0, parseFloat(formTotalPrice) - (parseFloat(formAdvance) || 0)))}
-                    </span>
-                  </div>
-                  {parseInt(formInstallmentsCount, 10) > 0 && (
+                parseFloat(formAdvance) > (parseFloat(formTotalPrice) || 0) ? (
+                  <div className="p-3.5 bg-rose-50 border border-rose-300 rounded-xl flex items-start gap-2.5 text-xs text-rose-800 animate-in fade-in">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-slate-600">Approx. Per Month:</span>
-                      <span className="font-bold text-slate-900 ml-2">
-                        ৳
-                        {formatBDT(
-                          Math.round(
-                            Math.max(0, parseFloat(formTotalPrice) - (parseFloat(formAdvance) || 0)) /
-                              parseInt(formInstallmentsCount, 10)
-                          )
-                        )}
+                      <span className="font-bold">Overpayment Detected:</span> Advance payment (৳{formatBDT(parseFloat(formAdvance))}) exceeds total agreed price (৳{formatBDT(parseFloat(formTotalPrice))}) by{" "}
+                      <strong className="underline font-bold">
+                        ৳{formatBDT(parseFloat(formAdvance) - parseFloat(formTotalPrice))}
+                      </strong>
+                      . Please reduce the advance amount or adjust the agreed price before recording.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3.5 bg-brand-50/70 border border-brand-200 rounded-xl flex items-center justify-between text-xs">
+                    <div>
+                      <span className="text-slate-600">Remaining Balance:</span>
+                      <span
+                        className={`font-extrabold ml-2 ${
+                          parseFloat(formTotalPrice) - (parseFloat(formAdvance) || 0) <= 0
+                            ? "text-emerald-700"
+                            : "text-rose-700"
+                        }`}
+                      >
+                        ৳{formatBDT(Math.max(0, parseFloat(formTotalPrice) - (parseFloat(formAdvance) || 0)))}
+                        {parseFloat(formTotalPrice) - (parseFloat(formAdvance) || 0) <= 0 && " (Fully Settled)"}
                       </span>
                     </div>
-                  )}
-                </div>
+                    {parseInt(formInstallmentsCount, 10) > 0 &&
+                      parseFloat(formTotalPrice) - (parseFloat(formAdvance) || 0) > 0 && (
+                        <div>
+                          <span className="text-slate-600">Approx. Per Month:</span>
+                          <span className="font-bold text-slate-900 ml-2">
+                            ৳
+                            {formatBDT(
+                              Math.round(
+                                (parseFloat(formTotalPrice) - (parseFloat(formAdvance) || 0)) /
+                                  parseInt(formInstallmentsCount, 10)
+                              )
+                            )}
+                          </span>
+                        </div>
+                      )}
+                  </div>
+                )
               )}
 
               {/* Modal Actions */}
@@ -1260,8 +1307,11 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmittingSale}
-                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50"
+                  disabled={
+                    isSubmittingSale ||
+                    (parseFloat(formAdvance) > (parseFloat(formTotalPrice) || 0) && parseFloat(formTotalPrice) > 0)
+                  }
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmittingSale ? "Recording..." : "Confirm & Record Sale"}
                 </button>

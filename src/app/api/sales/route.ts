@@ -22,7 +22,15 @@ export async function POST(req: NextRequest) {
   const userId = (s.user as any).id;
   const prisma: any = await getTenantClientFromSession();
   const saleId = randomUUID();
-  const due = Number(b.total_agreed_price) - Number(b.advance || 0);
+  const advance = Number(b.advance || 0);
+  const totalPrice = Number(b.total_agreed_price || 0);
+  if (advance > totalPrice) {
+    return NextResponse.json(
+      { error: `Advance payment cannot exceed total agreed price` },
+      { status: 400 }
+    );
+  }
+  const due = totalPrice - advance;
 
   // If multiple plots are given, take the first as the primary plotId reference
   const primaryPlotId =
