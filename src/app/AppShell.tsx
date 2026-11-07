@@ -152,7 +152,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <aside className="w-[270px] bg-slate-900 text-slate-300 flex flex-col flex-shrink-0">
+      <aside className="w-[280px] bg-slate-900 text-slate-300 flex flex-col flex-shrink-0">
         <div className="h-16 px-6 flex items-center gap-3 border-b border-slate-800 bg-slate-950">
           <div className="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-lg">L</div>
           <div><h1 className="text-sm font-bold text-white tracking-wide">LANDINVEST</h1><p className="text-[11px] text-slate-400">Partnership ERP Suite</p></div>
@@ -170,7 +170,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <button
                     type="button"
                     onClick={() => setOpenMenus((prev) => ({ ...prev, [item.key]: !isOpen }))}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-medium transition ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
                       isChildActive ? "text-white bg-slate-800" : "text-slate-400 hover:text-white hover:bg-slate-800"
                     }`}
                   >
@@ -210,7 +210,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href!}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition ${
                   active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"
                 }`}
               >
@@ -228,7 +228,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <Link
                     key={href}
                     href={href}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition ${
                       active ? "text-white bg-brand-700/80" : "text-slate-400 hover:text-white hover:bg-slate-800"
                     }`}
                   >
