@@ -230,6 +230,11 @@ export default function BookingsClient({ data }: { data: BookingsPageData }) {
       return;
     }
 
+    if (advNum > 0 && paymentMethod === "BANK" && !bankAccountId) {
+      setFormError("Please select a target bank account for bank advance payment");
+      return;
+    }
+
     setCreateBusy(true);
     setFormError(null);
 

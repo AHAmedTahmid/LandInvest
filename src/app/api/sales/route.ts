@@ -109,6 +109,24 @@ export async function POST(req: NextRequest) {
     }
 
     if (Number(b.advance) > 0) {
+      const isBankMethod =
+        b.payment_method === "BANK" ||
+        b.payment_method === "BANK_TRANSFER" ||
+        b.payment_method === "CHEQUE" ||
+        b.payment_method === "MFS" ||
+        !!b.bank_account;
+
+      if (isBankMethod && !b.bank_account) {
+        throw new Error("A valid bank account must be selected for bank/cheque/MFS payments.");
+      }
+
+      if (b.bank_account) {
+        const bankRecord = await tx.bankAccount.findUnique({ where: { id: b.bank_account } });
+        if (!bankRecord) {
+          throw new Error("Selected bank account was not found.");
+        }
+      }
+
       const payId = randomUUID();
       const cp = await tx.customerPayment.create({
         data: {
@@ -116,10 +134,12 @@ export async function POST(req: NextRequest) {
           saleId,
           paymentDate: new Date(),
           amountPaid: b.advance,
-          paymentMethod: b.payment_method || "CASH",
+          paymentMethod: b.payment_method || (b.bank_account ? "BANK" : "CASH"),
           bankAccountId: b.bank_account || null,
           receiptNo: `R-${Date.now()}`,
-          remarks: b.is_whole_project ? "Whole Project Advance" : "Advance / Booking Token",
+          remarks: b.transaction_ref
+            ? `${b.is_whole_project ? "Whole Project Advance" : "Advance / Booking Token"} (Ref: ${b.transaction_ref})`
+            : (b.is_whole_project ? "Whole Project Advance" : "Advance / Booking Token"),
         },
       });
       await writeAudit(tx, "customer_payments", payId, "CREATE", userId, null, cp);
@@ -128,17 +148,30 @@ export async function POST(req: NextRequest) {
         data: {
           id: randomUUID(),
           txnDate: new Date(),
-          accountType: b.bank_account ? "BANK" : "CASH",
+          accountType: isBankMethod ? "BANK" : "CASH",
           bankAccountId: b.bank_account || null,
           flowType: "IN",
           amount: b.advance,
-          purpose: `Plot Booking Advance: ${b.buyer_name || "Buyer"}`,
+          purpose: `Plot Booking Advance: ${b.buyer_name || "Buyer"}${b.transaction_ref ? ` [Ref: ${b.transaction_ref}]` : ""}`,
           referenceType: "SALE_PAYMENT",
           referenceId: saleId,
           createdBy: userId,
         },
       });
       await writeAudit(tx, "treasury_ledger", tl.id, "CREATE", userId, null, tl);
+
+      if (b.bank_account) {
+        const prevBank = await tx.bankAccount.findUnique({ where: { id: b.bank_account } });
+        const updatedBank = await tx.bankAccount.update({
+          where: { id: b.bank_account },
+          data: {
+            currentBalance: {
+              increment: b.advance,
+            },
+          },
+        });
+        await writeAudit(tx, "bank_accounts", b.bank_account, "UPDATE", userId, prevBank, updatedBank);
+      }
     }
 
     return sale;

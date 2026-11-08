@@ -240,6 +240,11 @@ export default function DuesClient({ data }: { data: DuesPageData }) {
       return;
     }
 
+    if (paymentMethod !== "CASH" && !bankAccountId) {
+      setPaymentError("Please select a deposit bank account.");
+      return;
+    }
+
     setIsSubmittingPayment(true);
     setPaymentError(null);
 

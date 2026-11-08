@@ -60,6 +60,15 @@ export async function collectPayment(tx: any, args: CollectArgs) {
   });
   await writeAudit(tx, "treasury_ledger", tl.id, "CREATE", args.userId, null, tl);
 
+  if (args.bankAccountId) {
+    const prevBank = await tx.bankAccount.findUnique({ where: { id: args.bankAccountId } });
+    const updBank = await tx.bankAccount.update({
+      where: { id: args.bankAccountId },
+      data: { currentBalance: { increment: amt } },
+    });
+    await writeAudit(tx, "bank_accounts", args.bankAccountId, "UPDATE", args.userId, prevBank, updBank);
+  }
+
   // FIFO settlement of the installment schedule
   let remaining = amt;
   const schedule = await tx.installmentSchedule.findMany({ where: { saleId: args.saleId, status: "UPCOMING" }, orderBy: { dueDate: "asc" } });

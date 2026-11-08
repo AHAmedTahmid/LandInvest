@@ -82,6 +82,8 @@ export default async function SalesPage() {
         bankName: true,
         accountNumber: true,
         branchName: true,
+        accountType: true,
+        currentBalance: true,
       },
     }),
   ]);
@@ -165,10 +167,19 @@ export default async function SalesPage() {
   const partialCount = sales.filter((s: any) => s.status === "PARTIAL").length;
   const bookedCount = sales.filter((s: any) => s.status === "BOOKED").length;
 
+  const banks = rawBanks.map((b: any) => ({
+    id: b.id,
+    bankName: b.bankName,
+    accountNumber: b.accountNumber,
+    branchName: b.branchName || null,
+    accountType: b.accountType || "BANK",
+    currentBalance: toNum(b.currentBalance),
+  }));
+
   const data: SalesDirectoryData = {
     sales,
     projects,
-    banks: rawBanks,
+    banks,
     canCreate,
     canCollect,
     metrics: {

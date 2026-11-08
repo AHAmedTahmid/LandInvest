@@ -27,6 +27,8 @@ import {
   Wallet,
   Receipt,
   PieChart,
+  Landmark,
+  Building2,
 } from "lucide-react";
 
 export interface SaleDirectoryItem {
@@ -88,6 +90,8 @@ export interface BankOption {
   bankName: string;
   accountNumber: string;
   branchName?: string | null;
+  accountType?: string | null;
+  currentBalance?: number;
 }
 
 export interface SalesDirectoryData {
@@ -125,10 +129,18 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
   const [formTotalPrice, setFormTotalPrice] = useState("");
   const [formAdvance, setFormAdvance] = useState("");
   const [formInstallmentsCount, setFormInstallmentsCount] = useState("6");
-  const [formPaymentMethod, setFormPaymentMethod] = useState("CASH");
+  const [formPaymentMethod, setFormPaymentMethod] = useState<"CASH" | "BANK" | "MFS">("CASH");
   const [formBankAccountId, setFormBankAccountId] = useState(data.banks[0]?.id || "");
+  const [formTxnRef, setFormTxnRef] = useState("");
   const [isSubmittingSale, setIsSubmittingSale] = useState(false);
   const [saleError, setSaleError] = useState<string | null>(null);
+
+  // Sync bank account default when data.banks becomes available
+  useEffect(() => {
+    if (!formBankAccountId && data.banks && data.banks.length > 0) {
+      setFormBankAccountId(data.banks[0].id);
+    }
+  }, [data.banks, formBankAccountId]);
 
   // Quick Collect Payment Modal State
   const [collectModalSale, setCollectModalSale] = useState<SaleDirectoryItem | null>(null);
@@ -239,6 +251,11 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
       return;
     }
 
+    if (advance > 0 && formPaymentMethod !== "CASH" && !formBankAccountId) {
+      setSaleError("Please select a target bank account for the advance payment.");
+      return;
+    }
+
     setIsSubmittingSale(true);
     setSaleError(null);
 
@@ -251,8 +268,9 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
         total_agreed_price: agreed,
         advance: parseFloat(formAdvance) || 0,
         installments_count: parseInt(formInstallmentsCount, 10) || 0,
-        payment_method: formPaymentMethod === "CASH" ? "CASH" : "BANK",
+        payment_method: formPaymentMethod,
         bank_account: formPaymentMethod !== "CASH" ? formBankAccountId : null,
+        transaction_ref: formTxnRef.trim() || null,
       };
 
       if (saleScope === "WHOLE_PROJECT") {
@@ -1212,38 +1230,176 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
                 </div>
               </div>
 
-              {/* Payment Method & Bank */}
+              {/* Advance Payment Method & Bank Settlement */}
               {parseFloat(formAdvance) > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Advance Payment Method</label>
-                    <select
-                      value={formPaymentMethod}
-                      onChange={(e) => setFormPaymentMethod(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    >
-                      <option value="CASH">Cash in Hand</option>
-                      <option value="BANK">Bank Account / Transfer</option>
-                    </select>
+                <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <Landmark className="w-3.5 h-3.5 text-brand-600" />
+                      Advance Payment Channel &amp; Destination
+                    </label>
+                    <span className="text-[11px] font-semibold text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-md border border-brand-200">
+                      Amount: ৳{formatBDT(parseFloat(formAdvance))}
+                    </span>
                   </div>
 
-                  {formPaymentMethod === "BANK" && (
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Deposit Bank <span className="text-rose-500">*</span>
-                      </label>
-                      <select
-                        value={formBankAccountId}
-                        onChange={(e) => setFormBankAccountId(e.target.value)}
-                        required
-                        className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                      >
-                        {data.banks.map((b) => (
-                          <option key={b.id} value={b.id}>
-                            {b.bankName} - {b.accountNumber}
-                          </option>
-                        ))}
-                      </select>
+                  {/* Payment Method Selector Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormPaymentMethod("CASH")}
+                      className={`p-2.5 rounded-lg border text-left flex items-center gap-2.5 transition ${
+                        formPaymentMethod === "CASH"
+                          ? "border-emerald-500 bg-emerald-50/60 text-emerald-950 font-bold ring-1 ring-emerald-500 shadow-xs"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
+                        formPaymentMethod === "CASH" ? "bg-emerald-200 text-emerald-800" : "bg-slate-100 text-slate-500"
+                      }`}>
+                        <Wallet className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold truncate">Cash in Hand</div>
+                        <div className="text-[10px] text-slate-500 truncate">Petty Cash Drawer</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormPaymentMethod("BANK");
+                        if (!formBankAccountId && data.banks.length > 0) {
+                          setFormBankAccountId(data.banks[0].id);
+                        }
+                      }}
+                      className={`p-2.5 rounded-lg border text-left flex items-center gap-2.5 transition ${
+                        formPaymentMethod === "BANK"
+                          ? "border-brand-600 bg-brand-50/60 text-brand-950 font-bold ring-1 ring-brand-600 shadow-xs"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
+                        formPaymentMethod === "BANK" ? "bg-brand-200 text-brand-800" : "bg-slate-100 text-slate-500"
+                      }`}>
+                        <Landmark className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold truncate">Bank Account</div>
+                        <div className="text-[10px] text-slate-500 truncate">Cheque / Transfer</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormPaymentMethod("MFS");
+                        if (!formBankAccountId && data.banks.length > 0) {
+                          const mfs = data.banks.find((b) => b.accountType === "MBANKING");
+                          setFormBankAccountId(mfs ? mfs.id : data.banks[0].id);
+                        }
+                      }}
+                      className={`p-2.5 rounded-lg border text-left flex items-center gap-2.5 transition ${
+                        formPaymentMethod === "MFS"
+                          ? "border-purple-600 bg-purple-50/60 text-purple-950 font-bold ring-1 ring-purple-600 shadow-xs"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${
+                        formPaymentMethod === "MFS" ? "bg-purple-200 text-purple-800" : "bg-slate-100 text-slate-500"
+                      }`}>
+                        <CreditCard className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold truncate">MFS Wallet</div>
+                        <div className="text-[10px] text-slate-500 truncate">bKash / Nagad / Upay</div>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Cash Notice */}
+                  {formPaymentMethod === "CASH" && (
+                    <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>
+                        Advance deposit of <strong>৳{formatBDT(parseFloat(formAdvance))}</strong> will be deposited into Company <strong>Physical Cash Drawer</strong> and logged in Cash Ledger.
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Bank / MFS Destination & Cheque Reference */}
+                  {(formPaymentMethod === "BANK" || formPaymentMethod === "MFS") && (
+                    <div className="space-y-3 pt-2 border-t border-slate-200">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            {formPaymentMethod === "MFS" ? "Receiving MFS Account" : "Deposit Bank Account"} <span className="text-rose-500">*</span>
+                          </label>
+                          {data.banks.length > 0 ? (
+                            <select
+                              value={formBankAccountId}
+                              onChange={(e) => setFormBankAccountId(e.target.value)}
+                              required
+                              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                            >
+                              <option value="">-- Select Bank Account --</option>
+                              {data.banks.map((b) => (
+                                <option key={b.id} value={b.id}>
+                                  {b.bankName} — A/C {b.accountNumber} {b.branchName ? `(${b.branchName})` : ""}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-800 flex items-center gap-1.5">
+                              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                              <span>No active bank accounts found. Please add accounts in Cash &amp; Bank Ledger.</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            {formPaymentMethod === "MFS" ? "TrxID / Reference" : "Cheque / Slip Ref (Optional)"}
+                          </label>
+                          <input
+                            type="text"
+                            value={formTxnRef}
+                            onChange={(e) => setFormTxnRef(e.target.value)}
+                            placeholder={formPaymentMethod === "MFS" ? "e.g. 9H7B6K2LP" : "e.g. CHQ-889104 or Slip #"}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Selected Bank Account Details Card */}
+                      {formBankAccountId && (
+                        (() => {
+                          const selectedBank = data.banks.find((b) => b.id === formBankAccountId);
+                          if (!selectedBank) return null;
+                          return (
+                            <div className="p-2.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between text-xs shadow-2xs">
+                              <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-md bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-700">
+                                  <Landmark className="w-3.5 h-3.5" />
+                                </div>
+                                <div>
+                                  <span className="font-bold text-slate-900">{selectedBank.bankName}</span>
+                                  <span className="text-slate-500 text-[11px] ml-2">A/C: {selectedBank.accountNumber}</span>
+                                  {selectedBank.branchName && (
+                                    <span className="text-slate-400 text-[11px] ml-1.5">({selectedBank.branchName})</span>
+                                  )}
+                                </div>
+                              </div>
+                              {selectedBank.currentBalance !== undefined && (
+                                <div className="text-right">
+                                  <span className="text-[10px] text-slate-400 block font-medium">Current Balance</span>
+                                  <span className="font-bold text-slate-900 text-xs">৳{formatBDT(selectedBank.currentBalance)}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()
+                      )}
                     </div>
                   )}
                 </div>
@@ -1419,16 +1575,19 @@ export default function SalesDirectoryClient({ data }: { data: SalesDirectoryDat
 
                 {collectMethod !== "CASH" && (
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Deposit Bank</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {collectMethod === "MFS" ? "Receiving MFS Account" : "Deposit Bank Account"} <span className="text-rose-500">*</span>
+                    </label>
                     <select
                       value={collectBankId}
                       onChange={(e) => setCollectBankId(e.target.value)}
                       required
                       className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
+                      <option value="">-- Select Bank Account --</option>
                       {data.banks.map((b) => (
                         <option key={b.id} value={b.id}>
-                          {b.bankName} - {b.accountNumber}
+                          {b.bankName} — A/C {b.accountNumber} {b.branchName ? `(${b.branchName})` : ""}
                         </option>
                       ))}
                     </select>
