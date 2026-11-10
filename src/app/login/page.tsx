@@ -126,10 +126,6 @@ export default function LoginPage() {
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Sign in <ArrowRight className="w-4 h-4" /></>}
               </button>
             </form>
-
-            <p className="text-center text-sm text-slate-500">
-              New organization? <Link href="/signup" className="font-semibold text-brand-700 hover:underline">Create account</Link>
-            </p>
           </div>
         </div>
       </div>
