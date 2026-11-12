@@ -267,6 +267,8 @@ describe("Fiscal Year (FY) Full Process E2E", () => {
     assert.equal(reportPage.status, 200);
     const reportHtml = await reportPage.text();
     assert.ok(reportHtml.includes(markerCat), "Report UI should include the FY 2025-2026 expense");
+    assert.ok(reportHtml.includes('value="2025-07-01"'), "ReportFilters From input should show active FY startDate");
+    assert.ok(reportHtml.includes('value="2026-06-30"'), "ReportFilters To input should show active FY endDate");
 
     // Report Export API should ALSO use active FY (2025-07-01..2026-06-30) and include the 2025-08-15 expense
     const exportPrev = await fetch(

@@ -76,7 +76,7 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         </div>
       </div>
 
-      <ReportFilters def={def} current={sp} />
+      <ReportFilters def={def} current={{ ...sp, from: filters.from, to: filters.to }} />
 
       <div className="bg-white rounded-xl shadow border p-4">
         <p className="text-sm text-slate-500 mb-3">Filters: {fSummary}</p>

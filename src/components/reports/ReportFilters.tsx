@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReportDef } from "@/lib/reports/registry";
 
 export default function ReportFilters({ def, current }: { def: ReportDef; current: Record<string, string> }) {
@@ -13,11 +13,18 @@ export default function ReportFilters({ def, current }: { def: ReportDef; curren
   const [bankAccountId, setBankAccountId] = useState(current.bankAccountId || "");
   const [status, setStatus] = useState(current.status || "");
 
+  useEffect(() => {
+    setFrom(current.from || "");
+    setTo(current.to || "");
+  }, [current.from, current.to]);
+
   function applyFilters(preset?: string) {
     const params = new URLSearchParams();
     if (preset) params.set("preset", preset);
-    if (from) params.set("from", from);
-    if (to) params.set("to", to);
+    if (!preset || preset === "custom") {
+      if (from) params.set("from", from);
+      if (to) params.set("to", to);
+    }
     if (projectId) params.set("projectId", projectId);
     if (partnerId) params.set("partnerId", partnerId);
     if (bankAccountId) params.set("bankAccountId", bankAccountId);
