@@ -12,6 +12,8 @@
     "setup": "node scripts/setup.mjs",
     "clean:data": "node scripts/clean_test_data.mjs",
     "seed:roles": "tsx scripts/seed_roles.mjs",
+    "seed:fy": "node scripts/seed_fiscal_years.mjs",
+    "test:fy": "node --test scripts/test_fiscal_years.mjs",
     "worker": "tsx src/worker.ts",
     "acceptance": "node scripts/acceptance.mjs",
     "rbac:smoke": "node scripts/rbac_smoke.mjs",

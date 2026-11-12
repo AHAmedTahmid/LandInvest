@@ -5,6 +5,7 @@ import { getTenantClientFromSession } from "@/lib/tenant";
 import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
+import { getFiscalYears } from "@/lib/fiscalYear";
 import { buildReportHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
@@ -20,11 +21,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
   if (!(await can(session, "reports.export"))) return new Response("Forbidden: reports.export", { status: 403 });
 
   const sp = req.nextUrl.searchParams;
+  const prisma: any = await getTenantClientFromSession();
   const preset = (sp.get("preset") as any) || "this_month";
   const { from, to } = getPresetRange(preset, sp.get("from") ?? undefined, sp.get("to") ?? undefined);
+  let fyFrom = sp.get("from") || from.toISOString().slice(0, 10);
+  let fyTo = sp.get("to") || to.toISOString().slice(0, 10);
+  if (preset === "this_fy" && !sp.get("from") && !sp.get("to")) {
+    try {
+      const { currentFiscalYear } = await getFiscalYears(prisma);
+      if (currentFiscalYear) {
+        fyFrom = currentFiscalYear.startDate;
+        fyTo = currentFiscalYear.endDate;
+      }
+    } catch {
+      // Fallback to default preset dates if FY setting read fails
+    }
+  }
   const filters = {
-    from: sp.get("from") || from.toISOString().slice(0, 10),
-    to: sp.get("to") || to.toISOString().slice(0, 10),
+    from: fyFrom,
+    to: fyTo,
     projectId: sp.get("projectId") || undefined,
     partnerId: sp.get("partnerId") || undefined,
     bankAccountId: sp.get("bankAccountId") || undefined,
@@ -35,7 +50,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
     action: sp.get("action") || undefined,
   };
 
-  const prisma: any = await getTenantClientFromSession();
   const queryFn = REPORT_QUERIES[key];
   if (!queryFn) return NextResponse.json({ error: "Unknown report" }, { status: 404 });
   const data = await queryFn(prisma, filters);
