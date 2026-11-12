@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       userId: (session.user as any).id,
       role: canApprove ? "super_admin" : "accountant",
     });
-    return NextResponse.json(res);
+    return NextResponse.json({ ...res, id: (res as any).id ?? (res as any).requestId });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 400 });
   }

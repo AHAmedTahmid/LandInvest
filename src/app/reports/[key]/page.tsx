@@ -69,8 +69,8 @@ export default async function ReportDetailPage({ params, searchParams }: { param
           <Link href="/reports" className="border px-3 py-2 rounded text-sm">← Back</Link>
           {canExport && (
             <>
-              <a href={`/api/reports/${key}/pdf?${new URLSearchParams(sp as any)}`} className="bg-red-600 text-white px-3 py-2 rounded text-sm">PDF</a>
-              <a href={`/api/reports/${key}/excel?${new URLSearchParams(sp as any)}`} className="bg-green-600 text-white px-3 py-2 rounded text-sm">Excel</a>
+              <a href={`/api/reports/${key}?${new URLSearchParams({ ...sp, format: "pdf" })}`} className="bg-red-600 text-white px-3 py-2 rounded text-sm">PDF</a>
+              <a href={`/api/reports/${key}?${new URLSearchParams({ ...sp, format: "excel" })}`} className="bg-green-600 text-white px-3 py-2 rounded text-sm">Excel</a>
             </>
           )}
         </div>
