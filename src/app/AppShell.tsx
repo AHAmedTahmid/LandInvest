@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Users, Wallet, Map, Receipt, FileCheck, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound, LogOut, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, Map, Receipt, FileCheck, BadgeDollarSign, PieChart, ShieldCheck, Bell, Languages, UserCog, KeyRound, CalendarRange, LogOut, ChevronDown } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useLang } from "@/lib/i18n";
 
@@ -86,6 +86,7 @@ const NAV: NavItem[] = [
 const ADMIN_NAV = [
   { href: "/settings/users", key: "users", icon: UserCog, perm: "users.manage" },
   { href: "/settings/roles", key: "roles", icon: KeyRound, perm: "roles.manage" },
+  { href: "/settings/fiscal-years", key: "fiscal_years", icon: CalendarRange, perm: ["dashboard.settings.manage", "roles.manage", "users.manage"] },
 ] as const;
 
 const TITLES: Record<string, string> = {
@@ -113,6 +114,7 @@ const TITLES: Record<string, string> = {
   "/audit": "audit",
   "/settings/users": "users",
   "/settings/roles": "roles",
+  "/settings/fiscal-years": "fiscal_years",
 };
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -122,6 +124,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isAuth = pathname === "/login" || pathname === "/signup" || pathname === "/change-password" || pathname === "/forgot-password" || pathname?.startsWith("/invite") || pathname?.startsWith("/reset-password");
   const [perms, setPerms] = useState<string[] | null>(null);
   const [me, setMe] = useState<{ fullName: string | null; email: string | null } | null>(null);
+  const [currentFyLabel, setCurrentFyLabel] = useState<string | null>(null);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ partners: true, treasury: true, projects: true, expenses: true, sales: true });
 
   // load my permissions once; hide menu items I may not open, force password change when required
@@ -136,6 +139,27 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }).catch(() => {});
     return () => { active = false; };
   }, [isAuth, pathname, router]);
+
+  // load active fiscal year for the header badge and refresh when updated
+  useEffect(() => {
+    if (isAuth) return;
+    let active = true;
+    const loadFy = () => {
+      fetch("/api/settings/fiscal-years")
+        .then(r => (r.ok ? r.json() : null))
+        .then(d => {
+          if (!active || !d) return;
+          if (d.currentFiscalYear?.label) setCurrentFyLabel(d.currentFiscalYear.label);
+        })
+        .catch(() => {});
+    };
+    loadFy();
+    window.addEventListener("fy-updated", loadFy);
+    return () => {
+      active = false;
+      window.removeEventListener("fy-updated", loadFy);
+    };
+  }, [isAuth, pathname]);
 
   if (isAuth) return <>{children}</>;
 
@@ -250,7 +274,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3"><h2 className="text-lg font-bold text-slate-800">{title}</h2><span className="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">{t("fy")}</span></div>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold text-slate-800">{title}</h2>
+            {perms !== null && has(["dashboard.settings.manage", "roles.manage", "users.manage"]) ? (
+              <Link href="/settings/fiscal-years" title={t("fiscal_years")} className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs px-2.5 py-0.5 rounded-full font-medium border border-emerald-200 transition">
+                {currentFyLabel ?? t("fy")}
+              </Link>
+            ) : (
+              <span className="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">
+                {currentFyLabel ?? t("fy")}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <button onClick={toggle} className="flex items-center gap-1.5 border px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-slate-50"><Languages className="w-3.5 h-3.5" />{lang === "en" ? "বাংলা" : "English"}</button>
             <Link href="/sales" className="flex items-center gap-2 bg-brand-700 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg">{t("newEntry")}</Link><span className="p-2 text-slate-400"><Bell className="w-4 h-4" /></span></div>

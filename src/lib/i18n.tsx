@@ -35,6 +35,7 @@ const DICT: Record<string, { en: string; bn: string }> = {
   audit: { en: "Audit Trail", bn: "অডিট ট্রেইল" },
   users: { en: "Users", bn: "ব্যবহারকারী" },
   roles: { en: "Roles", bn: "ভূমিকা" },
+  fiscal_years: { en: "Fiscal Years (FY)", bn: "অর্থবছর (FY)" },
   administration: { en: "Administration", bn: "প্রশাসন" },
   logout: { en: "Log out", bn: "লগ আউট" },
   executive: { en: "Executive Overview", bn: "এক্সিকিউটিভ ওভারভিউ" },

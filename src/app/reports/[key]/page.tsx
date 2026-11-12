@@ -4,6 +4,7 @@ import { getTenantClientFromSession } from "@/lib/tenant";
 import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
+import { getFiscalYears } from "@/lib/fiscalYear";
 import { REPORT_QUERIES } from "@/lib/reports";
 import ReportTable from "@/components/reports/ReportTable";
 import ReportFilters from "@/components/reports/ReportFilters";
@@ -22,11 +23,25 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   }
 
   const canExport = await can(session, "reports.export");
+  const prisma: any = await getTenantClientFromSession();
   const preset = (sp.preset as any) || "this_month";
   const { from, to } = getPresetRange(preset, sp.from, sp.to);
+  let fyFrom = sp.from || from.toISOString().slice(0, 10);
+  let fyTo = sp.to || to.toISOString().slice(0, 10);
+  if (preset === "this_fy" && !sp.from && !sp.to) {
+    try {
+      const { currentFiscalYear } = await getFiscalYears(prisma);
+      if (currentFiscalYear) {
+        fyFrom = currentFiscalYear.startDate;
+        fyTo = currentFiscalYear.endDate;
+      }
+    } catch {
+      // Fallback to default preset dates if FY setting read fails
+    }
+  }
   const filters = {
-    from: sp.from || from.toISOString().slice(0, 10),
-    to: sp.to || to.toISOString().slice(0, 10),
+    from: fyFrom,
+    to: fyTo,
     projectId: sp.projectId || undefined,
     partnerId: sp.partnerId || undefined,
     bankAccountId: sp.bankAccountId || undefined,
@@ -36,8 +51,6 @@ export default async function ReportDetailPage({ params, searchParams }: { param
     tableName: sp.tableName || undefined,
     action: sp.action || undefined,
   };
-
-  const prisma: any = await getTenantClientFromSession();
   const queryFn = REPORT_QUERIES[key];
   if (!queryFn) notFound();
   const data = await queryFn(prisma, filters);
