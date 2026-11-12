@@ -1,0 +1,202 @@
+[
+  {
+    "hash": "31dad91",
+    "date": "2026-11-12",
+    "message": "fix(sales): set PAID_IN_FULL/PARTIAL sale status and SOLD plot status on upfront payment"
+  },
+  {
+    "hash": "82192d8",
+    "date": "2026-11-12",
+    "message": "fix(reports): sync ReportFilters dates with active FY and avoid stale dates on preset switch"
+  },
+  {
+    "hash": "9e38822",
+    "date": "2026-11-12",
+    "message": "fix(e2e): fix report export links, expenses validation, contra id shape, and add full-project E2E suite"
+  },
+  {
+    "hash": "2d0b866",
+    "date": "2026-11-12",
+    "message": "test(fy): add relative FY seed data, E2E TDD test suite, and report export FY fix"
+  },
+  {
+    "hash": "a8d3d2d",
+    "date": "2026-11-12",
+    "message": "feat(settings): add Fiscal Year management and active FY configuration"
+  },
+  {
+    "hash": "366dd15",
+    "date": "2026-11-12",
+    "message": "feat(reports): add category filters, search, and grid/list view switcher"
+  },
+  {
+    "hash": "9f92209",
+    "date": "2026-11-10",
+    "message": "chore(auth): remove organization signup link from login and use webpack for dev"
+  },
+  {
+    "hash": "fd33c2b",
+    "date": "2026-11-08",
+    "message": "fix(sales): fix bank selection in plot sales and sync deposits to bank balances"
+  },
+  {
+    "hash": "c3c4c91",
+    "date": "2026-11-07",
+    "message": "feat(sales): prevent overpayment beyond total agreed price with live warning messages and backend validation"
+  },
+  {
+    "hash": "be3ae50",
+    "date": "2026-11-07",
+    "message": "feat(sales): add multi-plot selection and entire project sale options to Record New Plot Sale modal"
+  },
+  {
+    "hash": "0edf5bb",
+    "date": "2026-11-07",
+    "message": "feat(sales): modernize Plot Sales master directory with financial KPI cards, status filtering, and quick actions"
+  },
+  {
+    "hash": "fe8a264",
+    "date": "2026-11-07",
+    "message": "feat(sales): add Dues & Installments module with receivables ledger, overdue tracking, and payment collection"
+  },
+  {
+    "hash": "1b160a5",
+    "date": "2026-11-07",
+    "message": "style(navigation): decrease sidebar font size to 12px and widen to 280px to guarantee single line labels"
+  },
+  {
+    "hash": "ffbe196",
+    "date": "2026-11-07",
+    "message": "feat(sales): add dedicated Bookings module with multi-plot selection and whole-project reservation"
+  },
+  {
+    "hash": "e93ad28",
+    "date": "2026-11-07",
+    "message": "feat(sales): add Plot Sales & Bookings navigation with Sales, Bookings, and Dues sub-routes"
+  },
+  {
+    "hash": "0c70b5b",
+    "date": "2026-11-05",
+    "message": "feat(expenses): add Project-wise Cost Breakdown with per-shotok metrics and category aggregation"
+  },
+  {
+    "hash": "5f8eb06",
+    "date": "2026-11-05",
+    "message": "feat(expenses): add dedicated Approval Queue for pending project expenses with dual-decision workflow"
+  },
+  {
+    "hash": "31b7113",
+    "date": "2026-11-05",
+    "message": "feat(expenses): modernize Expenses directory with advanced filtering, channel badges, and receipt modal"
+  },
+  {
+    "hash": "338f488",
+    "date": "2026-11-05",
+    "message": "feat(expenses): add Project Expenses dashboard with KPI metrics, channel distribution, and category insights"
+  },
+  {
+    "hash": "02b806e",
+    "date": "2026-11-05",
+    "message": "feat(expenses): add Project Expenses navigation with Dashboard, Expenses, Approvals, and Cost Breakdown"
+  },
+  {
+    "hash": "db607d1",
+    "date": "2026-11-05",
+    "message": "style(navigation): decrease sidebar font size by 1 and keep nav labels in single line"
+  },
+  {
+    "hash": "1a21894",
+    "date": "2026-11-05",
+    "message": "style(ui-ux): polish keyboard dismissal, backdrop click-away, instant search reset, and empty-state guidance across treasury and projects pages"
+  },
+  {
+    "hash": "4ddecc5",
+    "date": "2026-11-05",
+    "message": "feat(projects): modernize project detail page with inventory control, financial dossier, and plot management modal"
+  },
+  {
+    "hash": "bc2a8d3",
+    "date": "2026-11-05",
+    "message": "feat(projects): upgrade All Projects directory with KPI metrics, plot allocation stats, and navigation"
+  },
+  {
+    "hash": "ce9dd03",
+    "date": "2026-11-05",
+    "message": "feat(projects): add dedicated Plots management screen with custom plot pricing and sizing"
+  },
+  {
+    "hash": "f77d47e",
+    "date": "2026-11-05",
+    "message": "feat(projects): add dedicated New Acquirement screen with land entry and plot distribution setup"
+  },
+  {
+    "hash": "4920731",
+    "date": "2026-11-05",
+    "message": "feat(projects): add Land Projects & Acquisition navigation with New Acquirement, Plots, and All Projects sub-routes"
+  },
+  {
+    "hash": "8afd27f",
+    "date": "2026-11-05",
+    "message": "feat(treasury): add view action and transaction voucher modal to ledger transactions table"
+  },
+  {
+    "hash": "00e7396",
+    "date": "2026-11-05",
+    "message": "fix(treasury): clean up account type options by removing parenthetical examples"
+  },
+  {
+    "hash": "da220fa",
+    "date": "2026-11-04",
+    "message": "feat(treasury): add view option and interactive voucher modal action to recent cash movements"
+  },
+  {
+    "hash": "177cb45",
+    "date": "2026-11-04",
+    "message": "fix(treasury): display human-readable buyer and plot labels for sale payments in treasury ledger"
+  },
+  {
+    "hash": "62360af",
+    "date": "2026-11-04",
+    "message": "fix(treasury): simplify contra transfer with intuitive deposit/withdrawal flow and balance preview"
+  },
+  {
+    "hash": "dccdeae",
+    "date": "2026-11-04",
+    "message": "feat(treasury): add contra transfer approvals queue with dual-authorization workflow"
+  },
+  {
+    "hash": "eb7848d",
+    "date": "2026-11-04",
+    "message": "feat(treasury): add treasury transactions view with date filtering, channel breakdown, and export"
+  },
+  {
+    "hash": "ba7b727",
+    "date": "2026-11-04",
+    "message": "feat(treasury): add bank and mobile banking account management with locked opening balance"
+  },
+  {
+    "hash": "9b887e8",
+    "date": "2026-11-04",
+    "message": "feat(treasury): add Cash & Bank Ledger dashboard with liquidity analytics and balance charts"
+  },
+  {
+    "hash": "7ca9ff9",
+    "date": "2026-11-04",
+    "message": "feat(treasury): add bank account schema, immutable opening balance, and Cash & Bank Ledger navigation"
+  },
+  {
+    "hash": "3c417de",
+    "date": "2026-11-04",
+    "message": "feat(dashboard): redesign Quick Actions widget with full-width layout, themes, and descriptive subtexts"
+  },
+  {
+    "hash": "5c454ef",
+    "date": "2026-11-04",
+    "message": "fix(partners): remove non-mandatory label from bank details UI"
+  },
+  {
+    "hash": "2fd8954",
+    "date": "2026-11-03",
+    "message": "feat(partners): add optional bank details and active status toggle to partners"
+  }
+]

@@ -1,0 +1,763 @@
+{
+  "pages": [
+    {
+      "route": "/audit",
+      "file": "src/app/audit/page.tsx",
+      "permissions": [
+        "audit.view"
+      ]
+    },
+    {
+      "route": "/change-password",
+      "file": "src/app/change-password/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/dashboard",
+      "file": "src/app/dashboard/page.tsx",
+      "permissions": [
+        "dashboard.view",
+        "dashboard.customize",
+        "dashboard.layout.manage",
+        "dashboard.export"
+      ]
+    },
+    {
+      "route": "/expenses/approvals",
+      "file": "src/app/expenses/approvals/page.tsx",
+      "permissions": [
+        "expenses.view",
+        "expenses.approve"
+      ]
+    },
+    {
+      "route": "/expenses/breakdown",
+      "file": "src/app/expenses/breakdown/page.tsx",
+      "permissions": [
+        "expenses.view"
+      ]
+    },
+    {
+      "route": "/expenses/dashboard",
+      "file": "src/app/expenses/dashboard/page.tsx",
+      "permissions": [
+        "expenses.view"
+      ]
+    },
+    {
+      "route": "/expenses",
+      "file": "src/app/expenses/page.tsx",
+      "permissions": [
+        "expenses.view",
+        "expenses.approve",
+        "expenses.create"
+      ]
+    },
+    {
+      "route": "/forgot-password",
+      "file": "src/app/forgot-password/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/invite/[token]",
+      "file": "src/app/invite/[token]/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/login",
+      "file": "src/app/login/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/",
+      "file": "src/app/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/partners/capital",
+      "file": "src/app/partners/capital/page.tsx",
+      "permissions": [
+        "partners.capital.deposit",
+        "partners.manage",
+        "partners.view"
+      ]
+    },
+    {
+      "route": "/partners/dashboard",
+      "file": "src/app/partners/dashboard/page.tsx",
+      "permissions": [
+        "partners.view",
+        "partners.manage"
+      ]
+    },
+    {
+      "route": "/partners",
+      "file": "src/app/partners/page.tsx",
+      "permissions": [
+        "partners.manage",
+        "partners.view"
+      ]
+    },
+    {
+      "route": "/projects/new",
+      "file": "src/app/projects/new/page.tsx",
+      "permissions": [
+        "projects.view",
+        "projects.create"
+      ]
+    },
+    {
+      "route": "/projects",
+      "file": "src/app/projects/page.tsx",
+      "permissions": [
+        "projects.view",
+        "projects.create"
+      ]
+    },
+    {
+      "route": "/projects/plots",
+      "file": "src/app/projects/plots/page.tsx",
+      "permissions": [
+        "projects.view",
+        "plots.manage",
+        "projects.create",
+        "projects.edit"
+      ]
+    },
+    {
+      "route": "/projects/[id]",
+      "file": "src/app/projects/[id]/page.tsx",
+      "permissions": [
+        "projects.view",
+        "projects.edit",
+        "plots.manage"
+      ]
+    },
+    {
+      "route": "/reports",
+      "file": "src/app/reports/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/reports/project-pnl",
+      "file": "src/app/reports/project-pnl/page.tsx",
+      "permissions": [
+        "profit.view",
+        "reports.view",
+        "profit.distribute",
+        "reports.export"
+      ]
+    },
+    {
+      "route": "/reports/[key]",
+      "file": "src/app/reports/[key]/page.tsx",
+      "permissions": [
+        "reports.export"
+      ]
+    },
+    {
+      "route": "/reset-password/[token]",
+      "file": "src/app/reset-password/[token]/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/sales/bookings",
+      "file": "src/app/sales/bookings/page.tsx",
+      "permissions": [
+        "sales.view",
+        "sales.create",
+        "sales.collect"
+      ]
+    },
+    {
+      "route": "/sales/dues",
+      "file": "src/app/sales/dues/page.tsx",
+      "permissions": [
+        "sales.view",
+        "sales.collect"
+      ]
+    },
+    {
+      "route": "/sales",
+      "file": "src/app/sales/page.tsx",
+      "permissions": [
+        "sales.view",
+        "sales.create",
+        "sales.collect"
+      ]
+    },
+    {
+      "route": "/sales/[id]",
+      "file": "src/app/sales/[id]/page.tsx",
+      "permissions": [
+        "sales.view"
+      ]
+    },
+    {
+      "route": "/settings/billing",
+      "file": "src/app/settings/billing/page.tsx",
+      "permissions": [
+        "billing.manage"
+      ]
+    },
+    {
+      "route": "/settings/fiscal-years",
+      "file": "src/app/settings/fiscal-years/page.tsx",
+      "permissions": [
+        "dashboard.settings.manage",
+        "roles.manage",
+        "users.manage"
+      ]
+    },
+    {
+      "route": "/settings/roles",
+      "file": "src/app/settings/roles/page.tsx",
+      "permissions": [
+        "roles.manage"
+      ]
+    },
+    {
+      "route": "/settings/users",
+      "file": "src/app/settings/users/page.tsx",
+      "permissions": [
+        "users.manage"
+      ]
+    },
+    {
+      "route": "/signup",
+      "file": "src/app/signup/page.tsx",
+      "permissions": []
+    },
+    {
+      "route": "/treasury/accounts",
+      "file": "src/app/treasury/accounts/page.tsx",
+      "permissions": [
+        "treasury.bank.manage",
+        "treasury.view"
+      ]
+    },
+    {
+      "route": "/treasury/approvals",
+      "file": "src/app/treasury/approvals/page.tsx",
+      "permissions": [
+        "treasury.view",
+        "treasury.contra.approve"
+      ]
+    },
+    {
+      "route": "/treasury/dashboard",
+      "file": "src/app/treasury/dashboard/page.tsx",
+      "permissions": [
+        "treasury.view"
+      ]
+    },
+    {
+      "route": "/treasury",
+      "file": "src/app/treasury/page.tsx",
+      "permissions": [
+        "treasury.view",
+        "treasury.contra.approve",
+        "treasury.contra.create"
+      ]
+    },
+    {
+      "route": "/treasury/transactions",
+      "file": "src/app/treasury/transactions/page.tsx",
+      "permissions": [
+        "treasury.view"
+      ]
+    },
+    {
+      "route": "/vouchers",
+      "file": "src/app/vouchers/page.tsx",
+      "permissions": []
+    }
+  ],
+  "apis": [
+    {
+      "route": "/api/auth/change-password",
+      "file": "src/app/api/auth/change-password/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/auth/forgot-password",
+      "file": "src/app/api/auth/forgot-password/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/auth/reset-password",
+      "file": "src/app/api/auth/reset-password/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/auth/[...nextauth]",
+      "file": "src/app/api/auth/[...nextauth]/route.ts",
+      "methods": [],
+      "permissions": []
+    },
+    {
+      "route": "/api/banks",
+      "file": "src/app/api/banks/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/billing/invoices",
+      "file": "src/app/api/billing/invoices/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "billing.manage"
+      ]
+    },
+    {
+      "route": "/api/billing/pay",
+      "file": "src/app/api/billing/pay/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "billing.manage"
+      ]
+    },
+    {
+      "route": "/api/dashboard/insights",
+      "file": "src/app/api/dashboard/insights/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "dashboard.view"
+      ]
+    },
+    {
+      "route": "/api/dashboard/layout",
+      "file": "src/app/api/dashboard/layout/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "dashboard.view",
+        "dashboard.layout.manage",
+        "dashboard.customize"
+      ]
+    },
+    {
+      "route": "/api/dashboard/widgets/[key]",
+      "file": "src/app/api/dashboard/widgets/[key]/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/expenses",
+      "file": "src/app/api/expenses/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "expenses.view",
+        "expenses.create"
+      ]
+    },
+    {
+      "route": "/api/expenses/[id]/approve",
+      "file": "src/app/api/expenses/[id]/approve/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "expenses.approve"
+      ]
+    },
+    {
+      "route": "/api/expenses/[id]/voucher",
+      "file": "src/app/api/expenses/[id]/voucher/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "expenses.view"
+      ]
+    },
+    {
+      "route": "/api/invites/accept",
+      "file": "src/app/api/invites/accept/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/invites",
+      "file": "src/app/api/invites/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "users.manage",
+        "users.view"
+      ]
+    },
+    {
+      "route": "/api/me/permissions",
+      "file": "src/app/api/me/permissions/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/partners",
+      "file": "src/app/api/partners/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/projects",
+      "file": "src/app/api/projects/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/reports/pnl/distribute",
+      "file": "src/app/api/reports/pnl/distribute/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "profit.distribute"
+      ]
+    },
+    {
+      "route": "/api/reports/pnl/excel",
+      "file": "src/app/api/reports/pnl/excel/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "dashboard.view"
+      ]
+    },
+    {
+      "route": "/api/reports/pnl/pdf",
+      "file": "src/app/api/reports/pnl/pdf/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "dashboard.view"
+      ]
+    },
+    {
+      "route": "/api/reports/pnl",
+      "file": "src/app/api/reports/pnl/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "profit.view"
+      ]
+    },
+    {
+      "route": "/api/reports/[key]",
+      "file": "src/app/api/reports/[key]/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "reports.export"
+      ]
+    },
+    {
+      "route": "/api/roles",
+      "file": "src/app/api/roles/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "roles.manage"
+      ]
+    },
+    {
+      "route": "/api/roles/[id]/duplicate",
+      "file": "src/app/api/roles/[id]/duplicate/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "roles.manage"
+      ]
+    },
+    {
+      "route": "/api/roles/[id]",
+      "file": "src/app/api/roles/[id]/route.ts",
+      "methods": [
+        "PATCH",
+        "DELETE"
+      ],
+      "permissions": [
+        "roles.manage"
+      ]
+    },
+    {
+      "route": "/api/sales",
+      "file": "src/app/api/sales/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "sales.view",
+        "sales.create"
+      ]
+    },
+    {
+      "route": "/api/sales/[id]/pay",
+      "file": "src/app/api/sales/[id]/pay/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "sales.view"
+      ]
+    },
+    {
+      "route": "/api/sales/[id]/receipt",
+      "file": "src/app/api/sales/[id]/receipt/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "sales.view"
+      ]
+    },
+    {
+      "route": "/api/settings/fiscal-years",
+      "file": "src/app/api/settings/fiscal-years/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "dashboard.settings.manage",
+        "roles.manage",
+        "users.manage"
+      ]
+    },
+    {
+      "route": "/api/signup",
+      "file": "src/app/api/signup/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": []
+    },
+    {
+      "route": "/api/treasury/contra",
+      "file": "src/app/api/treasury/contra/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "treasury.contra.create",
+        "treasury.contra.approve",
+        "treasury.view"
+      ]
+    },
+    {
+      "route": "/api/treasury/contra/[id]/approve",
+      "file": "src/app/api/treasury/contra/[id]/approve/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "treasury.contra.approve"
+      ]
+    },
+    {
+      "route": "/api/users",
+      "file": "src/app/api/users/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "permissions": [
+        "users.view",
+        "users.manage"
+      ]
+    },
+    {
+      "route": "/api/users/[id]/reset",
+      "file": "src/app/api/users/[id]/reset/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "users.manage"
+      ]
+    },
+    {
+      "route": "/api/users/[id]",
+      "file": "src/app/api/users/[id]/route.ts",
+      "methods": [
+        "PATCH",
+        "DELETE"
+      ],
+      "permissions": [
+        "users.manage"
+      ]
+    },
+    {
+      "route": "/api/vouchers",
+      "file": "src/app/api/vouchers/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "permissions": [
+        "expenses.view"
+      ]
+    },
+    {
+      "route": "/api/vouchers/[id]/action",
+      "file": "src/app/api/vouchers/[id]/action/route.ts",
+      "methods": [
+        "POST"
+      ],
+      "permissions": [
+        "expenses.approve"
+      ]
+    },
+    {
+      "route": "/api/vouchers/[id]",
+      "file": "src/app/api/vouchers/[id]/route.ts",
+      "methods": [
+        "GET",
+        "PATCH"
+      ],
+      "permissions": [
+        "expenses.view",
+        "expenses.create",
+        "expenses.approve"
+      ]
+    }
+  ],
+  "serverActions": [
+    {
+      "file": "src/app/partners/capital/page.tsx",
+      "functions": [],
+      "permissions": [
+        "partners.capital.deposit",
+        "partners.manage",
+        "partners.view"
+      ]
+    },
+    {
+      "file": "src/app/partners/page.tsx",
+      "functions": [],
+      "permissions": [
+        "partners.manage",
+        "partners.view"
+      ]
+    },
+    {
+      "file": "src/app/projects/new/page.tsx",
+      "functions": [],
+      "permissions": [
+        "projects.view",
+        "projects.create"
+      ]
+    },
+    {
+      "file": "src/app/projects/plots/page.tsx",
+      "functions": [],
+      "permissions": [
+        "projects.view",
+        "plots.manage",
+        "projects.create",
+        "projects.edit"
+      ]
+    },
+    {
+      "file": "src/app/projects/[id]/page.tsx",
+      "functions": [],
+      "permissions": [
+        "projects.view",
+        "projects.edit",
+        "plots.manage"
+      ]
+    },
+    {
+      "file": "src/app/reports/project-pnl/page.tsx",
+      "functions": [],
+      "permissions": [
+        "profit.view",
+        "reports.view",
+        "profit.distribute",
+        "reports.export"
+      ]
+    },
+    {
+      "file": "src/app/sales/[id]/page.tsx",
+      "functions": [],
+      "permissions": [
+        "sales.view"
+      ]
+    },
+    {
+      "file": "src/app/settings/billing/page.tsx",
+      "functions": [],
+      "permissions": [
+        "billing.manage"
+      ]
+    },
+    {
+      "file": "src/app/treasury/accounts/page.tsx",
+      "functions": [],
+      "permissions": [
+        "treasury.bank.manage",
+        "treasury.view"
+      ]
+    },
+    {
+      "file": "src/app/treasury/approvals/page.tsx",
+      "functions": [],
+      "permissions": [
+        "treasury.view",
+        "treasury.contra.approve"
+      ]
+    },
+    {
+      "file": "src/app/treasury/page.tsx",
+      "functions": [],
+      "permissions": [
+        "treasury.view",
+        "treasury.contra.approve",
+        "treasury.contra.create"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,910 @@
+{
+  "database": "control_plane",
+  "tableCount": 7,
+  "viewCount": 0,
+  "fkCount": 6,
+  "uniqueIndexCount": 18,
+  "tables": [
+    {
+      "TABLE_NAME": "billing_invoices",
+      "TABLE_TYPE": "BASE TABLE",
+      "ENGINE": "InnoDB",
+      "TABLE_COLLATION": "utf8mb4_unicode_ci",
+      "TABLE_ROWS": 0
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "TABLE_TYPE": "BASE TABLE",
+      "ENGINE": "InnoDB",
+      "TABLE_COLLATION": "utf8mb4_unicode_ci",
+      "TABLE_ROWS": 11
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "TABLE_TYPE": "BASE TABLE",
+      "ENGINE": "InnoDB",
+      "TABLE_COLLATION": "utf8mb4_unicode_ci",
+      "TABLE_ROWS": 0
+    },
+    {
+      "TABLE_NAME": "plans",
+      "TABLE_TYPE": "BASE TABLE",
+      "ENGINE": "InnoDB",
+      "TABLE_COLLATION": "utf8mb4_unicode_ci",
+      "TABLE_ROWS": 2
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "TABLE_TYPE": "BASE TABLE",
+      "ENGINE": "InnoDB",
+      "TABLE_COLLATION": "utf8mb4_unicode_ci",
+      "TABLE_ROWS": 2
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "TABLE_TYPE": "BASE TABLE",
+      "ENGINE": "InnoDB",
+      "TABLE_COLLATION": "utf8mb4_unicode_ci",
+      "TABLE_ROWS": 3
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "TABLE_TYPE": "BASE TABLE",
+      "ENGINE": "InnoDB",
+      "TABLE_COLLATION": "utf8mb4_unicode_ci",
+      "TABLE_ROWS": 0
+    }
+  ],
+  "columns": [
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "id",
+      "ORDINAL_POSITION": 1,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "PRI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "tenant_id",
+      "ORDINAL_POSITION": 2,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "MUL",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "subscription_id",
+      "ORDINAL_POSITION": 3,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "MUL",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "amount",
+      "ORDINAL_POSITION": 4,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "decimal",
+      "COLUMN_TYPE": "decimal(10,2)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "currency",
+      "ORDINAL_POSITION": 5,
+      "COLUMN_DEFAULT": "BDT",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(10)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "status",
+      "ORDINAL_POSITION": 6,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(20)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "invoice_date",
+      "ORDINAL_POSITION": 7,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "date",
+      "COLUMN_TYPE": "date",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "provider_invoice_id",
+      "ORDINAL_POSITION": 8,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "id",
+      "ORDINAL_POSITION": 1,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "PRI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "tenant_id",
+      "ORDINAL_POSITION": 2,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "MUL",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "full_name",
+      "ORDINAL_POSITION": 3,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(150)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "email",
+      "ORDINAL_POSITION": 4,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)",
+      "COLUMN_KEY": "UNI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "password_hash",
+      "ORDINAL_POSITION": 5,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "is_owner",
+      "ORDINAL_POSITION": 6,
+      "COLUMN_DEFAULT": "0",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_TYPE": "tinyint(1)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "is_active",
+      "ORDINAL_POSITION": 7,
+      "COLUMN_DEFAULT": "1",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_TYPE": "tinyint(1)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "must_change_password",
+      "ORDINAL_POSITION": 8,
+      "COLUMN_DEFAULT": "0",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_TYPE": "tinyint(1)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "last_login_at",
+      "ORDINAL_POSITION": 9,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "created_at",
+      "ORDINAL_POSITION": 10,
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp",
+      "COLUMN_KEY": "",
+      "EXTRA": "DEFAULT_GENERATED",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "COLUMN_NAME": "id",
+      "ORDINAL_POSITION": 1,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "PRI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "COLUMN_NAME": "user_id",
+      "ORDINAL_POSITION": 2,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "MUL",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "COLUMN_NAME": "token",
+      "ORDINAL_POSITION": 3,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)",
+      "COLUMN_KEY": "UNI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "COLUMN_NAME": "expires_at",
+      "ORDINAL_POSITION": 4,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "COLUMN_NAME": "created_at",
+      "ORDINAL_POSITION": 5,
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp",
+      "COLUMN_KEY": "",
+      "EXTRA": "DEFAULT_GENERATED",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "plans",
+      "COLUMN_NAME": "id",
+      "ORDINAL_POSITION": 1,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "PRI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "plans",
+      "COLUMN_NAME": "name",
+      "ORDINAL_POSITION": 2,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(50)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "plans",
+      "COLUMN_NAME": "price_monthly",
+      "ORDINAL_POSITION": 3,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "decimal",
+      "COLUMN_TYPE": "decimal(10,2)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "plans",
+      "COLUMN_NAME": "price_yearly",
+      "ORDINAL_POSITION": 4,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "decimal",
+      "COLUMN_TYPE": "decimal(10,2)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "plans",
+      "COLUMN_NAME": "max_users",
+      "ORDINAL_POSITION": 5,
+      "COLUMN_DEFAULT": "5",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "plans",
+      "COLUMN_NAME": "max_projects",
+      "ORDINAL_POSITION": 6,
+      "COLUMN_DEFAULT": "10",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "plans",
+      "COLUMN_NAME": "features",
+      "ORDINAL_POSITION": 7,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "json",
+      "COLUMN_TYPE": "json",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "id",
+      "ORDINAL_POSITION": 1,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "PRI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "tenant_id",
+      "ORDINAL_POSITION": 2,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "MUL",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "plan_id",
+      "ORDINAL_POSITION": 3,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "MUL",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "billing_cycle",
+      "ORDINAL_POSITION": 4,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(20)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "current_period_start",
+      "ORDINAL_POSITION": 5,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "date",
+      "COLUMN_TYPE": "date",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "current_period_end",
+      "ORDINAL_POSITION": 6,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "date",
+      "COLUMN_TYPE": "date",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "payment_provider",
+      "ORDINAL_POSITION": 7,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(30)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "provider_subscription_id",
+      "ORDINAL_POSITION": 8,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "YES",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "status",
+      "ORDINAL_POSITION": 9,
+      "COLUMN_DEFAULT": "active",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(20)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "id",
+      "ORDINAL_POSITION": 1,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "PRI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "company_name",
+      "ORDINAL_POSITION": 2,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(200)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "db_host",
+      "ORDINAL_POSITION": 3,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "db_name",
+      "ORDINAL_POSITION": 4,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(100)",
+      "COLUMN_KEY": "UNI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "db_user",
+      "ORDINAL_POSITION": 5,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(100)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "db_password_encrypted",
+      "ORDINAL_POSITION": 6,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "status",
+      "ORDINAL_POSITION": 7,
+      "COLUMN_DEFAULT": "trial",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(20)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "COLUMN_NAME": "created_at",
+      "ORDINAL_POSITION": 8,
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp",
+      "COLUMN_KEY": "",
+      "EXTRA": "DEFAULT_GENERATED",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "id",
+      "ORDINAL_POSITION": 1,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "PRI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "tenant_id",
+      "ORDINAL_POSITION": 2,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "MUL",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "email",
+      "ORDINAL_POSITION": 3,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "role_id",
+      "ORDINAL_POSITION": 4,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "char",
+      "COLUMN_TYPE": "char(36)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "invite_token",
+      "ORDINAL_POSITION": 5,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)",
+      "COLUMN_KEY": "UNI",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "expires_at",
+      "ORDINAL_POSITION": 6,
+      "COLUMN_DEFAULT": null,
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "accepted",
+      "ORDINAL_POSITION": 7,
+      "COLUMN_DEFAULT": "0",
+      "IS_NULLABLE": "NO",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_TYPE": "tinyint(1)",
+      "COLUMN_KEY": "",
+      "EXTRA": "",
+      "COLUMN_COMMENT": ""
+    }
+  ],
+  "foreignKeys": [
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "subscription_id",
+      "CONSTRAINT_NAME": "billing_invoices_subscription_id_fkey",
+      "REFERENCED_TABLE_NAME": "subscriptions",
+      "REFERENCED_COLUMN_NAME": "id",
+      "UPDATE_RULE": "CASCADE",
+      "DELETE_RULE": "SET NULL"
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "COLUMN_NAME": "tenant_id",
+      "CONSTRAINT_NAME": "billing_invoices_tenant_id_fkey",
+      "REFERENCED_TABLE_NAME": "tenants",
+      "REFERENCED_COLUMN_NAME": "id",
+      "UPDATE_RULE": "CASCADE",
+      "DELETE_RULE": "RESTRICT"
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "COLUMN_NAME": "tenant_id",
+      "CONSTRAINT_NAME": "global_users_tenant_id_fkey",
+      "REFERENCED_TABLE_NAME": "tenants",
+      "REFERENCED_COLUMN_NAME": "id",
+      "UPDATE_RULE": "CASCADE",
+      "DELETE_RULE": "RESTRICT"
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "plan_id",
+      "CONSTRAINT_NAME": "subscriptions_plan_id_fkey",
+      "REFERENCED_TABLE_NAME": "plans",
+      "REFERENCED_COLUMN_NAME": "id",
+      "UPDATE_RULE": "CASCADE",
+      "DELETE_RULE": "RESTRICT"
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "COLUMN_NAME": "tenant_id",
+      "CONSTRAINT_NAME": "subscriptions_tenant_id_fkey",
+      "REFERENCED_TABLE_NAME": "tenants",
+      "REFERENCED_COLUMN_NAME": "id",
+      "UPDATE_RULE": "CASCADE",
+      "DELETE_RULE": "RESTRICT"
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "COLUMN_NAME": "tenant_id",
+      "CONSTRAINT_NAME": "user_invitations_tenant_id_fkey",
+      "REFERENCED_TABLE_NAME": "tenants",
+      "REFERENCED_COLUMN_NAME": "id",
+      "UPDATE_RULE": "CASCADE",
+      "DELETE_RULE": "RESTRICT"
+    }
+  ],
+  "indexes": [
+    {
+      "TABLE_NAME": "billing_invoices",
+      "INDEX_NAME": "billing_invoices_subscription_id_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "subscription_id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "INDEX_NAME": "billing_invoices_tenant_id_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "tenant_id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "billing_invoices",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "INDEX_NAME": "global_users_email_key",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "email",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "INDEX_NAME": "global_users_tenant_id_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "tenant_id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "global_users",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "INDEX_NAME": "password_reset_tokens_token_key",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "token",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "INDEX_NAME": "password_reset_tokens_user_id_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "user_id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "plans",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "INDEX_NAME": "subscriptions_plan_id_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "plan_id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "subscriptions",
+      "INDEX_NAME": "subscriptions_tenant_id_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "tenant_id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "tenants",
+      "INDEX_NAME": "tenants_db_name_key",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "db_name",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "INDEX_NAME": "user_invitations_invite_token_key",
+      "NON_UNIQUE": 0,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "invite_token",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_invitations",
+      "INDEX_NAME": "user_invitations_tenant_id_idx",
+      "NON_UNIQUE": 1,
+      "SEQ_IN_INDEX": 1,
+      "COLUMN_NAME": "tenant_id",
+      "INDEX_TYPE": "BTREE"
+    }
+  ]
+}

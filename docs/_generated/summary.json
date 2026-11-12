@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-11-12T10:21:13.503Z",
+  "databases": {
+    "control_plane": {
+      "tables": 7,
+      "views": 0,
+      "foreignKeys": 6,
+      "indexes": 18
+    },
+    "tenant_demo": {
+      "tables": 19,
+      "views": 0,
+      "foreignKeys": 17,
+      "indexes": 57
+    }
+  },
+  "schemaDiff": {
+    "control": {
+      "inDbNotPrisma": [],
+      "inPrismaNotDb": []
+    },
+    "tenant": {
+      "inDbNotPrisma": [
+        "default_categories"
+      ],
+      "inPrismaNotDb": []
+    }
+  },
+  "counts": {
+    "pages": 37,
+    "apiRoutes": 39,
+    "serverActionFiles": 11,
+    "permissions": 79,
+    "permissionGroups": 9,
+    "dashboardTabs": 6,
+    "dashboardWidgets": 32,
+    "defaultRoles": 4,
+    "reports": 26,
+    "envVars": 19
+  }
+}

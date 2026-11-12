@@ -15,6 +15,7 @@
     "seed:fy": "node scripts/seed_fiscal_years.mjs",
     "test:fy": "node --test scripts/test_fiscal_years.mjs",
     "test:all": "node --test scripts/test_full_project.mjs",
+    "docs:generate": "tsx docs/_generated/extract_facts.mjs && node docs/_generated/render_factual_docs.mjs && node docs/_generated/render_modules.mjs && node docs/_generated/build_combined_and_pdf.mjs",
     "worker": "tsx src/worker.ts",
     "acceptance": "node scripts/acceptance.mjs",
     "rbac:smoke": "node scripts/rbac_smoke.mjs",

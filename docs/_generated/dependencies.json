@@ -1,0 +1,163 @@
+{
+  "name": "landinvest-app",
+  "version": "0.1.0",
+  "nodeVersion": "v24.19.0",
+  "npmVersion": "11.17.0",
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:i18n": "node scripts/test_translation_keys.mjs",
+    "setup": "node scripts/setup.mjs",
+    "clean:data": "node scripts/clean_test_data.mjs",
+    "seed:roles": "tsx scripts/seed_roles.mjs",
+    "seed:fy": "node scripts/seed_fiscal_years.mjs",
+    "test:fy": "node --test scripts/test_fiscal_years.mjs",
+    "test:all": "node --test scripts/test_full_project.mjs",
+    "docs:generate": "tsx docs/_generated/extract_facts.mjs && node docs/_generated/render_factual_docs.mjs && node docs/_generated/render_modules.mjs && node docs/_generated/build_combined_and_pdf.mjs",
+    "worker": "tsx src/worker.ts",
+    "acceptance": "node scripts/acceptance.mjs",
+    "rbac:smoke": "node scripts/rbac_smoke.mjs",
+    "audit:seed": "tsx scripts/audit_seed.mjs",
+    "audit": "node scripts/audit.mjs",
+    "dev:all": "start /b npm run worker && npm run dev"
+  },
+  "dependencies": [
+    {
+      "name": "@prisma/client",
+      "declared": "^6.19.3",
+      "locked": "6.19.3",
+      "type": "dependency"
+    },
+    {
+      "name": "bcryptjs",
+      "declared": "^3.0.3",
+      "locked": "3.0.3",
+      "type": "dependency"
+    },
+    {
+      "name": "bullmq",
+      "declared": "^6.3.8",
+      "locked": "6.3.8",
+      "type": "dependency"
+    },
+    {
+      "name": "ioredis",
+      "declared": "^6.0.0",
+      "locked": "6.0.0",
+      "type": "dependency"
+    },
+    {
+      "name": "lucide-react",
+      "declared": "^1.48.0",
+      "locked": "1.48.0",
+      "type": "dependency"
+    },
+    {
+      "name": "mysql2",
+      "declared": "^3.24.4",
+      "locked": "3.24.4",
+      "type": "dependency"
+    },
+    {
+      "name": "next",
+      "declared": "16.3.6",
+      "locked": "16.3.6",
+      "type": "dependency"
+    },
+    {
+      "name": "next-auth",
+      "declared": "^4.24.15",
+      "locked": "4.24.15",
+      "type": "dependency"
+    },
+    {
+      "name": "puppeteer",
+      "declared": "^25.12.0",
+      "locked": "25.12.0",
+      "type": "dependency"
+    },
+    {
+      "name": "react",
+      "declared": "19.2.8",
+      "locked": "19.2.8",
+      "type": "dependency"
+    },
+    {
+      "name": "react-dom",
+      "declared": "19.2.8",
+      "locked": "19.2.8",
+      "type": "dependency"
+    },
+    {
+      "name": "recharts",
+      "declared": "^3.10.1",
+      "locked": "3.10.1",
+      "type": "dependency"
+    }
+  ],
+  "devDependencies": [
+    {
+      "name": "@tailwindcss/postcss",
+      "declared": "^4",
+      "locked": "4.3.3",
+      "type": "devDependency"
+    },
+    {
+      "name": "@types/node",
+      "declared": "^20",
+      "locked": "20.19.43",
+      "type": "devDependency"
+    },
+    {
+      "name": "@types/react",
+      "declared": "^19",
+      "locked": "19.3.0",
+      "type": "devDependency"
+    },
+    {
+      "name": "@types/react-dom",
+      "declared": "^19",
+      "locked": "19.3.0",
+      "type": "devDependency"
+    },
+    {
+      "name": "eslint",
+      "declared": "^9",
+      "locked": "9.39.5",
+      "type": "devDependency"
+    },
+    {
+      "name": "eslint-config-next",
+      "declared": "16.3.6",
+      "locked": "16.3.6",
+      "type": "devDependency"
+    },
+    {
+      "name": "prisma",
+      "declared": "^6.19.3",
+      "locked": "6.19.3",
+      "type": "devDependency"
+    },
+    {
+      "name": "tailwindcss",
+      "declared": "^4",
+      "locked": "4.3.3",
+      "type": "devDependency"
+    },
+    {
+      "name": "tsx",
+      "declared": "^4.23.15",
+      "locked": "4.23.15",
+      "type": "devDependency"
+    },
+    {
+      "name": "typescript",
+      "declared": "^5",
+      "locked": "5.9.3",
+      "type": "devDependency"
+    }
+  ]
+}

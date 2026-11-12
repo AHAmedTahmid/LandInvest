@@ -1,0 +1,717 @@
+{
+  "totalKeys": 79,
+  "groups": 9,
+  "permissions": [
+    {
+      "key": "dashboard.view",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "View dashboard",
+      "bn": "ড্যাশবোর্ড দেখুন",
+      "category": null
+    },
+    {
+      "key": "dashboard.customize",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Customize own dashboard layout",
+      "bn": "নিজের ড্যাশবোর্ড কাস্টমাইজ করুন",
+      "category": null
+    },
+    {
+      "key": "dashboard.layout.manage",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Manage role default layouts",
+      "bn": "রোলের ডিফল্ট লেআউট পরিচালনা করুন",
+      "category": null
+    },
+    {
+      "key": "dashboard.export",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Export dashboard as PDF/PNG",
+      "bn": "ড্যাশবোর্ড এক্সপোর্ট (পিডিএফ/ছবি)",
+      "category": null
+    },
+    {
+      "key": "dashboard.settings.manage",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Manage dashboard settings & thresholds",
+      "bn": "ড্যাশবোর্ড সেটিংস ও থ্রেশহোল্ড পরিচালনা",
+      "category": null
+    },
+    {
+      "key": "dashboard.tab.overview",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "View Tab: Executive Overview",
+      "bn": "ট্যাব দেখুন: এক্সিকিউটিভ ওভারভিউ",
+      "category": "tabs"
+    },
+    {
+      "key": "dashboard.tab.financial",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "View Tab: Treasury & Financials",
+      "bn": "ট্যাব দেখুন: ট্রেজারি ও আর্থিক অবস্থা",
+      "category": "tabs"
+    },
+    {
+      "key": "dashboard.tab.projects",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "View Tab: Projects & Land",
+      "bn": "ট্যাব দেখুন: প্রকল্প ও জমি",
+      "category": "tabs"
+    },
+    {
+      "key": "dashboard.tab.sales",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "View Tab: Sales & Collections",
+      "bn": "ট্যাব দেখুন: বিক্রয় ও আদায়",
+      "category": "tabs"
+    },
+    {
+      "key": "dashboard.tab.partners",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "View Tab: Partners & Capital",
+      "bn": "ট্যাব দেখুন: অংশীদার ও মূলধন",
+      "category": "tabs"
+    },
+    {
+      "key": "dashboard.tab.operations",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "View Tab: Operations & Approvals",
+      "bn": "ট্যাব দেখুন: অপারেশনস ও অনুমোদন",
+      "category": "tabs"
+    },
+    {
+      "key": "dashboard.widget.cash_balance",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Cash in Hand",
+      "bn": "উইজেট: হাতে নগদ",
+      "category": "liquidity"
+    },
+    {
+      "key": "dashboard.widget.bank_balance",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Total Bank Balance",
+      "bn": "উইজেট: মোট ব্যাংক ব্যালেন্স",
+      "category": "liquidity"
+    },
+    {
+      "key": "dashboard.widget.total_liquidity",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Total Liquidity",
+      "bn": "উইজেট: মোট তারল্য",
+      "category": "liquidity"
+    },
+    {
+      "key": "dashboard.widget.working_capital",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Available Working Capital",
+      "bn": "উইজেট: কার্যনির্বাহী মূলধন",
+      "category": "liquidity"
+    },
+    {
+      "key": "dashboard.widget.partner_equity",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Partner Equity Injected",
+      "bn": "উইজেট: অংশীদার মূলধন বিনিয়োগ",
+      "category": "capital"
+    },
+    {
+      "key": "dashboard.widget.capital_deployed",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Capital Deployed in Land",
+      "bn": "উইজেট: প্রকল্পে নিয়োজিত মূলধন",
+      "category": "capital"
+    },
+    {
+      "key": "dashboard.widget.unsold_inventory",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Unsold Inventory Value",
+      "bn": "উইজেট: অবিক্রীত ইনভেন্টরি মূল্য",
+      "category": "inventory"
+    },
+    {
+      "key": "dashboard.widget.total_receivables",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Total Receivables",
+      "bn": "উইজেট: মোট বকেয়া/প্রাপ্য",
+      "category": "sales"
+    },
+    {
+      "key": "dashboard.widget.overdue_receivables",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Overdue Receivables",
+      "bn": "উইজেট: মেয়াদোত্তীর্ণ বকেয়া",
+      "category": "sales"
+    },
+    {
+      "key": "dashboard.widget.sales_month",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Sales This Month",
+      "bn": "উইজেট: চলতি মাসের বিক্রয়",
+      "category": "sales"
+    },
+    {
+      "key": "dashboard.widget.collections_month",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Collections This Month",
+      "bn": "উইজেট: চলতি মাসের নগদ আদায়",
+      "category": "sales"
+    },
+    {
+      "key": "dashboard.widget.expenses_month",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Expenses This Month",
+      "bn": "উইজেট: চলতি মাসের খরচ",
+      "category": "expenses"
+    },
+    {
+      "key": "dashboard.widget.pending_approvals",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Pending Approvals",
+      "bn": "উইজেট: অনুমোদনাধীন ভাউচার",
+      "category": "operations"
+    },
+    {
+      "key": "dashboard.widget.net_profit",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Net Profit & Realized Cash",
+      "bn": "উইজেট: নিট মুনাফা ও বাস্তবায়িত লাভ",
+      "category": "profit"
+    },
+    {
+      "key": "dashboard.widget.portfolio_roi",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Portfolio ROI %",
+      "bn": "উইজেট: পোর্টফোলিও আরওআই %",
+      "category": "profit"
+    },
+    {
+      "key": "dashboard.widget.cash_flow_trend",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: 12-Month Cash Flow Trend",
+      "bn": "উইজেট: ১২ মাসের ক্যাশ ফ্লো ট্রেন্ড",
+      "category": "liquidity"
+    },
+    {
+      "key": "dashboard.widget.project_cost_vs_sales",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Project Cost vs Sales vs Collected",
+      "bn": "উইজেট: প্রকল্প খরচ বনাম বিক্রয় বনাম আদায়",
+      "category": "projects"
+    },
+    {
+      "key": "dashboard.widget.project_cost_share",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Project-wise Cost Share",
+      "bn": "উইজেট: প্রকল্পভিত্তিক খরচ বণ্টন",
+      "category": "projects"
+    },
+    {
+      "key": "dashboard.widget.expense_breakdown",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Expense Breakdown by Category",
+      "bn": "উইজেট: খাতভিত্তিক ব্যয়ের বিভাজন",
+      "category": "expenses"
+    },
+    {
+      "key": "dashboard.widget.receivables_aging",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Receivables Aging",
+      "bn": "উইজেট: বকেয়া এইজিং বিশ্লেষণ",
+      "category": "sales"
+    },
+    {
+      "key": "dashboard.widget.plot_inventory_status",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Plot Inventory Status",
+      "bn": "উইজেট: প্লট ইনভেন্টরি অবস্থা",
+      "category": "inventory"
+    },
+    {
+      "key": "dashboard.widget.partner_equity_dist",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Partner Equity Distribution",
+      "bn": "উইজেট: অংশীদারদের মূলধন বণ্টন",
+      "category": "capital"
+    },
+    {
+      "key": "dashboard.widget.profit_by_project",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Profit by Project",
+      "bn": "উইজেট: প্রকল্পভিত্তিক নিট মুনাফা",
+      "category": "profit"
+    },
+    {
+      "key": "dashboard.widget.collection_trend",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Collection Trend vs Scheduled Dues",
+      "bn": "উইজেট: আদায় ট্রেন্ড বনাম নির্ধারিত বকেয়া",
+      "category": "sales"
+    },
+    {
+      "key": "dashboard.widget.cash_flow_forecast",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: 90-Day Cash Flow Forecast",
+      "bn": "উইজেট: ৯০ দিনের ক্যাশ ফ্লো পূর্বাভাস",
+      "category": "liquidity"
+    },
+    {
+      "key": "dashboard.widget.recent_transactions",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Recent Treasury Transactions",
+      "bn": "উইজেট: সাম্প্রতিক ট্রেজারি লেনদেন",
+      "category": "liquidity"
+    },
+    {
+      "key": "dashboard.widget.overdue_installments",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Overdue Installments List",
+      "bn": "উইজেট: মেয়াদোত্তীর্ণ কিস্তির তালিকা",
+      "category": "sales"
+    },
+    {
+      "key": "dashboard.widget.project_summary",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Projects Summary Table",
+      "bn": "উইজেট: প্রকল্পের সংক্ষিপ্ত বিবরণী",
+      "category": "projects"
+    },
+    {
+      "key": "dashboard.widget.partner_summary",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Partners Capital & Balance",
+      "bn": "উইজেট: অংশীদারদের মূলধন ও বর্তমান স্থিতি",
+      "category": "capital"
+    },
+    {
+      "key": "dashboard.widget.pending_vouchers",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Pending Expense Vouchers",
+      "bn": "উইজেট: অনুমোদনাধীন ব্যয়ের তালিকা",
+      "category": "operations"
+    },
+    {
+      "key": "dashboard.widget.quick_actions",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Quick Actions",
+      "bn": "উইজেট: দ্রুত অ্যাকশন",
+      "category": "operations"
+    },
+    {
+      "key": "dashboard.widget.active_alerts",
+      "module": "dashboard",
+      "moduleEn": "Dashboard & Executive Views",
+      "moduleBn": "ড্যাশবোর্ড ও এক্সিকিউটিভ ভিউ",
+      "en": "Widget: Smart Insights & Alerts",
+      "bn": "উইজেট: স্মার্ট ইনসাইট ও সতর্কবার্তা",
+      "category": "operations"
+    },
+    {
+      "key": "partners.view",
+      "module": "partners",
+      "moduleEn": "Partners",
+      "moduleBn": "পার্টনার",
+      "en": "View partners",
+      "bn": "পার্টনার দেখুন",
+      "category": null
+    },
+    {
+      "key": "partners.manage",
+      "module": "partners",
+      "moduleEn": "Partners",
+      "moduleBn": "পার্টনার",
+      "en": "Manage partners",
+      "bn": "পার্টনার ব্যবস্থাপনা",
+      "category": null
+    },
+    {
+      "key": "partners.capital.deposit",
+      "module": "partners",
+      "moduleEn": "Partners",
+      "moduleBn": "পার্টনার",
+      "en": "Record capital deposit",
+      "bn": "মূলধন জমা",
+      "category": null
+    },
+    {
+      "key": "partners.capital.withdraw",
+      "module": "partners",
+      "moduleEn": "Partners",
+      "moduleBn": "পার্টনার",
+      "en": "Record capital withdrawal",
+      "bn": "মূলধন উত্তোলন",
+      "category": null
+    },
+    {
+      "key": "partners.ledger.view",
+      "module": "partners",
+      "moduleEn": "Partners",
+      "moduleBn": "পার্টনার",
+      "en": "View partner ledger",
+      "bn": "পার্টনার লেজার দেখুন",
+      "category": null
+    },
+    {
+      "key": "treasury.view",
+      "module": "treasury",
+      "moduleEn": "Treasury",
+      "moduleBn": "ট্রেজারি",
+      "en": "View treasury",
+      "bn": "ট্রেজারি দেখুন",
+      "category": null
+    },
+    {
+      "key": "treasury.bank.manage",
+      "module": "treasury",
+      "moduleEn": "Treasury",
+      "moduleBn": "ট্রেজারি",
+      "en": "Manage bank accounts",
+      "bn": "ব্যাংক অ্যাকাউন্ট ব্যবস্থাপনা",
+      "category": null
+    },
+    {
+      "key": "treasury.contra.create",
+      "module": "treasury",
+      "moduleEn": "Treasury",
+      "moduleBn": "ট্রেজারি",
+      "en": "Create contra transfer",
+      "bn": "কন্ট্রা তৈরি",
+      "category": null
+    },
+    {
+      "key": "treasury.contra.approve",
+      "module": "treasury",
+      "moduleEn": "Treasury",
+      "moduleBn": "ট্রেজারি",
+      "en": "Approve contra transfer",
+      "bn": "কন্ট্রা অনুমোদন",
+      "category": null
+    },
+    {
+      "key": "projects.view",
+      "module": "projects",
+      "moduleEn": "Land Projects",
+      "moduleBn": "জমি প্রকল্প",
+      "en": "View projects",
+      "bn": "প্রকল্প দেখুন",
+      "category": null
+    },
+    {
+      "key": "projects.create",
+      "module": "projects",
+      "moduleEn": "Land Projects",
+      "moduleBn": "জমি প্রকল্প",
+      "en": "Create project",
+      "bn": "প্রকল্প তৈরি",
+      "category": null
+    },
+    {
+      "key": "projects.edit",
+      "module": "projects",
+      "moduleEn": "Land Projects",
+      "moduleBn": "জমি প্রকল্প",
+      "en": "Edit project",
+      "bn": "প্রকল্প সম্পাদনা",
+      "category": null
+    },
+    {
+      "key": "projects.delete",
+      "module": "projects",
+      "moduleEn": "Land Projects",
+      "moduleBn": "জমি প্রকল্প",
+      "en": "Delete project / plot",
+      "bn": "প্রকল্প/প্লট মুছুন",
+      "category": null
+    },
+    {
+      "key": "plots.manage",
+      "module": "projects",
+      "moduleEn": "Land Projects",
+      "moduleBn": "জমি প্রকল্প",
+      "en": "Manage plots",
+      "bn": "প্লট ব্যবস্থাপনা",
+      "category": null
+    },
+    {
+      "key": "expenses.view",
+      "module": "expenses",
+      "moduleEn": "Expenses",
+      "moduleBn": "ব্যয়",
+      "en": "View expenses",
+      "bn": "ব্যয় দেখুন",
+      "category": null
+    },
+    {
+      "key": "expenses.create",
+      "module": "expenses",
+      "moduleEn": "Expenses",
+      "moduleBn": "ব্যয়",
+      "en": "Create expense",
+      "bn": "ব্যয় তৈরি",
+      "category": null
+    },
+    {
+      "key": "expenses.approve",
+      "module": "expenses",
+      "moduleEn": "Expenses",
+      "moduleBn": "ব্যয়",
+      "en": "Approve expense",
+      "bn": "ব্যয় অনুমোদন",
+      "category": null
+    },
+    {
+      "key": "expenses.delete",
+      "module": "expenses",
+      "moduleEn": "Expenses",
+      "moduleBn": "ব্যয়",
+      "en": "Delete expense",
+      "bn": "ব্যয় মুছুন",
+      "category": null
+    },
+    {
+      "key": "sales.view",
+      "module": "sales",
+      "moduleEn": "Sales",
+      "moduleBn": "বিক্রয়",
+      "en": "View sales",
+      "bn": "বিক্রয় দেখুন",
+      "category": null
+    },
+    {
+      "key": "sales.create",
+      "module": "sales",
+      "moduleEn": "Sales",
+      "moduleBn": "বিক্রয়",
+      "en": "Create sale / booking",
+      "bn": "বিক্রয় তৈরি",
+      "category": null
+    },
+    {
+      "key": "sales.collect",
+      "module": "sales",
+      "moduleEn": "Sales",
+      "moduleBn": "বিক্রয়",
+      "en": "Collect payment",
+      "bn": "পেমেন্ট আদায়",
+      "category": null
+    },
+    {
+      "key": "receipts.print",
+      "module": "sales",
+      "moduleEn": "Sales",
+      "moduleBn": "বিক্রয়",
+      "en": "Print receipts",
+      "bn": "রসিদ প্রিন্ট",
+      "category": null
+    },
+    {
+      "key": "profit.view",
+      "module": "profit",
+      "moduleEn": "Profit",
+      "moduleBn": "লাভ",
+      "en": "View PnL",
+      "bn": "লাভ-ক্ষতি দেখুন",
+      "category": null
+    },
+    {
+      "key": "profit.distribute",
+      "module": "profit",
+      "moduleEn": "Profit",
+      "moduleBn": "লাভ",
+      "en": "Distribute profit",
+      "bn": "লাভ বণ্টন",
+      "category": null
+    },
+    {
+      "key": "reports.view",
+      "module": "reports",
+      "moduleEn": "Reports",
+      "moduleBn": "রিপোর্ট",
+      "en": "View reports",
+      "bn": "রিপোর্ট দেখুন",
+      "category": null
+    },
+    {
+      "key": "reports.export",
+      "module": "reports",
+      "moduleEn": "Reports",
+      "moduleBn": "রিপোর্ট",
+      "en": "Export reports",
+      "bn": "রিপোর্ট এক্সপোর্ট",
+      "category": null
+    },
+    {
+      "key": "reports.financial.view",
+      "module": "reports",
+      "moduleEn": "Reports",
+      "moduleBn": "রিপোর্ট",
+      "en": "View financial reports",
+      "bn": "আর্থিক প্রতিবেদন দেখুন",
+      "category": null
+    },
+    {
+      "key": "reports.partners.view",
+      "module": "reports",
+      "moduleEn": "Reports",
+      "moduleBn": "রিপোর্ট",
+      "en": "View partner reports",
+      "bn": "অংশীদার প্রতিবেদন দেখুন",
+      "category": null
+    },
+    {
+      "key": "reports.projects.view",
+      "module": "reports",
+      "moduleEn": "Reports",
+      "moduleBn": "রিপোর্ট",
+      "en": "View project reports",
+      "bn": "প্রকল্প প্রতিবেদন দেখুন",
+      "category": null
+    },
+    {
+      "key": "reports.sales.view",
+      "module": "reports",
+      "moduleEn": "Reports",
+      "moduleBn": "রিপোর্ট",
+      "en": "View sales reports",
+      "bn": "বিক্রয় প্রতিবেদন দেখুন",
+      "category": null
+    },
+    {
+      "key": "reports.audit.view",
+      "module": "reports",
+      "moduleEn": "Reports",
+      "moduleBn": "রিপোর্ট",
+      "en": "View audit reports",
+      "bn": "অডিট প্রতিবেদন দেখুন",
+      "category": null
+    },
+    {
+      "key": "users.view",
+      "module": "admin",
+      "moduleEn": "Administration",
+      "moduleBn": "প্রশাসন",
+      "en": "View users",
+      "bn": "ইউজার দেখুন",
+      "category": null
+    },
+    {
+      "key": "users.manage",
+      "module": "admin",
+      "moduleEn": "Administration",
+      "moduleBn": "প্রশাসন",
+      "en": "Manage users",
+      "bn": "ইউজার ব্যবস্থাপনা",
+      "category": null
+    },
+    {
+      "key": "roles.manage",
+      "module": "admin",
+      "moduleEn": "Administration",
+      "moduleBn": "প্রশাসন",
+      "en": "Manage roles",
+      "bn": "রোল ব্যবস্থাপনা",
+      "category": null
+    },
+    {
+      "key": "billing.manage",
+      "module": "admin",
+      "moduleEn": "Administration",
+      "moduleBn": "প্রশাসন",
+      "en": "Manage billing",
+      "bn": "বিলিং ব্যবস্থাপনা",
+      "category": null
+    },
+    {
+      "key": "audit.view",
+      "module": "admin",
+      "moduleEn": "Administration",
+      "moduleBn": "প্রশাসন",
+      "en": "View audit log",
+      "bn": "অডিট লগ দেখুন",
+      "category": null
+    }
+  ]
+}
