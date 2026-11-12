@@ -37,6 +37,9 @@ export async function POST(req: NextRequest) {
     b.plot_id ||
     (Array.isArray(b.plot_ids) && b.plot_ids.length > 0 ? b.plot_ids[0] : null);
 
+  const initialSaleStatus = due <= 0 ? "PAID_IN_FULL" : advance > 0 ? "PARTIAL" : "BOOKED";
+  const initialPlotStatus = due <= 0 ? "SOLD" : "BOOKED";
+
   const saleData = {
     id: saleId,
     projectId: b.project_id,
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
     totalAgreedPrice: b.total_agreed_price,
     advanceBookingAmount: b.advance || 0,
     currentDueAmount: due,
-    status: "BOOKED",
+    status: initialSaleStatus,
   };
 
   const result = await prisma.$transaction(async (tx: any) => {
@@ -60,8 +63,8 @@ export async function POST(req: NextRequest) {
         where: { projectId: b.project_id, status: "AVAILABLE" },
       });
       for (const pl of availPlots) {
-        await tx.projectPlot.update({ where: { id: pl.id }, data: { status: "BOOKED" } });
-        await writeAudit(tx, "project_plots", pl.id, "UPDATE", userId, { status: "AVAILABLE" }, { status: "BOOKED" });
+        await tx.projectPlot.update({ where: { id: pl.id }, data: { status: initialPlotStatus } });
+        await writeAudit(tx, "project_plots", pl.id, "UPDATE", userId, { status: "AVAILABLE" }, { status: initialPlotStatus });
       }
       sale = await tx.landSale.create({ data: { ...saleData, plotId: null } });
       await writeAudit(tx, "land_sales", saleId, "CREATE", userId, null, sale);
@@ -70,8 +73,8 @@ export async function POST(req: NextRequest) {
       for (const pid of b.plot_ids) {
         const plot = await tx.projectPlot.findUnique({ where: { id: pid } });
         if (plot && plot.status === "AVAILABLE") {
-          await tx.projectPlot.update({ where: { id: pid }, data: { status: "BOOKED" } });
-          await writeAudit(tx, "project_plots", pid, "UPDATE", userId, { status: "AVAILABLE" }, { status: "BOOKED" });
+          await tx.projectPlot.update({ where: { id: pid }, data: { status: initialPlotStatus } });
+          await writeAudit(tx, "project_plots", pid, "UPDATE", userId, { status: "AVAILABLE" }, { status: initialPlotStatus });
         }
       }
       sale = await tx.landSale.create({ data: saleData });
@@ -79,6 +82,10 @@ export async function POST(req: NextRequest) {
     } else if (b.plot_id) {
       // Single plot booking / sale (default path)
       sale = await sellPlot(tx, b.plot_id, saleData, userId);
+      if (initialPlotStatus === "SOLD") {
+        await tx.projectPlot.update({ where: { id: b.plot_id }, data: { status: "SOLD" } });
+        await writeAudit(tx, "project_plots", b.plot_id, "UPDATE", userId, { status: "BOOKED" }, { status: "SOLD" });
+      }
     } else {
       // Project-level or unassigned plot sale
       sale = await tx.landSale.create({ data: saleData });

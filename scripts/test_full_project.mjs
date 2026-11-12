@@ -312,7 +312,7 @@ describe("LandInvest Full Project E2E Suite (Start to Reports)", () => {
       for (let i = plotIds.length; i < 2; i++) {
         const pid = randomUUID();
         await db.query(
-          `INSERT INTO project_plots (id, project_id, plot_number, area_shotok, asking_price, status)
+          `INSERT INTO project_plots (id, project_id, plot_number, plot_size_shotok, asking_price, status)
            VALUES (?, ?, ?, 3.0, 600000.00, 'AVAILABLE')`,
           [pid, seededProjectId, `E2E-P-${pid.slice(0, 6)}`]
         );
@@ -381,6 +381,38 @@ describe("LandInvest Full Project E2E Suite (Start to Reports)", () => {
       headers: { Cookie: ownerCookie },
     });
     assert.equal(receiptRes.status, 200, `Receipt endpoint failed: ${receiptRes.status}`);
+
+    // 6e. Full upfront payment (advance === total_agreed_price) must mark sale PAID_IN_FULL and plot SOLD
+    const fullPlotId = randomUUID();
+    await db.query(
+      `INSERT INTO project_plots (id, project_id, plot_number, plot_size_shotok, asking_price, status)
+       VALUES (?, ?, ?, 2.5, 500000.00, 'AVAILABLE')`,
+      [fullPlotId, seededProjectId, `E2E-FULL-${fullPlotId.slice(0, 6)}`]
+    );
+    const fullSaleRes = await apiJson(ownerCookie, "/api/sales", {
+      method: "POST",
+      body: JSON.stringify({
+        project_id: seededProjectId,
+        plot_ids: [fullPlotId],
+        buyer_name: "E2E Full Payment Buyer",
+        buyer_phone: "01799887766",
+        total_agreed_price: 500000,
+        advance: 500000,
+        installments_count: 0,
+        payment_method: "CASH",
+      }),
+    });
+    assert.equal(fullSaleRes.status, 200, `Full payment sale failed: ${fullSaleRes.text}`);
+    const [[fullSaleRow]] = await db.query(
+      "SELECT status, current_due_amount FROM land_sales WHERE id = ?",
+      [fullSaleRes.json.id]
+    );
+    assert.equal(fullSaleRow.status, "PAID_IN_FULL", "Full upfront payment sale should be PAID_IN_FULL");
+    const [[fullPlotRow]] = await db.query(
+      "SELECT status FROM project_plots WHERE id = ?",
+      [fullPlotId]
+    );
+    assert.equal(fullPlotRow.status, "SOLD", "Full upfront payment plot should be SOLD");
   });
 
   it("7. Reports Catalog (/reports) has category filter & Grid/List view toggle", async () => {
