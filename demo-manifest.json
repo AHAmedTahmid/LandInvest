@@ -11,43 +11,43 @@
   "logins": [
     {
       "role": "Owner",
-      "email": "owner@demo.landinvest.test",
-      "password": "DemoPassword123!",
+      "email": "owner@alpha.com",
+      "password": "123456",
       "name": "Md. Rafiqul Islam",
       "purpose": "Full access across all executive dashboards, financial books, operations, reports, user administration, and company configurations."
     },
     {
       "role": "Managing Partner",
-      "email": "managing.partner@demo.landinvest.test",
-      "password": "DemoPassword123!",
+      "email": "admin@alpha.com",
+      "password": "123456",
       "name": "Barrister Tariq Ahmed",
       "purpose": "Executive oversight across all projects, financial ledgers, voucher approvals, and reports (excluding user & role administrative permissions)."
     },
     {
       "role": "Accountant",
-      "email": "accountant@demo.landinvest.test",
-      "password": "DemoPassword123!",
+      "email": "accountant@alpha.com",
+      "password": "123456",
       "name": "Mahfuzur Rahman",
       "purpose": "Treasury ledger, cash in hand, bank accounts, money receipts printing, customer installment collection, and voucher cost accounting."
     },
     {
       "role": "Site Manager",
-      "email": "site.manager@demo.landinvest.test",
-      "password": "DemoPassword123!",
+      "email": "site@alpha.com",
+      "password": "123456",
       "name": "Engr. Kamrul Hasan",
       "purpose": "Land projects inspection, cadastral plots demarcations, site earthwork progress, and on-site expense vouchers submission."
     },
     {
       "role": "Sales Executive",
-      "email": "sales.exec@demo.landinvest.test",
-      "password": "DemoPassword123!",
+      "email": "sales@alpha.com",
+      "password": "123456",
       "name": "Tanvir Ahmed",
       "purpose": "Custom role: Plot inventory, sales pricing, customer collections, and sales reports. Strictly restricted from costs, margins, and bank ledgers."
     },
     {
       "role": "Auditor (read-only)",
-      "email": "auditor@demo.landinvest.test",
-      "password": "DemoPassword123!",
+      "email": "auditor@alpha.com",
+      "password": "123456",
       "name": "Farhana Yasmin",
       "purpose": "Custom role: Comprehensive read-only review of books, audit trails, and reconciliation statements with zero write/edit permissions."
     }

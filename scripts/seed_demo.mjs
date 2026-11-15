@@ -27,7 +27,7 @@ const COMPANY_NAME = "Sonar Bangla Land Developers Ltd.";
 const COMPANY_NAME_BN = "সোনার বাংলা ল্যান্ড ডেভেলপার্স লিমিটেড";
 const TENANT_SLUG = "demo";
 const TENANT_DB = "tenant_demo";
-const UNIVERSAL_PASSWORD = "DemoPassword123!";
+const UNIVERSAL_PASSWORD = "123456";
 const DB_HOST = "127.0.0.1";
 const DB_USER = "root";
 const DB_PASS = "";
@@ -197,42 +197,42 @@ const passwordHash = await bcrypt.hash(UNIVERSAL_PASSWORD, 10);
 const usersList = [
   {
     id: "10000000-0000-0000-0000-000000000001",
-    email: "owner@demo.landinvest.test",
+    email: "owner@alpha.com",
     name: "Md. Rafiqul Islam",
     isOwner: true,
     roleName: "Owner",
   },
   {
     id: "10000000-0000-0000-0000-000000000002",
-    email: "managing.partner@demo.landinvest.test",
+    email: "admin@alpha.com",
     name: "Barrister Tariq Ahmed",
     isOwner: false,
     roleName: "Managing Partner",
   },
   {
     id: "10000000-0000-0000-0000-000000000003",
-    email: "accountant@demo.landinvest.test",
+    email: "accountant@alpha.com",
     name: "Mahfuzur Rahman",
     isOwner: false,
     roleName: "Accountant",
   },
   {
     id: "10000000-0000-0000-0000-000000000004",
-    email: "site.manager@demo.landinvest.test",
+    email: "site@alpha.com",
     name: "Engr. Kamrul Hasan",
     isOwner: false,
     roleName: "Site Manager",
   },
   {
     id: "10000000-0000-0000-0000-000000000005",
-    email: "sales.exec@demo.landinvest.test",
+    email: "sales@alpha.com",
     name: "Tanvir Ahmed",
     isOwner: false,
     roleName: "Sales Executive",
   },
   {
     id: "10000000-0000-0000-0000-000000000006",
-    email: "auditor@demo.landinvest.test",
+    email: "auditor@alpha.com",
     name: "Farhana Yasmin",
     isOwner: false,
     roleName: "Auditor (read-only)",
@@ -251,7 +251,7 @@ for (const u of usersList) {
 const deactivatedId = "10000000-0000-0000-0000-000000000007";
 await controlConn.query(
   `INSERT INTO global_users (id, tenant_id, full_name, email, password_hash, is_owner, is_active, must_change_password, created_at)
-   VALUES (?, ?, 'Arifur Rahman (Former Staff)', 'former.staff@demo.landinvest.test', ?, 0, 0, 0, ?)`,
+   VALUES (?, ?, 'Arifur Rahman (Former Staff)', 'former.staff@alpha.com', ?, 0, 0, 0, ?)`,
   [deactivatedId, tenantId, passwordHash, daysAgo(600)]
 );
 
@@ -374,7 +374,7 @@ for (const u of usersList) {
 const inviteRoleId = roleIdByName.get("Site Manager");
 await controlConn.query(
   `INSERT INTO user_invitations (id, tenant_id, email, role_id, invite_token, expires_at, accepted)
-   VALUES (?, ?, 'engineer.invite@demo.landinvest.test', ?, 'INVITE-TOKEN-DEMO-2026', ?, 0)`,
+   VALUES (?, ?, 'engineer.invite@alpha.com', ?, 'INVITE-TOKEN-DEMO-2026', ?, 0)`,
   [randomUUID(), tenantId, inviteRoleId, daysAfter(14)]
 );
 

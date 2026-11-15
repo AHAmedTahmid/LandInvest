@@ -18,20 +18,20 @@ This document describes the clean, realistic demonstration environment created i
 
 ## 2. Demo User Logins
 
-All demo users share the universal password: **`DemoPassword123!`**.
+All demo users share the universal password: **`123456`**.
 
 | Role | Email | User Name | What This User Demonstrates |
 |---|---|---|---|
-| **Owner** | `owner@demo.landinvest.test` | Md. Rafiqul Islam | Complete executive overview: portfolio ROI, profit distributions, treasury books, settings, and user administration. |
-| **Managing Partner** | `managing.partner@demo.landinvest.test` | Barrister Tariq Ahmed | C-level operational oversight across all projects, financial ledgers, and voucher approvals (excluding user management). |
-| **Accountant** | `accountant@demo.landinvest.test` | Mahfuzur Rahman | Treasury management: cash drawer, 3 commercial bank accounts, contra fund transfers, installment collections, money receipt generation, and expense accounting. |
-| **Site Manager** | `site.manager@demo.landinvest.test` | Engr. Kamrul Hasan | Field operations: cadastral plot inventory, earthwork development expenses, site boundary demarcations, and voucher submission. |
-| **Sales Executive** | `sales.exec@demo.landinvest.test` | Tanvir Ahmed | **Custom restricted role:** Plot pricing, customer sales contracts, and overdue collections. **Strictly restricted from viewing costs, bank balances, or profit margins.** |
-| **Auditor (read-only)** | `auditor@demo.landinvest.test` | Farhana Yasmin | **Custom audit role:** Comprehensive read-only review across all ledgers, audit trails, and reconciliation statements with zero write/edit permissions. |
+| **Owner** | `owner@alpha.com` | Md. Rafiqul Islam | Complete executive overview: portfolio ROI, profit distributions, treasury books, settings, and user administration. |
+| **Managing Partner** | `admin@alpha.com` | Barrister Tariq Ahmed | C-level operational oversight across all projects, financial ledgers, and voucher approvals (excluding user management). |
+| **Accountant** | `accountant@alpha.com` | Mahfuzur Rahman | Treasury management: cash drawer, 3 commercial bank accounts, contra fund transfers, installment collections, money receipt generation, and expense accounting. |
+| **Site Manager** | `site@alpha.com` | Engr. Kamrul Hasan | Field operations: cadastral plot inventory, earthwork development expenses, site boundary demarcations, and voucher submission. |
+| **Sales Executive** | `sales@alpha.com` | Tanvir Ahmed | **Custom restricted role:** Plot pricing, customer sales contracts, and overdue collections. **Strictly restricted from viewing costs, bank balances, or profit margins.** |
+| **Auditor (read-only)** | `auditor@alpha.com` | Farhana Yasmin | **Custom audit role:** Comprehensive read-only review across all ledgers, audit trails, and reconciliation statements with zero write/edit permissions. |
 
 *Additional Seeded Accounts:*
-- **Invited User:** `engineer.invite@demo.landinvest.test` (Pending invite for Site Manager role)
-- **Deactivated User:** `former.staff@demo.landinvest.test` (Demonstrates offboarding audit log in user settings)
+- **Invited User:** `engineer.invite@alpha.com` (Pending invite for Site Manager role)
+- **Deactivated User:** `former.staff@alpha.com` (Demonstrates offboarding audit log in user settings)
 
 ---
 
@@ -93,7 +93,7 @@ The portfolio features **6 distinct land development projects**, each intentiona
 | **Partner Capital Statements** | `/reports/partner-capital?partner=40000000-0000-0000-0000-000000000001` | Detailed running ledger for Managing Partner Md. Rafiqul Islam showing deposits, out-of-pocket expenses (`PAID_BY_PARTNER`), profit credits, and withdrawals. |
 | **Treasury Contra Transfers** | `/reports/contra-register` | 23 double-entry transfers between Cash in Hand and the 3 commercial bank accounts (DBBL, IBBL, BRAC Bank). |
 | **Money Receipts & Printing** | `/sales/befc311c-0b0c-4eae-87ac-7dc7de8ed3db` | Sequential money receipt `MR-0457` with customer copy, plot details, and printable PDF layout. |
-| **Restricted Role Verification** | Log in as `sales.exec@demo.landinvest.test` | Notice the dashboard has **zero cost, expense, or margin widgets**. The Financials and Operations tabs are hidden. Attempting to access cost APIs returns HTTP 403 Forbidden. |
+| **Restricted Role Verification** | Log in as `sales@alpha.com` | Notice the dashboard has **zero cost, expense, or margin widgets**. The Financials and Operations tabs are hidden. Attempting to access cost APIs returns HTTP 403 Forbidden. |
 | **Automated System Integrity** | `/reports/reconciliation` | Real-time automated audit scorecard verifying bank balances, partner balances, payment reconciliation, and isolation of partner-paid expenses (100% PASS). |
 
 ---
