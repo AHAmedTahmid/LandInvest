@@ -55,3 +55,6 @@ worker2.*
 
 *.err
 
+
+# tools
+graphify-out/

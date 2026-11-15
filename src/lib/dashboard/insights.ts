@@ -31,7 +31,15 @@ export async function evaluateDashboardInsights(prisma: any): Promise<DashboardI
   }
   const settings: Record<string, any> = {};
   for (const s of settingsRows) {
-    settings[s.settingKey] = typeof s.settingValue === "string" ? JSON.parse(s.settingValue) : s.settingValue;
+    if (typeof s.settingValue === "string") {
+      try {
+        settings[s.settingKey] = JSON.parse(s.settingValue);
+      } catch {
+        settings[s.settingKey] = s.settingValue;
+      }
+    } else {
+      settings[s.settingKey] = s.settingValue;
+    }
   }
 
   const minCashBalance = settings["min_cash_balance"] ?? 500000;

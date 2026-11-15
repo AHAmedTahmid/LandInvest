@@ -1488,6 +1488,7 @@ export namespace Prisma {
     dbUser: string | null
     dbPasswordEncrypted: string | null
     status: string | null
+    isDemo: boolean | null
     createdAt: Date | null
   }
 
@@ -1499,6 +1500,7 @@ export namespace Prisma {
     dbUser: string | null
     dbPasswordEncrypted: string | null
     status: string | null
+    isDemo: boolean | null
     createdAt: Date | null
   }
 
@@ -1510,6 +1512,7 @@ export namespace Prisma {
     dbUser: number
     dbPasswordEncrypted: number
     status: number
+    isDemo: number
     createdAt: number
     _all: number
   }
@@ -1523,6 +1526,7 @@ export namespace Prisma {
     dbUser?: true
     dbPasswordEncrypted?: true
     status?: true
+    isDemo?: true
     createdAt?: true
   }
 
@@ -1534,6 +1538,7 @@ export namespace Prisma {
     dbUser?: true
     dbPasswordEncrypted?: true
     status?: true
+    isDemo?: true
     createdAt?: true
   }
 
@@ -1545,6 +1550,7 @@ export namespace Prisma {
     dbUser?: true
     dbPasswordEncrypted?: true
     status?: true
+    isDemo?: true
     createdAt?: true
     _all?: true
   }
@@ -1629,6 +1635,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status: string
+    isDemo: boolean
     createdAt: Date
     _count: TenantCountAggregateOutputType | null
     _min: TenantMinAggregateOutputType | null
@@ -1657,6 +1664,7 @@ export namespace Prisma {
     dbUser?: boolean
     dbPasswordEncrypted?: boolean
     status?: boolean
+    isDemo?: boolean
     createdAt?: boolean
     subscriptions?: boolean | Tenant$subscriptionsArgs<ExtArgs>
     globalUsers?: boolean | Tenant$globalUsersArgs<ExtArgs>
@@ -1675,10 +1683,11 @@ export namespace Prisma {
     dbUser?: boolean
     dbPasswordEncrypted?: boolean
     status?: boolean
+    isDemo?: boolean
     createdAt?: boolean
   }
 
-  export type TenantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyName" | "dbHost" | "dbName" | "dbUser" | "dbPasswordEncrypted" | "status" | "createdAt", ExtArgs["result"]["tenant"]>
+  export type TenantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyName" | "dbHost" | "dbName" | "dbUser" | "dbPasswordEncrypted" | "status" | "isDemo" | "createdAt", ExtArgs["result"]["tenant"]>
   export type TenantInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     subscriptions?: boolean | Tenant$subscriptionsArgs<ExtArgs>
     globalUsers?: boolean | Tenant$globalUsersArgs<ExtArgs>
@@ -1703,6 +1712,7 @@ export namespace Prisma {
       dbUser: string
       dbPasswordEncrypted: string
       status: string
+      isDemo: boolean
       createdAt: Date
     }, ExtArgs["result"]["tenant"]>
     composites: {}
@@ -2084,6 +2094,7 @@ export namespace Prisma {
     readonly dbUser: FieldRef<"Tenant", 'String'>
     readonly dbPasswordEncrypted: FieldRef<"Tenant", 'String'>
     readonly status: FieldRef<"Tenant", 'String'>
+    readonly isDemo: FieldRef<"Tenant", 'Boolean'>
     readonly createdAt: FieldRef<"Tenant", 'DateTime'>
   }
     
@@ -8426,6 +8437,7 @@ export namespace Prisma {
     dbUser: 'dbUser',
     dbPasswordEncrypted: 'dbPasswordEncrypted',
     status: 'status',
+    isDemo: 'isDemo',
     createdAt: 'createdAt'
   };
 
@@ -8645,6 +8657,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -8680,13 +8699,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -8707,6 +8719,7 @@ export namespace Prisma {
     dbUser?: StringFilter<"Tenant"> | string
     dbPasswordEncrypted?: StringFilter<"Tenant"> | string
     status?: StringFilter<"Tenant"> | string
+    isDemo?: BoolFilter<"Tenant"> | boolean
     createdAt?: DateTimeFilter<"Tenant"> | Date | string
     subscriptions?: SubscriptionListRelationFilter
     globalUsers?: GlobalUserListRelationFilter
@@ -8722,6 +8735,7 @@ export namespace Prisma {
     dbUser?: SortOrder
     dbPasswordEncrypted?: SortOrder
     status?: SortOrder
+    isDemo?: SortOrder
     createdAt?: SortOrder
     subscriptions?: SubscriptionOrderByRelationAggregateInput
     globalUsers?: GlobalUserOrderByRelationAggregateInput
@@ -8741,6 +8755,7 @@ export namespace Prisma {
     dbUser?: StringFilter<"Tenant"> | string
     dbPasswordEncrypted?: StringFilter<"Tenant"> | string
     status?: StringFilter<"Tenant"> | string
+    isDemo?: BoolFilter<"Tenant"> | boolean
     createdAt?: DateTimeFilter<"Tenant"> | Date | string
     subscriptions?: SubscriptionListRelationFilter
     globalUsers?: GlobalUserListRelationFilter
@@ -8756,6 +8771,7 @@ export namespace Prisma {
     dbUser?: SortOrder
     dbPasswordEncrypted?: SortOrder
     status?: SortOrder
+    isDemo?: SortOrder
     createdAt?: SortOrder
     _count?: TenantCountOrderByAggregateInput
     _max?: TenantMaxOrderByAggregateInput
@@ -8773,6 +8789,7 @@ export namespace Prisma {
     dbUser?: StringWithAggregatesFilter<"Tenant"> | string
     dbPasswordEncrypted?: StringWithAggregatesFilter<"Tenant"> | string
     status?: StringWithAggregatesFilter<"Tenant"> | string
+    isDemo?: BoolWithAggregatesFilter<"Tenant"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Tenant"> | Date | string
   }
 
@@ -9210,6 +9227,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionCreateNestedManyWithoutTenantInput
     globalUsers?: GlobalUserCreateNestedManyWithoutTenantInput
@@ -9225,6 +9243,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutTenantInput
     globalUsers?: GlobalUserUncheckedCreateNestedManyWithoutTenantInput
@@ -9240,6 +9259,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUpdateManyWithoutTenantNestedInput
     globalUsers?: GlobalUserUpdateManyWithoutTenantNestedInput
@@ -9255,6 +9275,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
     globalUsers?: GlobalUserUncheckedUpdateManyWithoutTenantNestedInput
@@ -9270,6 +9291,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
   }
 
@@ -9281,6 +9303,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9292,6 +9315,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9760,6 +9784,11 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -9825,6 +9854,7 @@ export namespace Prisma {
     dbUser?: SortOrder
     dbPasswordEncrypted?: SortOrder
     status?: SortOrder
+    isDemo?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9836,6 +9866,7 @@ export namespace Prisma {
     dbUser?: SortOrder
     dbPasswordEncrypted?: SortOrder
     status?: SortOrder
+    isDemo?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9847,6 +9878,7 @@ export namespace Prisma {
     dbUser?: SortOrder
     dbPasswordEncrypted?: SortOrder
     status?: SortOrder
+    isDemo?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9866,6 +9898,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10175,11 +10215,6 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type GlobalUserOrderByRelevanceInput = {
     fields: GlobalUserOrderByRelevanceFieldEnum | GlobalUserOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -10223,14 +10258,6 @@ export namespace Prisma {
     mustChangePassword?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type UserInvitationOrderByRelevanceInput = {
@@ -10409,6 +10436,10 @@ export namespace Prisma {
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -10677,10 +10708,6 @@ export namespace Prisma {
     connect?: TenantWhereUniqueInput
   }
 
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
-  }
-
   export type TenantUpdateOneRequiredWithoutGlobalUsersNestedInput = {
     create?: XOR<TenantCreateWithoutGlobalUsersInput, TenantUncheckedCreateWithoutGlobalUsersInput>
     connectOrCreate?: TenantCreateOrConnectWithoutGlobalUsersInput
@@ -10748,6 +10775,11 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -10786,6 +10818,14 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10973,19 +11013,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type SubscriptionCreateWithoutTenantInput = {
@@ -11294,6 +11321,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     globalUsers?: GlobalUserCreateNestedManyWithoutTenantInput
     userInvitations?: UserInvitationCreateNestedManyWithoutTenantInput
@@ -11308,6 +11336,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     globalUsers?: GlobalUserUncheckedCreateNestedManyWithoutTenantInput
     userInvitations?: UserInvitationUncheckedCreateNestedManyWithoutTenantInput
@@ -11393,6 +11422,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     globalUsers?: GlobalUserUpdateManyWithoutTenantNestedInput
     userInvitations?: UserInvitationUpdateManyWithoutTenantNestedInput
@@ -11407,6 +11437,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     globalUsers?: GlobalUserUncheckedUpdateManyWithoutTenantNestedInput
     userInvitations?: UserInvitationUncheckedUpdateManyWithoutTenantNestedInput
@@ -11468,6 +11499,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionCreateNestedManyWithoutTenantInput
     userInvitations?: UserInvitationCreateNestedManyWithoutTenantInput
@@ -11482,6 +11514,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutTenantInput
     userInvitations?: UserInvitationUncheckedCreateNestedManyWithoutTenantInput
@@ -11512,6 +11545,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUpdateManyWithoutTenantNestedInput
     userInvitations?: UserInvitationUpdateManyWithoutTenantNestedInput
@@ -11526,6 +11560,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
     userInvitations?: UserInvitationUncheckedUpdateManyWithoutTenantNestedInput
@@ -11540,6 +11575,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionCreateNestedManyWithoutTenantInput
     globalUsers?: GlobalUserCreateNestedManyWithoutTenantInput
@@ -11554,6 +11590,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutTenantInput
     globalUsers?: GlobalUserUncheckedCreateNestedManyWithoutTenantInput
@@ -11584,6 +11621,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUpdateManyWithoutTenantNestedInput
     globalUsers?: GlobalUserUpdateManyWithoutTenantNestedInput
@@ -11598,6 +11636,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
     globalUsers?: GlobalUserUncheckedUpdateManyWithoutTenantNestedInput
@@ -11612,6 +11651,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionCreateNestedManyWithoutTenantInput
     globalUsers?: GlobalUserCreateNestedManyWithoutTenantInput
@@ -11626,6 +11666,7 @@ export namespace Prisma {
     dbUser: string
     dbPasswordEncrypted: string
     status?: string
+    isDemo?: boolean
     createdAt?: Date | string
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutTenantInput
     globalUsers?: GlobalUserUncheckedCreateNestedManyWithoutTenantInput
@@ -11685,6 +11726,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUpdateManyWithoutTenantNestedInput
     globalUsers?: GlobalUserUpdateManyWithoutTenantNestedInput
@@ -11699,6 +11741,7 @@ export namespace Prisma {
     dbUser?: StringFieldUpdateOperationsInput | string
     dbPasswordEncrypted?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    isDemo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
     globalUsers?: GlobalUserUncheckedUpdateManyWithoutTenantNestedInput

@@ -15,6 +15,7 @@ model Tenant {
   dbUser              String   @map("db_user") @db.VarChar(100)
   dbPasswordEncrypted String   @map("db_password_encrypted") @db.Text
   status              String   @default("trial") @db.VarChar(20)
+  isDemo              Boolean  @default(false) @map("is_demo")
   createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
   subscriptions    Subscription[]

@@ -39,3 +39,4 @@ Stored in each tenant database (`dashboard_settings`: `id`, `setting_key`, `sett
 - No external feature-flag service is used. Feature visibility is controlled by **RBAC permissions** (`src/lib/permissions.ts`) and tenant status (`control_plane.tenants.status` in `["active", "trial"]`).
 `;
 writeDoc("12-configuration-and-environment.md", ...)`
+

@@ -40,3 +40,4 @@ On startup, `src/worker.ts` verifies:
 - **Automated Daily Snapshots / Backups:** `UNVERIFIED:` Not present in `src/worker.ts`.
 `;
 writeDoc("11-background-jobs.md", ...)`
+

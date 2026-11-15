@@ -40,3 +40,4 @@
 | **Idempotent** | আইডেমপোটেন্ট | An operation that produces the same safe result even if executed multiple times (e.g., `seedRoles`). |
 `;
 writeDoc("20-glossary.md", ...)`
+

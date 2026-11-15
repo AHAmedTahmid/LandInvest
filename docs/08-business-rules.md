@@ -24,3 +24,4 @@
 | **BR-14** | **Owner role cannot be edited/deleted; current active FY cannot be deleted** | Prevents system lockout and ensures an active reporting FY always exists. | `src/app/api/roles/[id]/route.ts`, `src/lib/fiscalYear.ts` | `scripts/test_fiscal_years.mjs` (Test 3) |
 `;
 writeDoc("08-business-rules.md", ...)`
+

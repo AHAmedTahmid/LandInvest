@@ -32,3 +32,4 @@
 4. **Stubbed Billing & Password Reset Delivery:** Billing payment (`POST /api/billing/pay`) has no cryptographic webhook verification because no live gateway is wired yet.
 `;
 writeDoc("15-security.md", ...)`
+

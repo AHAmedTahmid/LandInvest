@@ -27,3 +27,4 @@
 | **Add a Fiscal Year / Setting** | `src/lib/fiscalYear.ts` (or `dashboard_settings`) | Store under a unique `settingKey` in `dashboard_settings` with `writeAudit()`. |
 `;
 writeDoc("17-developer-guide.md", ...)`
+

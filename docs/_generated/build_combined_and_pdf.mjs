@@ -300,3 +300,4 @@ generatePdf().catch((err) => {
   console.error("PDF generation failed:", err);
   process.exit(1);
 });
+

@@ -66,3 +66,4 @@ LandInvest solves these problems by enforcing every financial movement through i
 2. **Database-Per-Tenant Operations:** Schema updates must be rolled out across every active tenant database, and backups must cover both `control_plane` and all `tenant_*` databases.
 3. **Production Hardening Needed:** Ensure strong `NEXTAUTH_SECRET`, non-empty MySQL root/app passwords, and HTTPS termination before public internet exposure.
 `;
+

@@ -98,3 +98,4 @@ Implemented in [`src/lib/tenant.ts`](../src/lib/tenant.ts):
 | **Database Schemas** | `prisma/control/schema.prisma`, `prisma/tenant/schema.prisma` | Separate Prisma schemas & generated clients (`src/generated/control`, `src/generated/tenant`). |
 | **Scripts & Tests** | `scripts/` | Setup, seeding, acceptance (`acceptance.mjs`), Fiscal Year TDD (`test_fiscal_years.mjs`), Full E2E (`test_full_project.mjs`). |
 `;
+

@@ -62,3 +62,4 @@ DATABASE_URL_TENANT="mysql://<user>:<pass>@localhost:3306/<db_name>" npx prisma 
 - [ ] `npm run docs:generate` re-run if tables, permissions, routes, or reports changed.
 `;
 writeDoc("14-deployment-and-operations.md", ...)`
+

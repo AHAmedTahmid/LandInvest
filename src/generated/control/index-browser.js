@@ -129,6 +129,7 @@ exports.Prisma.TenantScalarFieldEnum = {
   dbUser: 'dbUser',
   dbPasswordEncrypted: 'dbPasswordEncrypted',
   status: 'status',
+  isDemo: 'isDemo',
   createdAt: 'createdAt'
 };
 

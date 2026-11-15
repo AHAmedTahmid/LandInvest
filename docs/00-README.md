@@ -72,3 +72,4 @@ For strict accuracy, all items not directly proven by code comments or commit me
 6. **`UNVERIFIED:` Automated backup/restore execution in production**: Backup/restore procedures in `14-deployment-and-operations.md` document standard `mysqldump` commands for the observed schema layout, as no automated backup script exists in `scripts/`.
 `;
 writeDoc("00-README.md", ...)`
+

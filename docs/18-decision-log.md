@@ -22,3 +22,4 @@
 | **D-12** | SaaS Billing | **Stubbed billing module** | Live Stripe / SSLCommerz / bKash | `Inferred reason:` Data model (`billing_invoices`, `subscription_plans`) is ready while payment gateway integration is deferred. | Cannot collect real online payments yet. |
 `;
 writeDoc("18-decision-log.md", ...)`
+

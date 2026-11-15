@@ -12,6 +12,8 @@
     "setup": "node scripts/setup.mjs",
     "clean:data": "node scripts/clean_test_data.mjs",
     "seed:roles": "tsx scripts/seed_roles.mjs",
+    "seed:demo": "tsx scripts/seed_demo.mjs",
+    "seed:demo:verify": "tsx scripts/verify_demo_seed.mjs",
     "seed:fy": "node scripts/seed_fiscal_years.mjs",
     "test:fy": "node --test scripts/test_fiscal_years.mjs",
     "test:all": "node --test scripts/test_full_project.mjs",

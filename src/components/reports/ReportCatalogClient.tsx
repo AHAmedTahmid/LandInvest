@@ -477,3 +477,4 @@ export default function ReportCatalogClient({ groups }: { groups: ReportGroupDat
     </div>
   );
 }
+

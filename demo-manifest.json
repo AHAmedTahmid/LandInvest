@@ -1,0 +1,184 @@
+{
+  "tenant": {
+    "companyName": "Sonar Bangla Land Developers Ltd.",
+    "companyNameBn": "সোনার বাংলা ল্যান্ড ডেভেলপার্স লিমিটেড",
+    "dbName": "tenant_demo",
+    "slug": "demo",
+    "asOfDate": "2026-11-15",
+    "currency": "BDT",
+    "currencySymbol": "৳"
+  },
+  "logins": [
+    {
+      "role": "Owner",
+      "email": "owner@demo.landinvest.test",
+      "password": "DemoPassword123!",
+      "name": "Md. Rafiqul Islam",
+      "purpose": "Full access across all executive dashboards, financial books, operations, reports, user administration, and company configurations."
+    },
+    {
+      "role": "Managing Partner",
+      "email": "managing.partner@demo.landinvest.test",
+      "password": "DemoPassword123!",
+      "name": "Barrister Tariq Ahmed",
+      "purpose": "Executive oversight across all projects, financial ledgers, voucher approvals, and reports (excluding user & role administrative permissions)."
+    },
+    {
+      "role": "Accountant",
+      "email": "accountant@demo.landinvest.test",
+      "password": "DemoPassword123!",
+      "name": "Mahfuzur Rahman",
+      "purpose": "Treasury ledger, cash in hand, bank accounts, money receipts printing, customer installment collection, and voucher cost accounting."
+    },
+    {
+      "role": "Site Manager",
+      "email": "site.manager@demo.landinvest.test",
+      "password": "DemoPassword123!",
+      "name": "Engr. Kamrul Hasan",
+      "purpose": "Land projects inspection, cadastral plots demarcations, site earthwork progress, and on-site expense vouchers submission."
+    },
+    {
+      "role": "Sales Executive",
+      "email": "sales.exec@demo.landinvest.test",
+      "password": "DemoPassword123!",
+      "name": "Tanvir Ahmed",
+      "purpose": "Custom role: Plot inventory, sales pricing, customer collections, and sales reports. Strictly restricted from costs, margins, and bank ledgers."
+    },
+    {
+      "role": "Auditor (read-only)",
+      "email": "auditor@demo.landinvest.test",
+      "password": "DemoPassword123!",
+      "name": "Farhana Yasmin",
+      "purpose": "Custom role: Comprehensive read-only review of books, audit trails, and reconciliation statements with zero write/edit permissions."
+    }
+  ],
+  "projects": {
+    "soldOut": {
+      "id": "50000000-0000-0000-0000-000000000001",
+      "name": "Green Valley City",
+      "status": "SOLD_OUT",
+      "mouza": "Baraipara, Savar",
+      "totalAreaShotok": 150.0,
+      "plotCount": 30,
+      "highlights": "100% sold & collected. Net profit ৳ 1.39 Cr distributed in full across syndicate partners. High ROI (>57%)."
+    },
+    "sellingActive": {
+      "id": "50000000-0000-0000-0000-000000000002",
+      "name": "River View Township",
+      "status": "SELLING",
+      "mouza": "Rohitpur, Keraniganj",
+      "totalAreaShotok": 220.0,
+      "plotCount": 40,
+      "highlights": "65% sold/booked. Active installment collections, receivables aging buckets (1-30, 31-60, 61-90, >90 days overdue), held and reserved plots."
+    },
+    "sellingEarly": {
+      "id": "50000000-0000-0000-0000-000000000003",
+      "name": "Lake Garden Oasis",
+      "status": "SELLING",
+      "mouza": "Bhelanagar, Purbachal Sector 22",
+      "totalAreaShotok": 180.0,
+      "plotCount": 32,
+      "highlights": "25% sold. Premium corner/road-facing plots, staggered asking prices, unpriced common reserve plots."
+    },
+    "developing": {
+      "id": "50000000-0000-0000-0000-000000000004",
+      "name": "Palm Heights",
+      "status": "DEVELOPING",
+      "mouza": "Baoani, Gazipur Sadar",
+      "totalAreaShotok": 120.0,
+      "plotCount": 24,
+      "highlights": "Land acquired & registered. Active earth filling & boundary wall expenses, pending vouchers (>3 days old), 6 newly priced plots, 18 unpriced."
+    },
+    "underBayna": {
+      "id": "50000000-0000-0000-0000-000000000005",
+      "name": "Sunrise Residency",
+      "status": "UNDER_BAYNA",
+      "mouza": "Murapara, Rupganj, Narayanganj",
+      "totalAreaShotok": 90.0,
+      "plotCount": 18,
+      "highlights": "Bayna paid 68 days ago, contract expiring in 9 days (triggers dashboard bayna expiry warning alert)."
+    },
+    "draft": {
+      "id": "50000000-0000-0000-0000-000000000006",
+      "name": "Meghna Riverside Estate",
+      "status": "DRAFT",
+      "mouza": "Baushia, Gazaria",
+      "totalAreaShotok": 70.0,
+      "plotCount": 14,
+      "highlights": "Preliminary creation wizard draft ready for completion."
+    }
+  },
+  "sampleItems": {
+    "partnerWithLongLedger": {
+      "id": "40000000-0000-0000-0000-000000000001",
+      "name": "Md. Rafiqul Islam",
+      "phone": "01700-000001",
+      "route": "/partners/40000000-0000-0000-0000-000000000001"
+    },
+    "bankAccount": {
+      "id": "30000000-0000-0000-0000-000000000001",
+      "name": "Dutch-Bangla Bank PLC",
+      "accountNumber": "DBBL-0115-12045892",
+      "route": "/treasury"
+    },
+    "printableReceipt": {
+      "id": "36ef1751-383b-4e7a-bbd5-fe42ea8f39cc",
+      "saleId": "befc311c-0b0c-4eae-87ac-7dc7de8ed3db",
+      "receiptNo": "MR-0457",
+      "amount": 159250.00,
+      "buyer": "Anisur Rahman",
+      "route": "/sales/befc311c-0b0c-4eae-87ac-7dc7de8ed3db"
+    },
+    "pendingVoucher": {
+      "id": "fdb126e0-25bb-48d8-a0da-1ee64dbb6130",
+      "description": "Gazipur Palm Heights subgrade earth filling 3rd bill",
+      "amount": 485000.00,
+      "route": "/expenses/approvals"
+    },
+    "heldPlot": {
+      "id": "3636ed00-42be-43f1-a2e8-aeb3758d6f59",
+      "plotNumber": "RV-26",
+      "projectId": "50000000-0000-0000-0000-000000000002",
+      "route": "/projects/50000000-0000-0000-0000-000000000002"
+    }
+  },
+  "roles": {
+    "owner": "20000000-0000-0000-0000-000000000001",
+    "managingPartner": "20000000-0000-0000-0000-000000000002",
+    "accountant": "20000000-0000-0000-0000-000000000003",
+    "siteManager": "20000000-0000-0000-0000-000000000004",
+    "salesExecutive": "20000000-0000-0000-0000-000000000005",
+    "auditor": "20000000-0000-0000-0000-000000000006"
+  },
+  "keyRoutes": {
+    "dashboard": "/",
+    "dashboardFinancial": "/?tab=financial",
+    "dashboardProjects": "/?tab=projects",
+    "dashboardSales": "/?tab=sales",
+    "dashboardPartners": "/?tab=partners",
+    "dashboardOperations": "/?tab=operations",
+    "projects": "/projects",
+    "projectDetailSoldOut": "/projects/50000000-0000-0000-0000-000000000001",
+    "projectDetailSelling": "/projects/50000000-0000-0000-0000-000000000002",
+    "sales": "/sales",
+    "salesReceivablesAging": "/reports/receivables-aging",
+    "salesInstallments": "/reports/installment-report",
+    "partners": "/partners",
+    "partnerStatement": "/reports/partner-capital?partner=40000000-0000-0000-0000-000000000001",
+    "treasury": "/treasury",
+    "treasuryContraRegister": "/reports/contra-register",
+    "expenses": "/expenses",
+    "expenseApprovals": "/expenses/approvals",
+    "expenseRegister": "/reports/expense-register",
+    "reports": "/reports",
+    "reportBalanceSheet": "/reports/balance-sheet",
+    "reportCashBook": "/reports/cash-book",
+    "reportBankBook": "/reports/bank-book",
+    "reportProjectPnl": "/reports/project-pnl?project=50000000-0000-0000-0000-000000000001",
+    "reportReconciliation": "/reports/reconciliation",
+    "settingsRoles": "/settings/roles",
+    "settingsUsers": "/settings/users",
+    "settingsAuditLog": "/settings/audit"
+  }
+}
+

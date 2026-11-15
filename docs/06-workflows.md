@@ -171,3 +171,4 @@ flowchart LR
 - **Schema Rollout:** Iterate over all active `tenants.db_name` rows in `control_plane` and execute `prisma db push --schema=prisma/tenant/schema.prisma` with `DATABASE_URL_TENANT` set per tenant.
 `;
 writeDoc("06-workflows.md", ...)`
+

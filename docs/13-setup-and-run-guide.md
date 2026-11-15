@@ -66,3 +66,4 @@
 | `Table 'tenant_demo.users' doesn't exist` | Login accounts live in `control_plane.global_users`, not in tenant DBs. | Query `control_plane.global_users` for auth records. |
 `;
 writeDoc("13-setup-and-run-guide.md", ...)`
+
