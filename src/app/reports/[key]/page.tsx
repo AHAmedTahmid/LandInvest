@@ -9,6 +9,7 @@ import { REPORT_QUERIES } from "@/lib/reports";
 import ReportTable from "@/components/reports/ReportTable";
 import ReportFilters from "@/components/reports/ReportFilters";
 import BalanceSheetView from "@/components/reports/financial/BalanceSheetView";
+import CashBookView from "@/components/reports/financial/CashBookView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -75,6 +76,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         data={data}
         filters={filters}
         projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "cash-book") {
+    return (
+      <CashBookView
+        def={def}
+        data={data}
+        filters={filters}
         canExport={canExport}
       />
     );

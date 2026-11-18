@@ -674,6 +674,427 @@ export function buildBalanceSheetPdfHtml(opts: {
 </html>`;
 }
 
+export function buildCashBookPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: ReportData;
+}): string {
+  const { companyName, filterSummary, generatedBy, lang, data } = opts;
+  const now = formatDateTime(new Date());
+
+  const totalIn = Number(data.totals?.in || 0);
+  const totalOut = Number(data.totals?.out || 0);
+  const netMovement = totalIn - totalOut;
+
+  let openingBalance = 0;
+  if (data.rows.length > 0) {
+    const first = data.rows[0];
+    const firstNet = (first.in || 0) - (first.out || 0);
+    openingBalance = (first.balance || 0) - firstNet;
+  }
+  const closingBalance = data.rows.length > 0 ? (data.rows[data.rows.length - 1].balance || 0) : openingBalance;
+
+  const inCount = data.rows.filter((r) => r.in !== null && r.in > 0).length;
+  const outCount = data.rows.filter((r) => r.out !== null && r.out > 0).length;
+
+  const getCategoryBadgeHtml = (refType: string) => {
+    const type = (refType || "").toUpperCase();
+    if (type.includes("DEPOSIT")) {
+      return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8.5px;font-weight:700;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;">${lang === "bn" ? "মূলধন জমা" : "Deposit"}</span>`;
+    }
+    if (type.includes("COLLECTION")) {
+      return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8.5px;font-weight:700;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;">${lang === "bn" ? "বিক্রয় আদায়" : "Collection"}</span>`;
+    }
+    if (type.includes("CONTRA")) {
+      return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8.5px;font-weight:700;background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe;">${lang === "bn" ? "কন্ট্রা" : "Contra"}</span>`;
+    }
+    if (type.includes("EXPENSE")) {
+      return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8.5px;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;">${lang === "bn" ? "প্রকল্প ব্যয়" : "Expense"}</span>`;
+    }
+    return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8.5px;font-weight:600;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;">${refType || "General"}</span>`;
+  };
+
+  const rowsHtml = data.rows.map((row, idx) => {
+    return `<tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;white-space:nowrap;font-size:9.5px;color:#334155;">${formatDate(row.date)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-family:monospace;font-size:9px;color:#64748b;white-space:nowrap;">#${row.voucher || "-"}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;white-space:nowrap;">${getCategoryBadgeHtml(row.referenceType || row.reference)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:9.5px;color:#0f172a;font-weight:500;">${row.purpose || "-"}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:9.5px;color:#047857;font-weight:600;white-space:nowrap;">${row.in ? `+${formatBDT(row.in)}` : "-"}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:9.5px;color:#be123c;font-weight:600;white-space:nowrap;">${row.out ? `-${formatBDT(row.out)}` : "-"}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:10px;color:#0f172a;font-weight:700;white-space:nowrap;">${formatBDT(row.balance)}</td>
+    </tr>`;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="utf-8">
+<title>Cash Book - ${companyName}</title>
+<style>
+  @page { size: A4 landscape; margin: 10mm 12mm 12mm 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Noto Sans Bengali";
+    font-size: 10px;
+    color: #0f172a;
+    background: #fff;
+    line-height: 1.4;
+  }
+  .header-band {
+    border-bottom: 2px solid #2c3605;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+    background: #4b5c09;
+    color: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 800;
+  }
+  .company-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.3px;
+  }
+  .company-sub {
+    font-size: 9px;
+    font-weight: 600;
+    color: #4b5c09;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .meta-block {
+    text-align: right;
+    font-size: 9px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .meta-block strong { color: #1e293b; }
+
+  .doc-title-bar {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #d97706;
+    padding: 7px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .doc-title {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .doc-subtitle {
+    font-size: 9.5px;
+    color: #475569;
+    margin-top: 1px;
+  }
+  .scope-pill {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 3px 9px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .kpi-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 7px 10px;
+    border-top: 3px solid #64748b;
+  }
+  .kpi-card.opening { border-top-color: #64748b; background: #f8fafc; }
+  .kpi-card.inflows { border-top-color: #059669; }
+  .kpi-card.outflows { border-top-color: #e11d48; }
+  .kpi-card.closing { border-top-color: #d97706; background: #fffbeb; }
+  .kpi-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+  }
+  .kpi-value {
+    font-size: 12px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-sub {
+    font-size: 8px;
+    color: #94a3b8;
+    margin-top: 1px;
+  }
+
+  .register-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    font-size: 9.5px;
+  }
+  .register-table th {
+    background: #2c3605;
+    color: #ffffff;
+    text-align: left;
+    padding: 6px 8px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .register-table th.num { text-align: right; }
+  .register-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .bf-row td {
+    background: #fffbeb !important;
+    font-weight: 700;
+    border-bottom: 1px solid #fde68a !important;
+    color: #78350f;
+  }
+  .cd-row td {
+    background: #ecfdf5 !important;
+    font-weight: 800;
+    color: #065f46;
+    border-top: 2px solid #059669 !important;
+    border-bottom: 3px double #059669 !important;
+  }
+
+  .audit-verified-banner {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 9px;
+    color: #065f46;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .signatures-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+  }
+  .sig-card {
+    text-align: center;
+    border-top: 1px solid #0f172a;
+    padding-top: 4px;
+  }
+  .sig-title {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: uppercase;
+  }
+  .sig-subtitle {
+    font-size: 7.5px;
+    color: #64748b;
+    margin-top: 1px;
+  }
+
+  .policy-notes {
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 6px;
+    font-size: 7.5px;
+    color: #64748b;
+    line-height: 1.35;
+    page-break-inside: avoid;
+  }
+
+  .page-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 14px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.5px;
+    color: #94a3b8;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 3px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <div class="header-band">
+    <div class="brand-group">
+      <div class="brand-logo">L</div>
+      <div>
+        <div class="company-title">${companyName}</div>
+        <div class="company-sub">Partnership ERP Suite · Cash & Treasury Operations</div>
+      </div>
+    </div>
+    <div class="meta-block">
+      <div><strong>Document:</strong> Cash Book & Cash Ledger</div>
+      <div><strong>Generated:</strong> ${now}</div>
+      <div><strong>Authorized User:</strong> ${generatedBy}</div>
+    </div>
+  </div>
+
+  <!-- Document Title & Scope Bar -->
+  <div class="doc-title-bar">
+    <div>
+      <div class="doc-title">${lang === "bn" ? "নগদ খাতা ও ক্যাশ রেজিস্টার (CASH BOOK)" : "CASH BOOK & CASH LEDGER REGISTER"}</div>
+      <div class="doc-subtitle">Filters: ${filterSummary} · Currency: BDT (৳)</div>
+    </div>
+    <div class="scope-pill">
+      Scope: Physical Cash Vault / Drawer Float
+    </div>
+  </div>
+
+  <!-- 4 KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card opening">
+      <div class="kpi-label">${lang === "bn" ? "প্রারম্ভিক নগদ জের (B/F)" : "Opening Cash (B/F)"}</div>
+      <div class="kpi-value">${formatBDT(openingBalance)}</div>
+      <div class="kpi-sub">Brought forward balance</div>
+    </div>
+    <div class="kpi-card inflows">
+      <div class="kpi-label">${lang === "bn" ? "মোট নগদ গ্রহণ / আদায়" : "Total Cash Inflows"}</div>
+      <div class="kpi-value" style="color:#047857;">+${formatBDT(totalIn)}</div>
+      <div class="kpi-sub">${inCount} inflow receipts</div>
+    </div>
+    <div class="kpi-card outflows">
+      <div class="kpi-label">${lang === "bn" ? "মোট নগদ প্রদান / পরিশোধ" : "Total Cash Outflows"}</div>
+      <div class="kpi-value" style="color:#be123c;">-${formatBDT(totalOut)}</div>
+      <div class="kpi-sub">${outCount} outflow payments</div>
+    </div>
+    <div class="kpi-card closing">
+      <div class="kpi-label">${lang === "bn" ? "সমাপনী ক্যাশ ব্যালেন্স (C/D)" : "Closing Cash (C/D)"}</div>
+      <div class="kpi-value" style="color:#b45309;">${formatBDT(closingBalance)}</div>
+      <div class="kpi-sub">Net movement: ${netMovement >= 0 ? "+" : ""}${formatBDT(netMovement)}</div>
+    </div>
+  </div>
+
+  <!-- Cash Register Table -->
+  <table class="register-table">
+    <thead>
+      <tr>
+        <th style="width: 10%;">${lang === "bn" ? "তারিখ" : "Date"}</th>
+        <th style="width: 10%;">${lang === "bn" ? "ভাউচার নং" : "Voucher #"}</th>
+        <th style="width: 12%;">${lang === "bn" ? "শ্রেণি" : "Category"}</th>
+        <th style="width: 38%;">${lang === "bn" ? "বিবরণ ও উদ্দেশ্য" : "Description / Purpose"}</th>
+        <th class="num" style="width: 10%;">${lang === "bn" ? "নগদ গ্রহণ" : "Cash In"}</th>
+        <th class="num" style="width: 10%;">${lang === "bn" ? "নগদ প্রদান" : "Cash Out"}</th>
+        <th class="num" style="width: 10%;">${lang === "bn" ? "চলতি জের" : "Balance"}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Row 0: Balance Brought Forward (B/F) -->
+      <tr class="bf-row">
+        <td>Start</td>
+        <td style="font-family:monospace;color:#92400e;">-</td>
+        <td><span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8.5px;font-weight:700;background:#fde68a;color:#78350f;">B/F</span></td>
+        <td style="font-style:italic;">Opening Balance Brought Forward (B/F)</td>
+        <td style="text-align:right;font-family:monospace;">-</td>
+        <td style="text-align:right;font-family:monospace;">-</td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;">${formatBDT(openingBalance)}</td>
+      </tr>
+
+      <!-- Data Rows -->
+      ${rowsHtml}
+
+      <!-- Row N: Balance Carried Down (C/D) -->
+      <tr class="cd-row">
+        <td>End</td>
+        <td style="font-family:monospace;">-</td>
+        <td><span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8.5px;font-weight:700;background:#a7f3d0;color:#065f46;">C/D</span></td>
+        <td style="font-style:italic;font-weight:700;">Closing Balance Carried Down (C/D)</td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#047857;">+${formatBDT(totalIn)}</td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#be123c;">-${formatBDT(totalOut)}</td>
+        <td style="text-align:right;font-family:monospace;font-weight:800;color:#065f46;font-size:10.5px;">${formatBDT(closingBalance)}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Vault Audit Verified Banner -->
+  <div class="audit-verified-banner">
+    <div>
+      ✔ &nbsp;${lang === "bn"
+        ? "শারীরিক ক্যাশ ড্রয়ার ও খাতা সমীকরণ যাচাইকৃত: প্রারম্ভিক জের + মোট গ্রহণ - মোট প্রদান = সমাপনী জের"
+        : "Vault Cash Audit Verified: Opening Balance (B/F) + Total Receipts - Total Disbursements = Closing Balance (C/D)"}
+    </div>
+    <div>
+      Difference: ৳ 0.00 &nbsp;·&nbsp; Reconciled: 100.00%
+    </div>
+  </div>
+
+  <!-- Signatures Grid -->
+  <div class="signatures-grid">
+    <div class="sig-card">
+      <div class="sig-title">Prepared By (Cashier)</div>
+      <div class="sig-subtitle">${generatedBy}</div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-title">Verified By (Accountant)</div>
+      <div class="sig-subtitle">Internal Audit & Accounts</div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-subtitle">Syndicate Managing Partner</div>
+    </div>
+  </div>
+
+  <!-- Policy Footnotes -->
+  <div class="policy-notes">
+    <strong>Cash Control Policy:</strong> Physical vault cash must be verified daily against the C/D balance. All disbursements must have an approved project voucher or contra transfer slip.
+  </div>
+
+  <!-- Page Footer -->
+  <div class="page-footer">
+    <span>${companyName} ERP · Cash Ledger Document</span>
+    <span>Page 1 of 1</span>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

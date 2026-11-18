@@ -25,6 +25,23 @@ const cashBookColumns: ReportColumn[] = [
 ];
 
 export async function queryCashBook(prisma: any, filters: ReportFilters): Promise<ReportData> {
+  // 1. Calculate true Opening Balance prior to filters.from
+  let openingBalance = 0;
+  if (filters.from) {
+    const priorRows = await prisma.treasuryLedger.findMany({
+      where: {
+        accountType: "CASH",
+        txnDate: { lt: new Date(filters.from) },
+      },
+      select: { flowType: true, amount: true },
+    });
+    for (const r of priorRows) {
+      const amt = toNum(r.amount);
+      openingBalance += r.flowType === "IN" ? amt : -amt;
+    }
+  }
+
+  // 2. Fetch cash transactions within selected date range
   const where: any = { accountType: "CASH" };
   if (filters.from || filters.to) {
     where.txnDate = {};
@@ -33,16 +50,20 @@ export async function queryCashBook(prisma: any, filters: ReportFilters): Promis
   }
   const rows = await prisma.treasuryLedger.findMany({ where, orderBy: [{ txnDate: "asc" }, { createdAt: "asc" }] });
 
-  let balance = 0;
+  let balance = openingBalance;
   const data = rows.map((r: any) => {
     const amt = toNum(r.amount);
     const isIn = r.flowType === "IN";
     balance += isIn ? amt : -amt;
     return {
+      id: r.id,
       date: r.txnDate,
       purpose: r.purpose,
       reference: r.referenceType,
+      referenceType: r.referenceType,
       voucher: r.referenceId?.slice(0, 8) ?? "-",
+      amount: amt,
+      flowType: r.flowType,
       in: isIn ? amt : null,
       out: !isIn ? amt : null,
       balance,
@@ -51,14 +72,19 @@ export async function queryCashBook(prisma: any, filters: ReportFilters): Promis
 
   const totalIn = data.reduce((s: number, r: any) => s + (r.in || 0), 0);
   const totalOut = data.reduce((s: number, r: any) => s + (r.out || 0), 0);
+  const netChange = totalIn - totalOut;
+  const closingBalance = balance;
 
   return {
     columns: cashBookColumns,
     rows: data,
-    totals: { in: totalIn, out: totalOut, balance },
+    totals: { in: totalIn, out: totalOut, balance: closingBalance },
     summary: [
-      { labelEn: "Opening Balance", labelBn: "প্রারম্ভিক ব্যালেন্স", value: formatBDT(0) },
-      { labelEn: "Closing Balance", labelBn: "সমাপনী ব্যালেন্স", value: formatBDT(balance) },
+      { labelEn: "Opening Balance (B/F)", labelBn: "প্রারম্ভিক ব্যালেন্স (পূর্বের জের)", value: formatBDT(openingBalance) },
+      { labelEn: "Total Cash Received", labelBn: "মোট নগদ গ্রহণ / আদায়", value: formatBDT(totalIn) },
+      { labelEn: "Total Cash Disbursed", labelBn: "মোট নগদ প্রদান / পরিশোধ", value: formatBDT(totalOut) },
+      { labelEn: "Net Cash Movement", labelBn: "চলতি সময়ের নগদ পরিবর্তন", value: `${netChange >= 0 ? "+" : ""}${formatBDT(netChange)}` },
+      { labelEn: "Closing Balance (C/D)", labelBn: "সমাপনী ব্যালেন্স (পরের জের)", value: formatBDT(closingBalance) },
     ],
   };
 }

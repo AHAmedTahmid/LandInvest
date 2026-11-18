@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
 import { getFiscalYears } from "@/lib/fiscalYear";
-import { buildReportHtml, buildBalanceSheetPdfHtml, generatePdf } from "@/lib/reports/pdf";
+import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
 
@@ -92,6 +92,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
       projectName,
     });
     landscape = false; // Official A4 portrait statement of financial position
+  } else if (key === "cash-book") {
+    html = buildCashBookPdfHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+    });
+    landscape = true; // High-readability A4 landscape cash register
   } else {
     html = buildReportHtml({
       titleEn: def.titleEn,
