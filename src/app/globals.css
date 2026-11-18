@@ -28,3 +28,27 @@ body {
 .animate-slide-in {
   animation: slide-in 0.3s ease-out;
 }
+
+@media print {
+  aside,
+  header,
+  nav,
+  .no-print,
+  button:not(.print-show) {
+    display: none !important;
+  }
+
+  body, html, main {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+
+  @page {
+    size: auto;
+    margin: 10mm 12mm 12mm 12mm;
+  }
+}

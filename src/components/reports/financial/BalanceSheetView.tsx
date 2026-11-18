@@ -213,6 +213,7 @@ export default function BalanceSheetView({
                   href={`/api/reports/balance-sheet?${new URLSearchParams({
                     ...(searchParams ? Object.fromEntries(searchParams.entries()) : {}),
                     format: "pdf",
+                    lang,
                   })}`}
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 hover:border-red-300 transition shadow-sm"
                 >
@@ -223,6 +224,7 @@ export default function BalanceSheetView({
                   href={`/api/reports/balance-sheet?${new URLSearchParams({
                     ...(searchParams ? Object.fromEntries(searchParams.entries()) : {}),
                     format: "excel",
+                    lang,
                   })}`}
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition shadow-sm"
                 >

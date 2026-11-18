@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
 import { getFiscalYears } from "@/lib/fiscalYear";
-import { buildReportHtml, generatePdf } from "@/lib/reports/pdf";
+import { buildReportHtml, buildBalanceSheetPdfHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
 
@@ -64,10 +64,55 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
     return new Response(html, { headers: { "Content-Type": "application/vnd.ms-excel", "Content-Disposition": `attachment; filename="${key}.xls"` } });
   }
 
-  const html = buildReportHtml({ titleEn: def.titleEn, titleBn: def.titleBn, companyName, filterSummary: fSummary, generatedBy, lang: "en", data });
+  const lang = (sp.get("lang") as "en" | "bn") || "en";
+  let html: string;
+  let landscape = true;
+
+  if (key === "balance-sheet") {
+    let projectName: string | undefined;
+    if (filters.projectId) {
+      try {
+        const p = await prisma.landProject.findUnique({
+          where: { id: filters.projectId },
+          select: { projectName: true },
+        });
+        projectName = p?.projectName;
+      } catch {
+        // Fallback if query fails
+      }
+    }
+    html = buildBalanceSheetPdfHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+      projectName,
+    });
+    landscape = false; // Official A4 portrait statement of financial position
+  } else {
+    html = buildReportHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+    });
+    landscape = true;
+  }
+
   try {
-    const pdf = await generatePdf(html);
-    return new Response(Buffer.from(pdf), { headers: { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="${key}.pdf"` } });
+    const pdf = await generatePdf(html, { landscape });
+    return new Response(Buffer.from(pdf), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="${key}.pdf"`,
+      },
+    });
   } catch {
     return new Response(html, { headers: { "Content-Type": "text/html" } });
   }
