@@ -31,7 +31,7 @@ type BankAccountOption = {
   bankName: string;
   accountNumber: string;
   branchName?: string | null;
-  currentBalance?: any;
+  currentBalance: number;
 };
 
 type Props = {

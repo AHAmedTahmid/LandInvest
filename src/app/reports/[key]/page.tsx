@@ -70,12 +70,19 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   }
 
   // Fetch bank accounts list for contextual account selector
-  let bankAccounts: { id: string; bankName: string; accountNumber: string; branchName: string | null; currentBalance: any }[] = [];
+  let bankAccounts: { id: string; bankName: string; accountNumber: string; branchName: string | null; currentBalance: number }[] = [];
   try {
-    bankAccounts = await prisma.bankAccount.findMany({
+    const rawBankAccounts = await prisma.bankAccount.findMany({
       select: { id: true, bankName: true, accountNumber: true, branchName: true, currentBalance: true },
       orderBy: { bankName: "asc" },
     });
+    bankAccounts = rawBankAccounts.map((b: any) => ({
+      id: b.id,
+      bankName: b.bankName,
+      accountNumber: b.accountNumber,
+      branchName: b.branchName,
+      currentBalance: Number(b.currentBalance || 0),
+    }));
   } catch {
     // Graceful fallback if bankAccount table is empty or inaccessible
   }
