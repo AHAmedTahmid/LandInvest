@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
 import { getFiscalYears } from "@/lib/fiscalYear";
-import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, generatePdf } from "@/lib/reports/pdf";
+import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
 
@@ -103,6 +103,30 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
       data,
     });
     landscape = true; // High-readability A4 landscape cash register
+  } else if (key === "bank-book") {
+    let bankAccountName: string | undefined;
+    if (filters.bankAccountId) {
+      try {
+        const acc = await prisma.bankAccount.findUnique({
+          where: { id: filters.bankAccountId },
+          select: { bankName: true, accountNumber: true },
+        });
+        if (acc) bankAccountName = `${acc.bankName} (${acc.accountNumber})`;
+      } catch {
+        // Fallback if query fails
+      }
+    }
+    html = buildBankBookPdfHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+      bankAccountName,
+    });
+    landscape = true; // High-readability A4 landscape bank register
   } else {
     html = buildReportHtml({
       titleEn: def.titleEn,

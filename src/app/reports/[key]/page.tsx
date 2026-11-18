@@ -10,6 +10,7 @@ import ReportTable from "@/components/reports/ReportTable";
 import ReportFilters from "@/components/reports/ReportFilters";
 import BalanceSheetView from "@/components/reports/financial/BalanceSheetView";
 import CashBookView from "@/components/reports/financial/CashBookView";
+import BankBookView from "@/components/reports/financial/BankBookView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -68,6 +69,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
     // Graceful fallback if landProject table is empty or inaccessible
   }
 
+  // Fetch bank accounts list for contextual account selector
+  let bankAccounts: { id: string; bankName: string; accountNumber: string; branchName: string | null; currentBalance: any }[] = [];
+  try {
+    bankAccounts = await prisma.bankAccount.findMany({
+      select: { id: true, bankName: true, accountNumber: true, branchName: true, currentBalance: true },
+      orderBy: { bankName: "asc" },
+    });
+  } catch {
+    // Graceful fallback if bankAccount table is empty or inaccessible
+  }
+
   // Specialized High-Elegance Financial Views
   if (key === "balance-sheet") {
     return (
@@ -87,6 +99,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         def={def}
         data={data}
         filters={filters}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "bank-book") {
+    return (
+      <BankBookView
+        def={def}
+        data={data}
+        filters={filters}
+        bankAccounts={bankAccounts}
         canExport={canExport}
       />
     );
