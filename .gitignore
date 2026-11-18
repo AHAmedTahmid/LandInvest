@@ -58,3 +58,11 @@ worker2.*
 
 # tools
 graphify-out/
+scratch/
+output/
+Safari_PMS_Test_Cases.xlsx
+Safari_PMS_Test_Results.xlsx
+pnpm-lock.yaml
+pnpm-workspace.yaml
+screenshots/
+

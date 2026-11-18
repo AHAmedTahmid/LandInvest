@@ -8,6 +8,7 @@ import { getFiscalYears } from "@/lib/fiscalYear";
 import { REPORT_QUERIES } from "@/lib/reports";
 import ReportTable from "@/components/reports/ReportTable";
 import ReportFilters from "@/components/reports/ReportFilters";
+import BalanceSheetView from "@/components/reports/financial/BalanceSheetView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -54,6 +55,30 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   const queryFn = REPORT_QUERIES[key];
   if (!queryFn) notFound();
   const data = await queryFn(prisma, filters);
+
+  // Fetch projects list for contextual dropdown filters across reports
+  let projects: { id: string; projectName: string }[] = [];
+  try {
+    projects = await prisma.landProject.findMany({
+      select: { id: true, projectName: true },
+      orderBy: { projectName: "asc" },
+    });
+  } catch {
+    // Graceful fallback if landProject table is empty or inaccessible
+  }
+
+  // Specialized High-Elegance Financial Views
+  if (key === "balance-sheet") {
+    return (
+      <BalanceSheetView
+        def={def}
+        data={data}
+        filters={filters}
+        projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
 
   const fSummary = filterSummary(filters);
   const lang = "en";
