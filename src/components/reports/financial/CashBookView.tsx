@@ -42,7 +42,7 @@ type Props = {
 export default function CashBookView({ def, data, filters, canExport }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { lang, toggle } = useLang();
+  const { lang } = useLang();
 
   // Filter states
   const [preset, setPreset] = useState(searchParams.get("preset") || "this_month");
@@ -220,15 +220,6 @@ export default function CashBookView({ def, data, filters, canExport }: Props) {
 
           {/* Action Toolbar */}
           <div className="flex flex-wrap items-center gap-2 print:hidden">
-            {/* Language Toggle */}
-            <button
-              onClick={toggle}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition"
-              title="Toggle Language"
-            >
-              <span>{lang === "en" ? "বাংলা" : "English"}</span>
-            </button>
-
             {/* Print Button */}
             <button
               onClick={handlePrint}
