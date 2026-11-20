@@ -13,6 +13,7 @@ import CashBookView from "@/components/reports/financial/CashBookView";
 import BankBookView from "@/components/reports/financial/BankBookView";
 import DailySummaryView from "@/components/reports/financial/DailySummaryView";
 import ReceiptsPaymentsView from "@/components/reports/financial/ReceiptsPaymentsView";
+import ContraRegisterView from "@/components/reports/financial/ContraRegisterView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -142,6 +143,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
       <ReceiptsPaymentsView
         def={def}
         data={data}
+        filters={filters}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "contra-register") {
+    return (
+      <ContraRegisterView
+        def={def}
+        data={data as any}
         filters={filters}
         canExport={canExport}
       />

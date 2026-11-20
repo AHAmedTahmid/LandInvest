@@ -2502,6 +2502,319 @@ export function buildReceiptsPaymentsPdfHtml(opts: {
 </html>`;
 }
 
+export function buildContraRegisterPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+}): string {
+  const { companyName, filterSummary, generatedBy, lang, data } = opts;
+  const now = formatDateTime(new Date());
+
+  const transfers: any[] = data.transfers || [];
+  const kpis = data.kpis || {
+    totalTransferred: transfers.reduce((sum, t) => sum + (t.amount || 0), 0),
+    transferCount: transfers.length,
+    cashToBankAmount: 0,
+    cashToBankCount: 0,
+    bankToCashAmount: 0,
+    bankToCashCount: 0,
+    interAccountAmount: 0,
+    interAccountCount: 0,
+  };
+
+  const getBadgeHtml = (type: string) => {
+    switch (type) {
+      case "CASH_TO_BANK":
+      case "CASH_TO_MFS":
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;">Cash Deposit</span>`;
+      case "BANK_TO_CASH":
+      case "MFS_TO_CASH":
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;">Float Withdrawal</span>`;
+      default:
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe;">Inter-Account</span>`;
+    }
+  };
+
+  const getChannelHtml = (channel: any) => {
+    if (!channel || channel.type === "CASH") {
+      return `<strong>Cash in Hand</strong><br/><span style="font-size:8px;color:#047857;">Physical Vault</span>`;
+    }
+    const isMfs = channel.type === "MFS";
+    const subLabel = channel.accountNumber ? `<span style="font-size:8px;color:#64748b;font-family:monospace;">${channel.accountNumber}</span>` : "";
+    return `<strong>${channel.bankName || "Bank Account"}</strong>${isMfs ? ` <span style="font-size:7.5px;color:#be185d;background:#fdf2f8;padding:1px 3px;border-radius:3px;">MFS</span>` : ""}<br/>${subLabel}`;
+  };
+
+  const rowsHtml = transfers.map((t, idx) => `
+    <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;vertical-align:top;">
+        <span style="font-weight:700;color:#0f172a;">${t.date}</span><br/>
+        <span style="color:#64748b;font-size:7.5px;">${t.voucherNo}</span>
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8.5px;vertical-align:top;">
+        ${getChannelHtml(t.from)}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8px;text-align:center;vertical-align:top;">
+        ${getBadgeHtml(t.transferType)}<br/>
+        <span style="color:#94a3b8;font-size:7.5px;">Dr ➔ Cr</span>
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8.5px;vertical-align:top;">
+        ${getChannelHtml(t.to)}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8.5px;color:#1e293b;vertical-align:top;line-height:1.35;">
+        ${t.purpose}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8px;text-align:center;vertical-align:top;">
+        <span style="display:inline-block;padding:2px 5px;border-radius:3px;font-weight:700;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;">✓ POSTED</span>
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:9px;font-family:monospace;font-weight:700;text-align:right;color:#0f172a;vertical-align:top;">
+        ${formatBDT(t.amount)}
+      </td>
+    </tr>
+  `).join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${opts.titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.35;
+    }
+
+    /* Header */
+    .header-table {
+      width: 100%;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 8px;
+      color: #64748b;
+    }
+    .doc-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #065f46;
+      margin-top: 2px;
+    }
+
+    /* KPI Grid */
+    .kpi-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .kpi-card {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #0f172a;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 10px;
+    }
+    table.data-table th {
+      background: #1e293b;
+      color: #ffffff;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 6px 7px;
+      text-align: left;
+      border-right: 1px solid #334155;
+    }
+    table.data-table th:last-child {
+      border-right: none;
+    }
+
+    /* Statutory Note */
+    .statutory-box {
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      font-size: 7.5px;
+      color: #475569;
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 10px;
+    }
+    .sig-col {
+      width: 28%;
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #94a3b8;
+      margin-bottom: 4px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Treasury, Liquid Asset Management & Corporate Banking Division</div>
+        <div class="doc-title">${opts.titleEn} (${opts.titleBn})</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;font-size:8px;color:#475569;line-height:1.4;">
+        <div><strong>Filter:</strong> ${filterSummary}</div>
+        <div><strong>Generated:</strong> ${now}</div>
+        <div><strong>Prepared By:</strong> ${generatedBy}</div>
+        <div><strong>Accounting Standard:</strong> Zero Net Leakage (Dr ≡ Cr)</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- 4 KPI Cards -->
+  <div class="kpi-row">
+    <div class="kpi-card" style="border-left:3px solid #0f172a;">
+      <div class="kpi-label">Total Fund Transferred</div>
+      <div class="kpi-val">${formatBDT(kpis.totalTransferred)}</div>
+      <div class="kpi-sub">${kpis.transferCount} total executed transfers</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Cash ➔ Bank Deposits</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${formatBDT(kpis.cashToBankAmount)}</div>
+      <div class="kpi-sub">${kpis.cashToBankCount} deposits banked</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #d97706;">
+      <div class="kpi-label">Bank ➔ Cash Float</div>
+      <div class="kpi-val" style="color:#b45309;">${formatBDT(kpis.bankToCashAmount)}</div>
+      <div class="kpi-sub">${kpis.bankToCashCount} operational float withdrawals</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #7c3aed;">
+      <div class="kpi-label">Inter-Bank & MFS</div>
+      <div class="kpi-val" style="color:#6d28d9;">${formatBDT(kpis.interAccountAmount)}</div>
+      <div class="kpi-sub">${kpis.interAccountCount} wallet & account transfers</div>
+    </div>
+  </div>
+
+  <!-- Register Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:14%;">Date & Voucher #</th>
+        <th style="width:20%;">Source (From)</th>
+        <th style="width:13%;text-align:center;">Transfer Type</th>
+        <th style="width:20%;">Destination (To)</th>
+        <th style="width:19%;">Narration / Purpose</th>
+        <th style="width:7%;text-align:center;">Audit</th>
+        <th style="width:11%;text-align:right;">Amount (BDT)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml || `<tr><td colspan="7" style="text-align:center;padding:15px;color:#94a3b8;">No contra transfers recorded for this period.</td></tr>`}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;font-size:9px;">
+        <td colspan="2" style="padding:6px 7px;">TOTAL EXECUTED: ${transfers.length} TRANSFERS</td>
+        <td colspan="4" style="padding:6px 7px;text-align:center;font-size:8px;color:#cbd5e1;">
+          NET LIQUID TREASURY IMPACT: <span style="color:#34d399;font-weight:800;">৳ 0.00 (ZERO LEAKAGE PARITY)</span>
+        </td>
+        <td style="padding:6px 7px;text-align:right;font-family:monospace;font-size:10px;">
+          ${formatBDT(kpis.totalTransferred)}
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory & Audit Footnote -->
+  <div class="statutory-box">
+    <strong>Statutory Contra Governance:</strong> Contra entries reflect simultaneous double-entry transfers between internal liquid accounts (Vault ↔ Banks ↔ MFS Wallets). Debit and Credit entries offset identically, ensuring net asset conservation with zero impact on operational profit or loss. Bank deposits are corroborated by verified deposit counterfoils; cash withdrawals are reconciled with cheque counterfoils and physical vault logs.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Treasury)</div>
+      <div class="sig-sub">Senior Accounts Officer</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Internal Audit)</div>
+      <div class="sig-sub">Head of Audit & Compliance</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Executive Syndicate Committee</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

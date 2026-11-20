@@ -33,7 +33,7 @@ export function fiscalYearEnd(date: Date): Date {
   return date.getMonth() >= 6 ? new Date(y + 1, 5, 30) : new Date(y, 5, 30);
 }
 
-export type DatePreset = "today" | "this_month" | "last_month" | "this_quarter" | "this_fy" | "custom";
+export type DatePreset = "today" | "this_week" | "this_month" | "last_month" | "this_quarter" | "this_fy" | "all_time" | "custom";
 
 export function getPresetRange(preset: DatePreset, customFrom?: string, customTo?: string): { from: Date; to: Date } {
   const now = new Date();
@@ -41,6 +41,13 @@ export function getPresetRange(preset: DatePreset, customFrom?: string, customTo
   switch (preset) {
     case "today":
       return { from: today, to: today };
+    case "this_week": {
+      const startOfWeek = new Date(today);
+      const day = today.getDay();
+      const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+      startOfWeek.setDate(diff);
+      return { from: startOfWeek, to: today };
+    }
     case "this_month":
       return { from: new Date(today.getFullYear(), today.getMonth(), 1), to: today };
     case "last_month": {
@@ -54,6 +61,8 @@ export function getPresetRange(preset: DatePreset, customFrom?: string, customTo
     }
     case "this_fy":
       return { from: fiscalYearStart(today), to: today };
+    case "all_time":
+      return { from: new Date(2020, 0, 1), to: today };
     case "custom":
     default:
       return {
