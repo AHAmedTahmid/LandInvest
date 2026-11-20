@@ -268,7 +268,7 @@ export default function BalanceSheetView({
             </p>
             <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-100 pt-2 font-medium">
               <span>Cash: {formatBDT(cashAmount)}</span>
-              <span>Bank: {formatBDT(bankAmount)}</span>
+              <span>Bank & MFS: {formatBDT(bankAmount)}</span>
             </div>
           </div>
           <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500" />

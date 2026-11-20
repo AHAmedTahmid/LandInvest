@@ -23,11 +23,13 @@ import {
   Info,
   CreditCard,
   Building,
+  Smartphone,
   CheckCheck,
 } from "lucide-react";
 
 type BankAccountOption = {
   id: string;
+  accountType?: string;
   bankName: string;
   accountNumber: string;
   branchName?: string | null;
@@ -90,11 +92,16 @@ export default function BankBookView({
 
   // Selected account detail
   const activeAccount = bankAccounts.find((a) => a.id === selectedAccountId);
+  const isMfsActive =
+    activeAccount &&
+    (activeAccount.accountType === "MBANKING" ||
+      /bkash|nagad|rocket|upay/i.test(activeAccount.bankName));
+
   const accountScopeTitle = activeAccount
-    ? `${activeAccount.bankName} (${activeAccount.accountNumber})`
+    ? `${isMfsActive ? "📱 " : "🏦 "}${activeAccount.bankName} (${activeAccount.accountNumber})`
     : lang === "bn"
-    ? "সকল ব্যাংক অ্যাকাউন্ট (একত্রিত)"
-    : "All Bank Accounts (Consolidated)";
+    ? "সকল ব্যাংক ও এমএফএস অ্যাকাউন্ট (একত্রিত)"
+    : "All Bank & MFS Accounts (Consolidated)";
 
   // Filtered rows for client search / category filter
   const filteredRows = useMemo(() => {
@@ -169,6 +176,14 @@ export default function BankBookView({
         </span>
       );
     }
+    if (type.includes("MFS") || type.includes("BKASH") || type.includes("NAGAD") || type.includes("ROCKET")) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+          {lang === "bn" ? "এমএফএস" : "MFS Wallet"}
+        </span>
+      );
+    }
     if (type.includes("COLLECTION")) {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
@@ -221,7 +236,7 @@ export default function BankBookView({
               </span>
               <span>/</span>
               <span className="text-slate-800 font-semibold">
-                {lang === "bn" ? "ব্যাংক খাতা" : "Bank Book"}
+                {lang === "bn" ? "ব্যাংক ও এমএফএস খাতা" : "Bank & MFS Book"}
               </span>
             </div>
 
@@ -232,7 +247,7 @@ export default function BankBookView({
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                  {lang === "bn" ? "ব্যাংক খাতা ও লেজার (Bank Book)" : "Bank Book & Account Ledger"}
+                  {lang === "bn" ? "ব্যাংক ও এমএফএস খাতা (Bank & MFS Book)" : "Bank & MFS Book & Ledger"}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 flex items-center gap-2 mt-0.5">
                   <span className="font-semibold text-slate-700">
@@ -327,7 +342,7 @@ export default function BankBookView({
               selectedAccountId === "" ? "text-white" : "text-slate-900"
             }`}
           >
-            {lang === "bn" ? "সকল ব্যাংক অ্যাকাউন্ট" : "All Bank Accounts"}
+            {lang === "bn" ? "সকল ব্যাংক ও এমএফএস" : "All Bank & MFS Accounts"}
           </p>
           <p
             className={`text-xs mt-2 font-mono font-bold ${
@@ -343,37 +358,65 @@ export default function BankBookView({
         {/* Individual Accounts */}
         {bankAccounts.map((acc) => {
           const isSelected = selectedAccountId === acc.id;
+          const isMfs =
+            acc.accountType === "MBANKING" ||
+            /bkash|nagad|rocket|upay/i.test(acc.bankName);
           return (
             <button
               key={acc.id}
               onClick={() => handleAccountSelect(acc.id)}
               className={`p-4 rounded-2xl border text-left transition ${
                 isSelected
-                  ? "bg-brand-900 text-white border-brand-900 shadow-md ring-2 ring-brand-900/20"
-                  : "bg-white text-slate-800 border-slate-200/80 hover:border-brand-200 hover:bg-slate-50/60"
+                  ? isMfs
+                    ? "bg-purple-950 text-white border-purple-900 shadow-md ring-2 ring-purple-900/20"
+                    : "bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/20"
+                  : "bg-white text-slate-800 border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/60"
               }`}
             >
               <div className="flex items-center justify-between">
                 <span
                   className={`text-[11px] font-bold uppercase tracking-wider truncate ${
-                    isSelected ? "text-emerald-200" : "text-slate-500"
+                    isSelected ? "text-slate-300" : "text-slate-500"
                   }`}
                 >
                   {acc.bankName}
                 </span>
-                <CreditCard
-                  className={`w-4 h-4 shrink-0 ${
-                    isSelected ? "text-amber-300" : "text-slate-400"
-                  }`}
-                />
+                {isMfs ? (
+                  <Smartphone
+                    className={`w-4 h-4 shrink-0 ${
+                      isSelected ? "text-purple-300" : "text-purple-600"
+                    }`}
+                  />
+                ) : (
+                  <CreditCard
+                    className={`w-4 h-4 shrink-0 ${
+                      isSelected ? "text-amber-300" : "text-slate-400"
+                    }`}
+                  />
+                )}
               </div>
-              <p
-                className={`text-xs font-mono mt-1 truncate ${
-                  isSelected ? "text-white/80" : "text-slate-500"
-                }`}
-              >
-                {acc.accountNumber}
-              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <p
+                  className={`text-xs font-mono truncate ${
+                    isSelected ? "text-white/80" : "text-slate-500"
+                  }`}
+                >
+                  {acc.accountNumber}
+                </p>
+                <span
+                  className={`text-[9px] px-1.5 py-0.5 rounded font-semibold ${
+                    isMfs
+                      ? isSelected
+                        ? "bg-purple-900 text-purple-200 border border-purple-700"
+                        : "bg-purple-50 text-purple-700 border border-purple-200"
+                      : isSelected
+                      ? "bg-slate-800 text-slate-200 border border-slate-700"
+                      : "bg-blue-50 text-blue-700 border border-blue-200"
+                  }`}
+                >
+                  {isMfs ? "MFS" : "Bank"}
+                </span>
+              </div>
               <p
                 className={`text-xs mt-2 font-mono font-bold ${
                   isSelected ? "text-emerald-300" : "text-slate-900"

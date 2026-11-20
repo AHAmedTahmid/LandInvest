@@ -1399,7 +1399,7 @@ export function buildBankBookPdfHtml(opts: {
       </div>
     </div>
     <div class="meta-block">
-      <div><strong>Document:</strong> Bank Book & Account Ledger</div>
+      <div><strong>Document:</strong> Bank & MFS Account Ledger</div>
       <div><strong>Generated:</strong> ${now}</div>
       <div><strong>Authorized User:</strong> ${generatedBy}</div>
     </div>
@@ -1408,7 +1408,7 @@ export function buildBankBookPdfHtml(opts: {
   <!-- Document Title & Scope Bar -->
   <div class="doc-title-bar">
     <div>
-      <div class="doc-title">${lang === "bn" ? "ব্যাংক খাতা ও হিসাব লেজার (BANK BOOK)" : "BANK BOOK & ACCOUNT LEDGER"}</div>
+      <div class="doc-title">${lang === "bn" ? "ব্যাংক ও এমএফএস খাতা (BANK & MFS BOOK)" : "BANK & MFS ACCOUNT LEDGER"}</div>
       <div class="doc-subtitle">Filters: ${filterSummary} · Currency: BDT (৳)</div>
     </div>
     <div class="scope-pill">
@@ -1514,7 +1514,7 @@ export function buildBankBookPdfHtml(opts: {
 
   <!-- Policy Footnotes -->
   <div class="policy-notes">
-    <strong>Bank Control Policy:</strong> Bank balances are reconciled monthly with official bank statements. All payments are verified with cheque leaves, bank slips, or RTGS/BEFTN transaction confirmations.
+    <strong>Bank & MFS Control Policy:</strong> Bank and MFS balances are reconciled monthly with official commercial bank statements and verified mobile banking records (bKash/Nagad). All disbursements are supported by cheque leaves, deposit slips, RTGS/BEFTN, or MFS TrxIDs.
   </div>
 
   <!-- Page Footer -->
@@ -1872,7 +1872,7 @@ export function buildDailySummaryPdfHtml(opts: {
       <div class="doc-subtitle">Period: ${filterSummary} · Currency: BDT (৳)</div>
     </div>
     <div class="scope-pill">
-      Scope: Consolidated Cash & Bank Treasury (${activeDays} active days / ${totalTxns} txns)
+      Scope: Consolidated Cash, Bank & MFS Treasury (${activeDays} active days / ${totalTxns} txns)
     </div>
   </div>
 
@@ -1961,11 +1961,11 @@ export function buildDailySummaryPdfHtml(opts: {
       <div class="reconcile-row" style="font-weight:700;border-top:1px solid #cbd5e1;padding-top:2px;"><span>(=) Closing Cash:</span><span>${formatBDT(closingCash)}</span></div>
     </div>
     <div>
-      <div class="reconcile-col-title">Bank Channel Reconciliation</div>
-      <div class="reconcile-row"><span>Opening Bank (B/F):</span><span>${formatBDT(openingBank)}</span></div>
-      <div class="reconcile-row" style="color:#059669;"><span>(+) Bank Inflows:</span><span>+${formatBDT(totalBankIn)}</span></div>
-      <div class="reconcile-row" style="color:#e11d48;"><span>(-) Bank Outflows:</span><span>-${formatBDT(totalBankOut)}</span></div>
-      <div class="reconcile-row" style="font-weight:700;border-top:1px solid #cbd5e1;padding-top:2px;"><span>(=) Closing Bank:</span><span>${formatBDT(closingBank)}</span></div>
+      <div class="reconcile-col-title">Bank & MFS Channel Reconciliation</div>
+      <div class="reconcile-row"><span>Opening Bank & MFS (B/F):</span><span>${formatBDT(openingBank)}</span></div>
+      <div class="reconcile-row" style="color:#059669;"><span>(+) Bank & MFS Inflows:</span><span>+${formatBDT(totalBankIn)}</span></div>
+      <div class="reconcile-row" style="color:#e11d48;"><span>(-) Bank & MFS Outflows:</span><span>-${formatBDT(totalBankOut)}</span></div>
+      <div class="reconcile-row" style="font-weight:700;border-top:1px solid #cbd5e1;padding-top:2px;"><span>(=) Closing Bank & MFS:</span><span>${formatBDT(closingBank)}</span></div>
     </div>
   </div>
 
@@ -1987,7 +1987,7 @@ export function buildDailySummaryPdfHtml(opts: {
 
   <!-- Policy Notes -->
   <div class="policy-notes">
-    <strong>Treasury Integrity Note:</strong> Opening and closing balances reconcile directly with physical cash vault records and verified bank statements. All transactions are supported by approved vouchers and audit logs.
+    <strong>Treasury Integrity Note:</strong> Opening and closing balances reconcile directly with physical cash vault records, scheduled bank statements, and MFS wallets (bKash/Nagad/Rocket). All transactions are supported by approved vouchers and audit logs.
   </div>
 
   <!-- Page Footer -->

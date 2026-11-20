@@ -90,8 +90,8 @@ export async function queryBalanceSheet(prisma: any, filters: ReportFilters): Pr
     },
     {
       section: "Current Assets",
-      account: "Company Bank Accounts",
-      note: "Reconciled balance across all active company bank accounts",
+      account: "Bank & MFS Accounts",
+      note: "Reconciled balance across all active company bank accounts and MFS wallets (bKash/Nagad)",
       amount: bankBalance,
     },
     {

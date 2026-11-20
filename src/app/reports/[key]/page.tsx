@@ -71,14 +71,15 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   }
 
   // Fetch bank accounts list for contextual account selector
-  let bankAccounts: { id: string; bankName: string; accountNumber: string; branchName: string | null; currentBalance: number }[] = [];
+  let bankAccounts: { id: string; bankName: string; accountNumber: string; branchName: string | null; currentBalance: number; accountType?: string }[] = [];
   try {
     const rawBankAccounts = await prisma.bankAccount.findMany({
-      select: { id: true, bankName: true, accountNumber: true, branchName: true, currentBalance: true },
+      select: { id: true, bankName: true, accountNumber: true, branchName: true, currentBalance: true, accountType: true },
       orderBy: { bankName: "asc" },
     });
     bankAccounts = rawBankAccounts.map((b: any) => ({
       id: b.id,
+      accountType: b.accountType || "BANK",
       bankName: b.bankName,
       accountNumber: b.accountNumber,
       branchName: b.branchName,

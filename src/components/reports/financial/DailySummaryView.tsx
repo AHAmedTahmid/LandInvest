@@ -164,8 +164,8 @@ export default function DailySummaryView({ def, data, filters, canExport }: Prop
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
                   {lang === "bn"
-                    ? "দৈনিক নগদ ও ব্যাংক আদায়, পরিশোধ এবং নেট তারল্য চলাচলের সমন্বিত প্রতিবেদন"
-                    : "Daily consolidated cash and bank receipts, disbursements, and net treasury movement"}
+                    ? "দৈনিক নগদ ও ব্যাংক/এমএফএস আদায়, পরিশোধ এবং নেট তারল্য চলাচলের সমন্বিত প্রতিবেদন"
+                    : "Daily consolidated cash, bank, and MFS receipts, disbursements, and net treasury movement"}
                 </p>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function DailySummaryView({ def, data, filters, canExport }: Prop
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
                 <Layers className="w-3 h-3 text-emerald-600" />
-                {lang === "bn" ? "একত্রিত ট্রেজারি (নগদ ও ব্যাংক)" : "Consolidated Treasury (Cash & Bank)"}
+                {lang === "bn" ? "একত্রিত ট্রেজারি (নগদ, ব্যাংক ও এমএফএস)" : "Consolidated Treasury (Cash, Bank & MFS)"}
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
                 <Calendar className="w-3 h-3 text-emerald-600" />
@@ -713,7 +713,7 @@ export default function DailySummaryView({ def, data, filters, canExport }: Prop
             <div className="flex items-center justify-between text-xs font-bold text-slate-800">
               <span className="flex items-center gap-1.5">
                 <Landmark className="w-4 h-4 text-blue-600" />
-                {lang === "bn" ? "ব্যাংক চ্যানেল সমন্বয় (Bank Channel)" : "Bank Channel Reconciliation"}
+                {lang === "bn" ? "ব্যাংক ও এমএফএস চ্যানেল সমন্বয় (Bank & MFS)" : "Bank & MFS Channel Reconciliation"}
               </span>
               <span className="text-[11px] font-mono text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded">
                 {lang === "bn" ? "সমাপনী: " : "Closing: "} {formatBDT(closingBank)}
