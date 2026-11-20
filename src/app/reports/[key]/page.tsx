@@ -11,6 +11,7 @@ import ReportFilters from "@/components/reports/ReportFilters";
 import BalanceSheetView from "@/components/reports/financial/BalanceSheetView";
 import CashBookView from "@/components/reports/financial/CashBookView";
 import BankBookView from "@/components/reports/financial/BankBookView";
+import DailySummaryView from "@/components/reports/financial/DailySummaryView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -118,6 +119,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         data={data}
         filters={filters}
         bankAccounts={bankAccounts}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "daily-summary") {
+    return (
+      <DailySummaryView
+        def={def}
+        data={data}
+        filters={filters}
         canExport={canExport}
       />
     );
