@@ -12,6 +12,7 @@ import BalanceSheetView from "@/components/reports/financial/BalanceSheetView";
 import CashBookView from "@/components/reports/financial/CashBookView";
 import BankBookView from "@/components/reports/financial/BankBookView";
 import DailySummaryView from "@/components/reports/financial/DailySummaryView";
+import ReceiptsPaymentsView from "@/components/reports/financial/ReceiptsPaymentsView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -128,6 +129,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "daily-summary") {
     return (
       <DailySummaryView
+        def={def}
+        data={data}
+        filters={filters}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "receipts-payments") {
+    return (
+      <ReceiptsPaymentsView
         def={def}
         data={data}
         filters={filters}

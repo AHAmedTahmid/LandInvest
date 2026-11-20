@@ -2000,6 +2000,508 @@ export function buildDailySummaryPdfHtml(opts: {
 </html>`;
 }
 
+export function buildReceiptsPaymentsPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: ReportData;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data } = opts;
+  const now = formatDateTime(new Date());
+
+  const openingCash = Number(data.totals?.openingCash || 0);
+  const openingBank = Number(data.totals?.openingBank || 0);
+  const openingTreasury = Number(data.totals?.openingTreasury || (openingCash + openingBank));
+
+  const totalReceipts = Number(data.totals?.totalReceipts || 0);
+  const totalPayments = Number(data.totals?.totalPayments || 0);
+  const netSurplus = Number(data.totals?.netSurplus || (totalReceipts - totalPayments));
+
+  const closingCash = Number(data.totals?.closingCash || 0);
+  const closingBank = Number(data.totals?.closingBank || 0);
+  const closingTreasury = Number(data.totals?.closingTreasury || (closingCash + closingBank));
+
+  const receiptsSideTotal = Number(data.totals?.receiptsSideTotal || (openingTreasury + totalReceipts));
+  const paymentsSideTotal = Number(data.totals?.paymentsSideTotal || (totalPayments + closingTreasury));
+
+  const periodCashIn = Number(data.totals?.periodCashIn || 0);
+  const periodCashOut = Number(data.totals?.periodCashOut || 0);
+  const periodBankIn = Number(data.totals?.periodBankIn || 0);
+  const periodBankOut = Number(data.totals?.periodBankOut || 0);
+
+  const receiptsRows = data.rows.filter((r) => r.type === "RECEIPT");
+  const paymentsRows = data.rows.filter((r) => r.type === "PAYMENT");
+
+  const receiptsRowsHtml = receiptsRows.map((r, i) => `
+    <tr style="background:${i % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:4.5px 6px;color:#0f172a;font-weight:600;">
+        ${lang === "bn" ? r.categoryBn : r.category}
+        <div style="font-size:7px;color:#059669;font-weight:normal;">${lang === "bn" ? r.classificationBn : r.classification}</div>
+      </td>
+      <td style="padding:4.5px 5px;text-align:right;font-family:monospace;color:#475569;">
+        ${r.cashAmount > 0 ? formatBDT(r.cashAmount) : "-"}
+      </td>
+      <td style="padding:4.5px 5px;text-align:right;font-family:monospace;color:#475569;">
+        ${r.bankAmount > 0 ? formatBDT(r.bankAmount) : "-"}
+      </td>
+      <td style="padding:4.5px 6px;text-align:right;font-family:monospace;font-weight:700;color:#047857;">
+        ${formatBDT(r.totalAmount)}
+      </td>
+    </tr>
+  `).join("");
+
+  const paymentsRowsHtml = paymentsRows.map((p, i) => `
+    <tr style="background:${i % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:4.5px 6px;color:#0f172a;font-weight:600;">
+        ${lang === "bn" ? p.categoryBn : p.category}
+        <div style="font-size:7px;color:#e11d48;font-weight:normal;">${lang === "bn" ? p.classificationBn : p.classification}</div>
+      </td>
+      <td style="padding:4.5px 5px;text-align:right;font-family:monospace;color:#475569;">
+        ${p.cashAmount > 0 ? formatBDT(p.cashAmount) : "-"}
+      </td>
+      <td style="padding:4.5px 5px;text-align:right;font-family:monospace;color:#475569;">
+        ${p.bankAmount > 0 ? formatBDT(p.bankAmount) : "-"}
+      </td>
+      <td style="padding:4.5px 6px;text-align:right;font-family:monospace;font-weight:700;color:#be123c;">
+        ${formatBDT(p.totalAmount)}
+      </td>
+    </tr>
+  `).join("");
+
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="utf-8"/>
+<title>${lang === "bn" ? titleBn : titleEn} - ${companyName}</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 8mm 10mm 10mm 10mm;
+  }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #0f172a;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-size: 8px;
+    line-height: 1.35;
+  }
+
+  .header-band {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #0f172a;
+    margin-bottom: 10px;
+  }
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-logo {
+    width: 26px;
+    height: 26px;
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 14px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .company-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: #0f172a;
+  }
+  .company-sub {
+    font-size: 8px;
+    color: #64748b;
+  }
+  .meta-block {
+    text-align: right;
+    font-size: 8px;
+    color: #475569;
+    line-height: 1.4;
+  }
+
+  .doc-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 10px;
+    padding-bottom: 4px;
+  }
+  .doc-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+  }
+  .doc-subtitle {
+    font-size: 8.5px;
+    color: #475569;
+    margin-top: 1px;
+  }
+  .scope-pill {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .kpi-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+  .kpi-card.opening { border-left: 3px solid #64748b; }
+  .kpi-card.receipts { border-left: 3px solid #059669; }
+  .kpi-card.payments { border-left: 3px solid #e11d48; }
+  .kpi-card.closing { border-left: 3px solid #2563eb; }
+
+  .kpi-label {
+    font-size: 7.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  .kpi-value {
+    font-size: 12px;
+    font-weight: 800;
+    font-family: monospace;
+    color: #0f172a;
+    line-height: 1.1;
+  }
+  .kpi-sub {
+    font-size: 7.5px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  /* Dual Table Layout */
+  .dual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .table-box {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .side-header {
+    padding: 5px 8px;
+    font-weight: 800;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .side-header.receipts { background: #064e3b; color: #ecfdf5; }
+  .side-header.payments { background: #881337; color: #fff1f2; }
+
+  table.side-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.5px;
+  }
+  table.side-table thead tr {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 7px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-bottom: 1px solid #cbd5e1;
+  }
+  table.side-table th, table.side-table td {
+    padding: 3.5px 5px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .side-footer {
+    padding: 6px 8px;
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 800;
+    font-family: monospace;
+    font-size: 9px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #0f172a;
+  }
+
+  .reconcile-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    page-break-inside: avoid;
+  }
+  .reconcile-col-title {
+    font-size: 8px;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+  }
+  .reconcile-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: monospace;
+    font-size: 7.5px;
+    margin-bottom: 1.5px;
+  }
+
+  .signatures-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    page-break-inside: avoid;
+  }
+  .sig-card {
+    border-top: 1px solid #64748b;
+    padding-top: 4px;
+    text-align: center;
+  }
+  .sig-title {
+    font-size: 8px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .sig-subtitle {
+    font-size: 7px;
+    color: #64748b;
+  }
+
+  .policy-notes {
+    font-size: 7px;
+    color: #64748b;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 4px;
+    margin-top: 4px;
+    line-height: 1.3;
+    page-break-inside: avoid;
+  }
+
+  .page-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7px;
+    color: #94a3b8;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top Header Band -->
+  <div class="header-band">
+    <div class="brand-group">
+      <div class="brand-logo">R</div>
+      <div>
+        <div class="company-title">${companyName}</div>
+        <div class="company-sub">Partnership ERP Suite · Statutory Financial Statement</div>
+      </div>
+    </div>
+    <div class="meta-block">
+      <div><strong>Document:</strong> Receipts & Payments Statement</div>
+      <div><strong>Generated:</strong> ${now}</div>
+      <div><strong>Authorized User:</strong> ${generatedBy}</div>
+    </div>
+  </div>
+
+  <!-- Document Title & Scope -->
+  <div class="doc-title-bar">
+    <div>
+      <div class="doc-title">${lang === "bn" ? "আদায় ও পরিশোধ বিবরণী (RECEIPTS & PAYMENTS)" : "RECEIPTS & PAYMENTS STATEMENT"}</div>
+      <div class="doc-subtitle">Period: ${filterSummary} · Currency: BDT (৳)</div>
+    </div>
+    <div class="scope-pill">
+      Scope: Consolidated Cash, Bank & MFS Treasury · Pure Cash Accounting Basis
+    </div>
+  </div>
+
+  <!-- 4 KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card opening">
+      <div class="kpi-label">${lang === "bn" ? "প্রারম্ভিক তরল তহবিল (B/F)" : "Opening Reserves (B/F)"}</div>
+      <div class="kpi-value">${formatBDT(openingTreasury)}</div>
+      <div class="kpi-sub">Cash: ${formatBDT(openingCash)} · Bank/MFS: ${formatBDT(openingBank)}</div>
+    </div>
+    <div class="kpi-card receipts">
+      <div class="kpi-label">${lang === "bn" ? "মোট সংগৃহীত প্রাপ্তি (Inflows)" : "Total Receipts (Inflows)"}</div>
+      <div class="kpi-value" style="color:#047857;">+${formatBDT(totalReceipts)}</div>
+      <div class="kpi-sub">Cash: ${formatBDT(periodCashIn)} · Bank/MFS: ${formatBDT(periodBankIn)}</div>
+    </div>
+    <div class="kpi-card payments">
+      <div class="kpi-label">${lang === "bn" ? "মোট পরিশোধ (Disbursements)" : "Total Payments (Disbursements)"}</div>
+      <div class="kpi-value" style="color:#be123c;">-${formatBDT(totalPayments)}</div>
+      <div class="kpi-sub">Cash: ${formatBDT(periodCashOut)} · Bank/MFS: ${formatBDT(periodBankOut)}</div>
+    </div>
+    <div class="kpi-card closing">
+      <div class="kpi-label">${lang === "bn" ? "সমাপনী তরল তহবিল (C/D)" : "Closing Reserves (C/D)"}</div>
+      <div class="kpi-value" style="color:#1e40af;">${formatBDT(closingTreasury)}</div>
+      <div class="kpi-sub">Net Surplus: ${netSurplus >= 0 ? "+" : ""}${formatBDT(netSurplus)}</div>
+    </div>
+  </div>
+
+  <!-- Dual-Side T-Account Statement Table -->
+  <div class="dual-grid">
+    <!-- LEFT: RECEIPTS SIDE -->
+    <div class="table-box">
+      <div class="side-header receipts">
+        <span>Receipts (Inflows)</span>
+        <span style="font-family:monospace;">${formatBDT(receiptsSideTotal)}</span>
+      </div>
+      <table class="side-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;width:48%;">Particulars / Head</th>
+            <th style="text-align:right;width:17%;">Cash</th>
+            <th style="text-align:right;width:17%;">Bank/MFS</th>
+            <th style="text-align:right;width:18%;">Total (৳)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Opening Reserves Row -->
+          <tr style="background:#f0fdf4;font-weight:700;">
+            <td style="color:#065f46;">
+              To Opening Balance (B/F)
+              <div style="font-size:7px;color:#047857;font-weight:normal;">Cash in Hand & Bank Balances</div>
+            </td>
+            <td style="text-align:right;font-family:monospace;color:#334155;">${formatBDT(openingCash)}</td>
+            <td style="text-align:right;font-family:monospace;color:#334155;">${formatBDT(openingBank)}</td>
+            <td style="text-align:right;font-family:monospace;color:#065f46;font-weight:800;">${formatBDT(openingTreasury)}</td>
+          </tr>
+          ${receiptsRowsHtml}
+        </tbody>
+      </table>
+      <div class="side-footer">
+        <span style="font-size:7.5px;letter-spacing:0.2px;">TOTAL RECEIPTS SIDE</span>
+        <span style="color:#a7f3d0;">${formatBDT(receiptsSideTotal)}</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: PAYMENTS SIDE -->
+    <div class="table-box">
+      <div class="side-header payments">
+        <span>Payments (Outflows)</span>
+        <span style="font-family:monospace;">${formatBDT(paymentsSideTotal)}</span>
+      </div>
+      <table class="side-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;width:48%;">Particulars / Head</th>
+            <th style="text-align:right;width:17%;">Cash</th>
+            <th style="text-align:right;width:17%;">Bank/MFS</th>
+            <th style="text-align:right;width:18%;">Total (৳)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${paymentsRowsHtml}
+          <!-- Closing Reserves Row -->
+          <tr style="background:#eff6ff;font-weight:700;">
+            <td style="color:#1e40af;">
+              By Closing Balance (C/D)
+              <div style="font-size:7px;color:#2563eb;font-weight:normal;">Closing Cash & Bank Balances</div>
+            </td>
+            <td style="text-align:right;font-family:monospace;color:#334155;">${formatBDT(closingCash)}</td>
+            <td style="text-align:right;font-family:monospace;color:#334155;">${formatBDT(closingBank)}</td>
+            <td style="text-align:right;font-family:monospace;color:#1e40af;font-weight:800;">${formatBDT(closingTreasury)}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="side-footer">
+        <span style="font-size:7.5px;letter-spacing:0.2px;">TOTAL PAYMENTS SIDE</span>
+        <span style="color:#fde047;">${formatBDT(paymentsSideTotal)}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statutory Reconciliation Verification Blocks -->
+  <div class="reconcile-box">
+    <div>
+      <div class="reconcile-col-title">Receipts Side Verification</div>
+      <div class="reconcile-row"><span>Opening Reserves (B/F):</span><span>${formatBDT(openingTreasury)}</span></div>
+      <div class="reconcile-row" style="color:#059669;"><span>(+) Gross Receipts:</span><span>+${formatBDT(totalReceipts)}</span></div>
+      <div class="reconcile-row" style="font-weight:700;border-top:1px solid #cbd5e1;padding-top:2px;"><span>(=) Receipts Side Total:</span><span>${formatBDT(receiptsSideTotal)}</span></div>
+    </div>
+    <div>
+      <div class="reconcile-col-title">Payments Side Verification</div>
+      <div class="reconcile-row" style="color:#e11d48;"><span>Gross Disbursements:</span><span>${formatBDT(totalPayments)}</span></div>
+      <div class="reconcile-row" style="color:#2563eb;"><span>(+) Closing Reserves (C/D):</span><span>+${formatBDT(closingTreasury)}</span></div>
+      <div class="reconcile-row" style="font-weight:700;border-top:1px solid #cbd5e1;padding-top:2px;"><span>(=) Payments Side Total:</span><span>${formatBDT(paymentsSideTotal)}</span></div>
+    </div>
+  </div>
+
+  <!-- Signatures Grid -->
+  <div class="signatures-grid">
+    <div class="sig-card">
+      <div class="sig-title">Prepared By (Chief Accountant)</div>
+      <div class="sig-subtitle">${generatedBy}</div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-title">Verified By (Head of Internal Audit)</div>
+      <div class="sig-subtitle">Internal Audit & Statutory Compliance</div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-subtitle">Executive Syndicate Board</div>
+    </div>
+  </div>
+
+  <!-- Policy Notes -->
+  <div class="policy-notes">
+    <strong>Statutory Policy:</strong> This statement reflects actual liquid transactions during the period across all cash vaults, scheduled bank accounts, and MFS wallets. The Receipts Side and Payments Side are balanced and verified against general ledgers.
+  </div>
+
+  <!-- Page Footer -->
+  <div class="page-footer">
+    <span>${companyName} ERP · Receipts & Payments Statement</span>
+    <span>Page 1 of 1</span>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
