@@ -19,6 +19,7 @@ import PartnerCapitalView from "@/components/reports/partners/PartnerCapitalView
 import PartnersSummaryView from "@/components/reports/partners/PartnersSummaryView";
 import PartnerContributionView from "@/components/reports/partners/PartnerContributionView";
 import ProjectCostView from "@/components/reports/projects/ProjectCostView";
+import ProjectPnlView from "@/components/reports/projects/ProjectPnlView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -203,6 +204,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "project-cost") {
     return (
       <ProjectCostView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "project-pnl") {
+    return (
+      <ProjectPnlView
         def={def}
         data={data as any}
         filters={filters}

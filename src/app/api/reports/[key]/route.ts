@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
 import { getFiscalYears } from "@/lib/fiscalYear";
-import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, generatePdf } from "@/lib/reports/pdf";
+import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, buildProjectPnlPdfHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
 
@@ -204,6 +204,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
       data,
     });
     landscape = true; // Executive A4 landscape project cost statement
+  } else if (key === "project-pnl") {
+    html = buildProjectPnlPdfHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+    });
+    landscape = true; // Executive A4 landscape project pnl statement
   } else {
     html = buildReportHtml({
       titleEn: def.titleEn,
