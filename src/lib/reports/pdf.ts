@@ -3813,6 +3813,430 @@ export function buildPartnerContributionPdfHtml(opts: {
 </html>`;
 }
 
+export function buildProjectCostPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+}): string {
+  const { companyName, filterSummary, generatedBy, lang, data } = opts;
+  const now = formatDateTime(new Date());
+
+  const proj = data.selectedProject || {
+    projectName: "Project Cost Statement",
+    status: "N/A",
+    mouza: "-",
+    jlNumber: null,
+    dagNumbers: "-",
+    khatianNumbers: "-",
+    totalGrossAreaShotok: 0,
+    totalSaleableAreaShotok: 0,
+    infrastructureAreaShotok: 0,
+    efficiencyRatio: 0,
+    totalPlotsCount: 0,
+    targetSalesValue: 0,
+    totalAcquisitionCost: 0,
+    totalDevelopmentCost: 0,
+    totalProjectCost: 0,
+    grossCostPerShotok: 0,
+    saleableCostPerShotok: 0,
+    acquisitionItems: [],
+    developmentItems: [],
+  };
+
+  const acqRowsHtml = (proj.acquisitionItems || []).map((item: any, idx: number) => `
+    <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;">
+        <strong style="color:#0f172a;">${item.category}</strong><br/>
+        <span style="font-size:7px;color:#64748b;">${item.categoryBn}</span>
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:center;color:#475569;">
+        ${item.voucherCount}
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#047857;">
+        ${formatBDT(item.amount)}
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:right;color:#475569;">
+        ${item.pctOfTotal.toFixed(2)}%
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:right;color:#047857;">
+        ${formatBDT(item.costPerGrossShotok)}
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:right;color:#1d4ed8;">
+        ${formatBDT(item.costPerSaleableShotok)}
+      </td>
+    </tr>
+  `).join("");
+
+  const devRowsHtml = (proj.developmentItems || []).map((item: any, idx: number) => `
+    <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;">
+        <strong style="color:#0f172a;">${item.category}</strong><br/>
+        <span style="font-size:7px;color:#64748b;">${item.categoryBn}</span>
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:center;color:#475569;">
+        ${item.voucherCount}
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#1d4ed8;">
+        ${formatBDT(item.amount)}
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:right;color:#475569;">
+        ${item.pctOfTotal.toFixed(2)}%
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:right;color:#047857;">
+        ${formatBDT(item.costPerGrossShotok)}
+      </td>
+      <td style="padding:5px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;text-align:right;color:#1d4ed8;">
+        ${formatBDT(item.costPerSaleableShotok)}
+      </td>
+    </tr>
+  `).join("");
+
+  const acqPct = proj.totalProjectCost > 0 ? (proj.totalAcquisitionCost / proj.totalProjectCost) * 100 : 0;
+  const devPct = proj.totalProjectCost > 0 ? (proj.totalDevelopmentCost / proj.totalProjectCost) * 100 : 0;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${opts.titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 8.5px;
+      line-height: 1.35;
+      color: #0f172a;
+      background: #ffffff;
+    }
+
+    /* Header */
+    table.header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #1e1b4b;
+      padding-bottom: 6px;
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #1e1b4b;
+    }
+    .brand-sub {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .report-title-main {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .report-meta-text {
+      font-size: 7.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Project Banner */
+    .proj-banner {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .proj-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .proj-meta {
+      font-size: 7.5px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .kpi-card {
+      flex: 1;
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+    }
+    .kpi-label {
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #0f172a;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Section Subhead */
+    .section-head {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 4px 8px;
+      margin-top: 6px;
+      margin-bottom: 0px;
+      border: 1px solid #cbd5e1;
+      border-bottom: none;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 8px;
+    }
+    table.data-table th {
+      background: #1e1b4b;
+      color: #ffffff;
+      font-size: 7.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 4px 8px;
+      text-align: left;
+      border-right: 1px solid #312e81;
+    }
+    table.data-table th:last-child {
+      border-right: none;
+    }
+
+    /* Statutory Note */
+    .statutory-box {
+      padding: 5px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      font-size: 7px;
+      color: #475569;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 6px;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      width: 28%;
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #94a3b8;
+      margin-bottom: 3px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Real Estate Development & Quantity Surveying Division</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${lang === "bn" ? opts.titleBn : opts.titleEn}</div>
+        <div class="report-meta-text">
+          <span>Project: ${proj.projectName}</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Project Identity Banner -->
+  <div class="proj-banner">
+    <div>
+      <div class="proj-name">${proj.projectName} &nbsp;<span style="display:inline-block;padding:1px 5px;background:#e0e7ff;color:#3730a3;font-size:7px;border-radius:3px;text-transform:uppercase;">${proj.status}</span></div>
+      <div class="proj-meta">
+        <strong>Mouza:</strong> ${proj.mouza} ${proj.jlNumber ? `(JL #${proj.jlNumber})` : ""} &nbsp;·&nbsp;
+        <strong>Dag:</strong> ${proj.dagNumbers || "N/A"} &nbsp;·&nbsp;
+        <strong>Khatian:</strong> ${proj.khatianNumbers || "N/A"}
+      </div>
+    </div>
+    <div style="text-align:right;font-size:7.5px;">
+      <div><strong>Gross Area:</strong> ${proj.totalGrossAreaShotok.toFixed(2)} Shotok &nbsp;·&nbsp; <strong>Net Saleable:</strong> ${proj.totalSaleableAreaShotok.toFixed(2)} Shotok</div>
+      <div style="color:#64748b;"><strong>Efficiency:</strong> ${proj.efficiencyRatio.toFixed(1)}% Saleable &nbsp;·&nbsp; <strong>Infrastructure Space:</strong> ${proj.infrastructureAreaShotok.toFixed(2)} Shotok</div>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #1e1b4b;">
+      <div class="kpi-label">Total Capitalized Cost</div>
+      <div class="kpi-val">${formatBDT(proj.totalProjectCost)}</div>
+      <div class="kpi-sub">Acq: ${formatBDT(proj.totalAcquisitionCost)} · Dev: ${formatBDT(proj.totalDevelopmentCost)}</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Gross Cost / Shotok</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(proj.grossCostPerShotok)}</div>
+      <div class="kpi-sub">Across ${proj.totalGrossAreaShotok.toFixed(2)} gross acreage</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Saleable Cost / Shotok</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${formatBDT(proj.saleableCostPerShotok)}</div>
+      <div class="kpi-sub">Loaded across ${proj.totalSaleableAreaShotok.toFixed(2)} net plot shotok</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #d97706;">
+      <div class="kpi-label">Plot Demarcation & Target Value</div>
+      <div class="kpi-val" style="color:#b45309;">${proj.totalPlotsCount} Plots Demarcated</div>
+      <div class="kpi-sub">Asking Value: ${formatBDT(proj.targetSalesValue)}</div>
+    </div>
+  </div>
+
+  <!-- SECTION A: LAND ACQUISITION CAPITAL -->
+  <div class="section-head" style="background:#ecfdf5;color:#065f46;">
+    Section A: Land Acquisition Capital Cost
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:28%;">Cost Category</th>
+        <th style="width:8%;text-align:center;">Vouchers</th>
+        <th style="width:16%;text-align:right;">Amount (BDT)</th>
+        <th style="width:10%;text-align:right;">% of Total</th>
+        <th style="width:19%;text-align:right;">Cost / Gross Shotok</th>
+        <th style="width:19%;text-align:right;">Cost / Net Saleable</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${acqRowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#dcfce7;color:#065f46;font-weight:700;font-size:8px;">
+        <td style="padding:4px 8px;">SUBTOTAL LAND ACQUISITION</td>
+        <td style="padding:4px 8px;text-align:center;font-family:monospace;">${proj.acquisitionItems.reduce((s: number, r: any) => s + r.voucherCount, 0)}</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${formatBDT(proj.totalAcquisitionCost)}</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${acqPct.toFixed(2)}%</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${formatBDT(proj.totalGrossAreaShotok > 0 ? proj.totalAcquisitionCost / proj.totalGrossAreaShotok : 0)}</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${formatBDT(proj.totalSaleableAreaShotok > 0 ? proj.totalAcquisitionCost / proj.totalSaleableAreaShotok : 0)}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- SECTION B: SITE DEVELOPMENT EXPENSES -->
+  <div class="section-head" style="background:#eff6ff;color:#1e40af;">
+    Section B: Civil Infrastructure & Site Development Expenses
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:28%;">Development Work Category</th>
+        <th style="width:8%;text-align:center;">Vouchers</th>
+        <th style="width:16%;text-align:right;">Amount (BDT)</th>
+        <th style="width:10%;text-align:right;">% of Total</th>
+        <th style="width:19%;text-align:right;">Cost / Gross Shotok</th>
+        <th style="width:19%;text-align:right;">Cost / Net Saleable</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${devRowsHtml || `<tr><td colspan="6" style="text-align:center;padding:10px;color:#94a3b8;">No development vouchers recorded yet for this project.</td></tr>`}
+    </tbody>
+    <tfoot>
+      <tr style="background:#dbeafe;color:#1e40af;font-weight:700;font-size:8px;">
+        <td style="padding:4px 8px;">SUBTOTAL SITE DEVELOPMENT</td>
+        <td style="padding:4px 8px;text-align:center;font-family:monospace;">${proj.developmentItems.reduce((s: number, r: any) => s + r.voucherCount, 0)}</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${formatBDT(proj.totalDevelopmentCost)}</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${devPct.toFixed(2)}%</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${formatBDT(proj.totalGrossAreaShotok > 0 ? proj.totalDevelopmentCost / proj.totalGrossAreaShotok : 0)}</td>
+        <td style="padding:4px 8px;text-align:right;font-family:monospace;">${formatBDT(proj.totalSaleableAreaShotok > 0 ? proj.totalDevelopmentCost / proj.totalSaleableAreaShotok : 0)}</td>
+      </tr>
+      <tr style="background:#1e1b4b;color:#ffffff;font-weight:700;font-size:8.5px;">
+        <td colspan="2" style="padding:5px 8px;">TOTAL CAPITALIZED PROJECT INVESTMENT</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;font-size:9.5px;color:#ffffff;">${formatBDT(proj.totalProjectCost)}</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#ffffff;">100.00%</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#34d399;">${formatBDT(proj.grossCostPerShotok)}</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#93c5fd;">${formatBDT(proj.saleableCostPerShotok)}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory & Audit Footnote -->
+  <div class="statutory-box">
+    <strong>Quantity Surveying & Land Development Standard (Act No. 20 of 2010):</strong> Total project costs include registered deed acquisition capital and all verified on-site civil infrastructure works. Non-saleable spaces dedicated to internal access roads and green zones (${proj.infrastructureAreaShotok.toFixed(2)} Shotok) are loaded directly onto the cost basis of net saleable plot inventory (${proj.totalSaleableAreaShotok.toFixed(2)} Shotok), reflecting an actual layout efficiency of ${proj.efficiencyRatio.toFixed(1)}%.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Cost Accounts)</div>
+      <div class="sig-sub">Senior Quantity Surveyor</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Internal Audit)</div>
+      <div class="sig-sub">Head of Audit & Quality Assurance</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-sub">Syndicate Board of Directors</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
