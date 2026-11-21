@@ -1,3 +1,4 @@
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { getTenantClientFromSession } from "@/lib/tenant";
@@ -14,6 +15,7 @@ import BankBookView from "@/components/reports/financial/BankBookView";
 import DailySummaryView from "@/components/reports/financial/DailySummaryView";
 import ReceiptsPaymentsView from "@/components/reports/financial/ReceiptsPaymentsView";
 import ContraRegisterView from "@/components/reports/financial/ContraRegisterView";
+import PartnerCapitalView from "@/components/reports/partners/PartnerCapitalView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -152,6 +154,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "contra-register") {
     return (
       <ContraRegisterView
+        def={def}
+        data={data as any}
+        filters={filters}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "partner-capital") {
+    return (
+      <PartnerCapitalView
         def={def}
         data={data as any}
         filters={filters}

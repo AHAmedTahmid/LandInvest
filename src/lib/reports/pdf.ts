@@ -2815,6 +2815,357 @@ export function buildContraRegisterPdfHtml(opts: {
 </html>`;
 }
 
+export function buildPartnerCapitalPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+}): string {
+  const { companyName, filterSummary, generatedBy, lang, data } = opts;
+  const now = formatDateTime(new Date());
+
+  const partner = data.partner || { name: "Partner", phone: "-", projects: [] };
+  const transactions: any[] = data.transactions || [];
+  const kpis = data.kpis || {
+    openingBalance: 0,
+    totalDeposits: 0,
+    totalDirectExpenses: 0,
+    totalProfitCredits: 0,
+    totalCapitalAdditions: 0,
+    totalWithdrawals: 0,
+    netPeriodChange: 0,
+    closingBalance: 0,
+  };
+
+  const getBadgeHtml = (type: string) => {
+    switch (type) {
+      case "DEPOSIT":
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:7.5px;font-weight:700;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;">Deposit</span>`;
+      case "DIRECT_EXPENSE":
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:7.5px;font-weight:700;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;">Direct Expense</span>`;
+      case "PROFIT_CREDIT":
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:7.5px;font-weight:700;background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe;">Profit Share</span>`;
+      case "WITHDRAWAL":
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:7.5px;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;">Drawing</span>`;
+      default:
+        return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:7.5px;font-weight:700;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;">${type}</span>`;
+    }
+  };
+
+  const rowsHtml = transactions.map((t, idx) => `
+    <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8px;font-family:monospace;font-weight:600;color:#0f172a;vertical-align:top;">
+        ${t.date}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8px;vertical-align:top;">
+        ${getBadgeHtml(t.txnType)}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8px;color:#1e293b;vertical-align:top;line-height:1.35;">
+        ${t.description}
+        ${t.projectName ? `<div style="font-size:7.5px;color:#64748b;margin-top:2px;">Project: <strong>${t.projectName}</strong></div>` : ""}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#047857;vertical-align:top;">
+        ${t.deposit ? `+${formatBDT(t.deposit)}` : "-"}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#b45309;vertical-align:top;">
+        ${t.withdrawal ? `-${formatBDT(t.withdrawal)}` : "-"}
+      </td>
+      <td style="padding:5px 7px;border-bottom:1px solid #e2e8f0;font-size:9px;font-family:monospace;font-weight:800;text-align:right;color:#0f172a;vertical-align:top;">
+        ${formatBDT(t.balance)}
+      </td>
+    </tr>
+  `).join("");
+
+  const projectPills = (partner.projects || [])
+    .map((pr: any) => `<span style="display:inline-block;padding:2px 6px;margin-right:4px;margin-bottom:2px;border-radius:4px;font-size:7.5px;background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;">${pr.projectName} (<strong>${pr.sharePercentage}%</strong>)</span>`)
+    .join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${opts.titleEn} - ${partner.name} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 8mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.35;
+    }
+
+    /* Header */
+    .header-table {
+      width: 100%;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 8px;
+      color: #64748b;
+    }
+    .doc-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #581c87;
+      margin-top: 2px;
+    }
+
+    /* Partner Bio Box */
+    .partner-bio {
+      padding: 6px 8px;
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .partner-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #3b0764;
+    }
+    .partner-meta {
+      font-size: 8px;
+      color: #6b21a8;
+      margin-top: 2px;
+    }
+
+    /* KPI Grid */
+    .kpi-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .kpi-card {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .kpi-label {
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 10.5px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #0f172a;
+    }
+    .kpi-sub {
+      font-size: 6.5px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 10px;
+    }
+    table.data-table th {
+      background: #1e1b4b;
+      color: #ffffff;
+      font-size: 7.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 5px 6px;
+      text-align: left;
+      border-right: 1px solid #312e81;
+    }
+    table.data-table th:last-child {
+      border-right: none;
+    }
+
+    /* Statutory Note */
+    .statutory-box {
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      font-size: 7.5px;
+      color: #475569;
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 10px;
+    }
+    .sig-col {
+      width: 28%;
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #94a3b8;
+      margin-bottom: 4px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Partnership Syndicate & Equity Capital Accounts Division</div>
+        <div class="doc-title">${opts.titleEn} (${opts.titleBn})</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;font-size:8px;color:#475569;line-height:1.4;">
+        <div><strong>Period:</strong> ${filterSummary}</div>
+        <div><strong>Generated:</strong> ${now}</div>
+        <div><strong>Prepared By:</strong> ${generatedBy}</div>
+        <div><strong>Accounting Standard:</strong> Partner Equity Ledger (Dr/Cr)</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Partner Profile Summary -->
+  <div class="partner-bio">
+    <div>
+      <div class="partner-name">${partner.name}</div>
+      <div class="partner-meta">
+        Phone: <strong>${partner.phone}</strong>
+        ${partner.nidNumber ? ` &nbsp;|&nbsp; NID: <strong>${partner.nidNumber}</strong>` : ""}
+        ${partner.bankName ? ` &nbsp;|&nbsp; Bank: <strong>${partner.bankName} (${partner.bankAccountNumber || ""})</strong>` : ""}
+      </div>
+      ${partner.projects && partner.projects.length > 0 ? `<div style="margin-top:4px;">${projectPills}</div>` : ""}
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:7.5px;color:#6b21a8;text-transform:uppercase;font-weight:700;">Closing Equity (C/D)</div>
+      <div style="font-size:13px;font-weight:800;font-family:monospace;color:#3b0764;">${formatBDT(kpis.closingBalance)}</div>
+    </div>
+  </div>
+
+  <!-- 4 KPI Cards -->
+  <div class="kpi-row">
+    <div class="kpi-card" style="border-left:3px solid #64748b;">
+      <div class="kpi-label">Opening Capital (B/F)</div>
+      <div class="kpi-val">${formatBDT(kpis.openingBalance)}</div>
+      <div class="kpi-sub">Brought forward balance</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Capital & Direct Expenses</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(kpis.totalDeposits + kpis.totalDirectExpenses)}</div>
+      <div class="kpi-sub">Injected + out-of-pocket costs</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #7c3aed;">
+      <div class="kpi-label">Profit Share Credited</div>
+      <div class="kpi-val" style="color:#6d28d9;">${formatBDT(kpis.totalProfitCredits)}</div>
+      <div class="kpi-sub">Realized sales distributions</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #d97706;">
+      <div class="kpi-label">Drawings / Withdrawals</div>
+      <div class="kpi-val" style="color:#b45309;">${formatBDT(kpis.totalWithdrawals)}</div>
+      <div class="kpi-sub">Total capital debited</div>
+    </div>
+  </div>
+
+  <!-- Ledger Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:12%;">Date</th>
+        <th style="width:14%;">Type</th>
+        <th style="width:34%;">Particulars / Description</th>
+        <th style="width:13%;text-align:right;">Credit (+)</th>
+        <th style="width:13%;text-align:right;">Debit (-)</th>
+        <th style="width:14%;text-align:right;">Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Opening Balance Row -->
+      <tr style="background:#f1f5f9;font-weight:600;">
+        <td style="padding:5px 7px;border-bottom:1px solid #cbd5e1;font-size:8px;font-family:monospace;">${filterSummary.split(" ")[0] || "B/F"}</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #cbd5e1;font-size:7.5px;">B/F RESERVE</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #cbd5e1;font-size:8px;font-weight:700;">Opening Capital Balance Brought Forward</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #cbd5e1;text-align:right;color:#64748b;">-</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #cbd5e1;text-align:right;color:#64748b;">-</td>
+        <td style="padding:5px 7px;border-bottom:1px solid #cbd5e1;text-align:right;font-family:monospace;font-size:8.5px;font-weight:800;">${formatBDT(kpis.openingBalance)}</td>
+      </tr>
+      ${rowsHtml || `<tr><td colspan="6" style="text-align:center;padding:15px;color:#94a3b8;">No transactions recorded for this period.</td></tr>`}
+    </tbody>
+    <tfoot>
+      <tr style="background:#1e1b4b;color:#ffffff;font-weight:700;font-size:8.5px;">
+        <td colspan="3" style="padding:6px 7px;">PERIOD TOTALS & CLOSING EQUITY:</td>
+        <td style="padding:6px 7px;text-align:right;font-family:monospace;color:#34d399;">+${formatBDT(kpis.totalCapitalAdditions)}</td>
+        <td style="padding:6px 7px;text-align:right;font-family:monospace;color:#fcd34d;">-${formatBDT(kpis.totalWithdrawals)}</td>
+        <td style="padding:6px 7px;text-align:right;font-family:monospace;font-size:9.5px;font-weight:800;color:#ffffff;">${formatBDT(kpis.closingBalance)}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory & Audit Footnote -->
+  <div class="statutory-box">
+    <strong>Partner Capital Governance:</strong> Partner capital accounts are maintained in accordance with the Partnership Agreement and GAAP. Direct out-of-pocket development expenses are credited upon verified voucher approval. Realized profit shares are allocated based on registered percentage deeds. The closing balance reconciles directly with the Balance Sheet Partner Capital Accounts.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Treasury)</div>
+      <div class="sig-sub">Senior Accounts Officer</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Partner Acknowledgment</div>
+      <div class="sig-sub">${partner.name}</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-sub">Syndicate Board of Directors</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
