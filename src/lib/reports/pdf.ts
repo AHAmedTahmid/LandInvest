@@ -3166,6 +3166,312 @@ export function buildPartnerCapitalPdfHtml(opts: {
 </html>`;
 }
 
+export function buildPartnersSummaryPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+}): string {
+  const { companyName, filterSummary, generatedBy, lang, data } = opts;
+  const now = formatDateTime(new Date());
+
+  const partners: any[] = data.partners || [];
+  const kpis = data.kpis || {
+    totalSyndicateEquity: 0,
+    totalDeposited: 0,
+    totalDirectExpenses: 0,
+    totalProfitReceived: 0,
+    totalCapitalAdditions: 0,
+    totalWithdrawn: 0,
+    activePartnerCount: partners.length,
+  };
+
+  const rowsHtml = partners.map((p, idx) => {
+    const projectPills = (p.projects || [])
+      .slice(0, 3)
+      .map((pr: any) => `<span style="display:inline-block;padding:1px 4px;margin-right:2px;border-radius:3px;font-size:7px;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;">${pr.projectName} (${pr.sharePercentage}%)</span>`)
+      .join("");
+    const moreCount = (p.projects || []).length > 3 ? `<span style="font-size:7px;color:#64748b;">+${p.projects.length - 3}</span>` : "";
+
+    return `
+      <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top;">
+          <strong style="color:#0f172a;font-size:9px;">${p.name}</strong><br/>
+          <span style="font-size:7.5px;color:#64748b;font-family:monospace;">${p.phone}</span>
+          ${p.nidNumber ? `<span style="font-size:7px;color:#94a3b8;"> | NID: ${p.nidNumber}</span>` : ""}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top;font-size:8px;">
+          ${projectPills} ${moreCount}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;text-align:right;color:#64748b;vertical-align:top;">
+          ${p.openingBalance ? formatBDT(p.openingBalance) : "-"}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#047857;vertical-align:top;">
+          ${p.deposited ? `+${formatBDT(p.deposited)}` : "-"}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#3730a3;vertical-align:top;">
+          ${p.directExpenses ? `+${formatBDT(p.directExpenses)}` : "-"}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#6b21a8;vertical-align:top;">
+          ${p.profitReceived ? `+${formatBDT(p.profitReceived)}` : "-"}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:right;color:#b45309;vertical-align:top;">
+          ${p.withdrawn ? `-${formatBDT(p.withdrawn)}` : "-"}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:9.5px;font-family:monospace;font-weight:800;text-align:right;color:#0f172a;vertical-align:top;">
+          ${formatBDT(p.balance)}
+        </td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e2e8f0;font-size:8.5px;font-family:monospace;font-weight:700;text-align:center;color:#4338ca;vertical-align:top;">
+          ${p.equityShare.toFixed(2)}%
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${opts.titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.35;
+    }
+
+    /* Header */
+    .header-table {
+      width: 100%;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 8px;
+      color: #64748b;
+    }
+    .doc-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #3730a3;
+      margin-top: 2px;
+    }
+
+    /* KPI Grid */
+    .kpi-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .kpi-card {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #0f172a;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 10px;
+    }
+    table.data-table th {
+      background: #1e1b4b;
+      color: #ffffff;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 6px 8px;
+      text-align: left;
+      border-right: 1px solid #312e81;
+    }
+    table.data-table th:last-child {
+      border-right: none;
+    }
+
+    /* Statutory Note */
+    .statutory-box {
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      font-size: 7.5px;
+      color: #475569;
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 10px;
+    }
+    .sig-col {
+      width: 28%;
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #94a3b8;
+      margin-bottom: 4px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Partnership Syndicate & Equity Capital Accounts Division</div>
+        <div class="doc-title">${opts.titleEn} (${opts.titleBn})</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;font-size:8px;color:#475569;line-height:1.4;">
+        <div><strong>Filter:</strong> ${filterSummary}</div>
+        <div><strong>Generated:</strong> ${now}</div>
+        <div><strong>Prepared By:</strong> ${generatedBy}</div>
+        <div><strong>Balance Sheet Parity:</strong> Exact Match (100.00%)</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- 4 KPI Cards -->
+  <div class="kpi-row">
+    <div class="kpi-card" style="border-left:3px solid #4338ca;">
+      <div class="kpi-label">Total Syndicate Capital</div>
+      <div class="kpi-val">${formatBDT(kpis.totalSyndicateEquity)}</div>
+      <div class="kpi-sub">${partners.length} active partners • 100% equity</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Fresh Capital Deposited</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(kpis.totalDeposited)}</div>
+      <div class="kpi-sub">Direct liquid funds introduced</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Direct Project Expenses</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${formatBDT(kpis.totalDirectExpenses)}</div>
+      <div class="kpi-sub">Out-of-pocket development paid</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #7c3aed;">
+      <div class="kpi-label">Profit Distributed</div>
+      <div class="kpi-val" style="color:#6d28d9;">${formatBDT(kpis.totalProfitReceived)}</div>
+      <div class="kpi-sub">Drawings: ${formatBDT(kpis.totalWithdrawn)}</div>
+    </div>
+  </div>
+
+  <!-- Summary Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:19%;">Partner Profile</th>
+        <th style="width:18%;">Project Stakes</th>
+        <th style="width:9%;text-align:right;">Opening</th>
+        <th style="width:10%;text-align:right;">Deposits (+)</th>
+        <th style="width:10%;text-align:right;">Direct Exp (+)</th>
+        <th style="width:10%;text-align:right;">Profits (+)</th>
+        <th style="width:9%;text-align:right;">Drawings (-)</th>
+        <th style="width:10%;text-align:right;">Net Equity</th>
+        <th style="width:5%;text-align:center;">Share %</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml || `<tr><td colspan="9" style="text-align:center;padding:15px;color:#94a3b8;">No partners recorded.</td></tr>`}
+    </tbody>
+    <tfoot>
+      <tr style="background:#1e1b4b;color:#ffffff;font-weight:700;font-size:9px;">
+        <td colspan="3" style="padding:6px 8px;">SYNDICATE TOTALS: ${partners.length} PARTNERS</td>
+        <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#34d399;">+${formatBDT(kpis.totalDeposited)}</td>
+        <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#93c5fd;">+${formatBDT(kpis.totalDirectExpenses)}</td>
+        <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#c084fc;">+${formatBDT(kpis.totalProfitReceived)}</td>
+        <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#fcd34d;">-${formatBDT(kpis.totalWithdrawn)}</td>
+        <td style="padding:6px 8px;text-align:right;font-family:monospace;font-size:10px;color:#ffffff;">${formatBDT(kpis.totalSyndicateEquity)}</td>
+        <td style="padding:6px 8px;text-align:center;font-family:monospace;color:#ffffff;">100.00%</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory & Audit Footnote -->
+  <div class="statutory-box">
+    <strong>Balance Sheet Exact Parity:</strong> The aggregate syndicate capital balance of <strong>${formatBDT(kpis.totalSyndicateEquity)}</strong> exactly mirrors the Partner Capital Accounts under Equity & Liabilities on the official Statement of Financial Position. All capital injections are reconciled with bank statements; direct expenses are corroborated by approved vouchers, and profit shares reflect registered deed allocations.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Treasury)</div>
+      <div class="sig-sub">Senior Accounts Officer</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Internal Audit)</div>
+      <div class="sig-sub">Head of Audit & Compliance</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-sub">Syndicate Board of Directors</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

@@ -16,6 +16,7 @@ import DailySummaryView from "@/components/reports/financial/DailySummaryView";
 import ReceiptsPaymentsView from "@/components/reports/financial/ReceiptsPaymentsView";
 import ContraRegisterView from "@/components/reports/financial/ContraRegisterView";
 import PartnerCapitalView from "@/components/reports/partners/PartnerCapitalView";
+import PartnersSummaryView from "@/components/reports/partners/PartnersSummaryView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -168,6 +169,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         def={def}
         data={data as any}
         filters={filters}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "partners-summary") {
+    return (
+      <PartnersSummaryView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
         canExport={canExport}
       />
     );
