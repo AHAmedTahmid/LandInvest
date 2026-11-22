@@ -4636,6 +4636,326 @@ export function buildProjectPnlPdfHtml(opts: {
 </html>`;
 }
 
+export function buildProjectsComparisonPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+}): string {
+  const { companyName, filterSummary, generatedBy, lang, data } = opts;
+  const now = formatDateTime(new Date());
+
+  const projects: any[] = data.projects || [];
+  const totals = data.portfolioTotals || {
+    totalProjects: 0,
+    totalGrossArea: 0,
+    totalPlots: 0,
+    totalSoldPlots: 0,
+    totalCapitalizedCost: 0,
+    totalBookedSales: 0,
+    totalCashCollected: 0,
+    totalActiveReceivables: 0,
+    totalInvoicedProfit: 0,
+    overallPaybackRate: 0,
+    overallProjectedRoi: 0,
+    overallEfficiencyRatio: 0,
+  };
+
+  const rowsHtml = projects.map((p: any, idx: number) => `
+    <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;font-size:8px;">
+        <strong style="color:#0f172a;">${p.projectName}</strong><br/>
+        <span style="font-size:7px;color:#64748b;">${p.mouza} · ${p.status}</span>
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:8px;">
+        ${p.grossAreaShotok.toFixed(2)}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:center;font-family:monospace;font-size:8px;">
+        ${p.soldPlotsCount} / ${p.totalPlotsCount}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:8px;font-weight:700;">
+        ${formatBDT(p.totalProjectCost)}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:8px;font-weight:700;">
+        ${p.bookedSalesValue > 0 ? formatBDT(p.bookedSalesValue) : "-"}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:8px;color:#047857;font-weight:700;">
+        ${p.cashCollected > 0 ? formatBDT(p.cashCollected) : "-"}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:8px;color:#b45309;">
+        ${p.activeReceivables > 0 ? formatBDT(p.activeReceivables) : "-"}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:8px;font-weight:700;color:${p.invoicedProfit >= 0 ? "#047857" : "#b91c1c"};">
+        ${formatBDT(p.invoicedProfit)}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:center;font-family:monospace;font-size:7.5px;">
+        ${p.isPaybackAchieved ? `✔ ${p.paybackRate.toFixed(0)}%` : `${p.paybackRate.toFixed(1)}%`}
+      </td>
+      <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:8px;font-weight:700;color:#3730a3;">
+        ${p.projectedFullyDilutedRoi.toFixed(1)}%
+      </td>
+    </tr>
+  `).join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${opts.titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 8.5px;
+      line-height: 1.35;
+      color: #0f172a;
+      background: #ffffff;
+    }
+
+    /* Header */
+    table.header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #1e1b4b;
+      padding-bottom: 6px;
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #1e1b4b;
+    }
+    .brand-sub {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .report-title-main {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .report-meta-text {
+      font-size: 7.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .kpi-card {
+      flex: 1;
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+    }
+    .kpi-label {
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #0f172a;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 8px;
+    }
+    table.data-table th {
+      background: #1e1b4b;
+      color: #ffffff;
+      font-size: 7.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 4px 8px;
+      text-align: left;
+      border-right: 1px solid #312e81;
+    }
+    table.data-table th:last-child {
+      border-right: none;
+    }
+
+    /* Statutory Note */
+    .statutory-box {
+      padding: 5px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      font-size: 7px;
+      color: #475569;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 6px;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      width: 28%;
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #94a3b8;
+      margin-bottom: 3px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Syndicate Portfolio Management & Cross-Project Benchmark Division</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${lang === "bn" ? opts.titleBn : opts.titleEn}</div>
+        <div class="report-meta-text">
+          <span>Portfolio: ${totals.totalProjects} Projects</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #1e1b4b;">
+      <div class="kpi-label">Syndicate Project Assets</div>
+      <div class="kpi-val">${formatBDT(totals.totalCapitalizedCost)}</div>
+      <div class="kpi-sub">${totals.totalProjects} Projects · ${totals.totalGrossArea.toFixed(1)} Shotok Acreage</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Booked Sales & Collections</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(totals.totalBookedSales)}</div>
+      <div class="kpi-sub">Collected: ${formatBDT(totals.totalCashCollected)} (${totals.overallCollectionRate.toFixed(1)}%)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #d97706;">
+      <div class="kpi-label">Customer Receivables</div>
+      <div class="kpi-val" style="color:#b45309;">${formatBDT(totals.totalActiveReceivables)}</div>
+      <div class="kpi-sub">Available Asking: ${formatBDT(totals.totalUnsoldAskingValue)}</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Portfolio Plots Absorption</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${totals.totalSoldPlots} / ${totals.totalPlots} Plots</div>
+      <div class="kpi-sub">Overall ROI: ${totals.overallProjectedRoi.toFixed(1)}% · Payback: ${totals.overallPaybackRate.toFixed(1)}%</div>
+    </div>
+  </div>
+
+  <!-- Master Comparative Matrix Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:19%;">Project Profile</th>
+        <th style="width:7%;text-align:right;">Gross Area</th>
+        <th style="width:9%;text-align:center;">Plots (Sold/Tot)</th>
+        <th style="width:12%;text-align:right;">Capitalized Cost</th>
+        <th style="width:12%;text-align:right;">Booked Sales</th>
+        <th style="width:11%;text-align:right;">Cash Collected</th>
+        <th style="width:9%;text-align:right;">Receivables</th>
+        <th style="width:10%;text-align:right;">Invoiced Profit</th>
+        <th style="width:5%;text-align:center;">Payback</th>
+        <th style="width:6%;text-align:right;">ROI %</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#1e1b4b;color:#ffffff;font-weight:700;font-size:8px;">
+        <td style="padding:5px 8px;">TOTAL PORTFOLIO (${totals.totalProjects} PROJECTS)</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${totals.totalGrossArea.toFixed(2)}</td>
+        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${totals.totalSoldPlots} / ${totals.totalPlots}</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;font-size:8.5px;color:#ffffff;">${formatBDT(totals.totalCapitalizedCost)}</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;font-size:8.5px;color:#ffffff;">${formatBDT(totals.totalBookedSales)}</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;font-size:8.5px;color:#34d399;">${formatBDT(totals.totalCashCollected)}</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;font-size:8.5px;color:#fcd34d;">${formatBDT(totals.totalActiveReceivables)}</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;font-size:8.5px;color:#34d399;">${formatBDT(totals.totalInvoicedProfit)}</td>
+        <td style="padding:5px 8px;text-align:center;font-family:monospace;color:#ffffff;">${totals.overallPaybackRate.toFixed(1)}%</td>
+        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#93c5fd;">${totals.overallProjectedRoi.toFixed(1)}%</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory & Audit Footnote -->
+  <div class="statutory-box">
+    <strong>Portfolio Benchmark & Capital Equalization Standard (Act No. 20 of 2010):</strong> All project metrics are consolidated across active deed acquisitions and approved site vouchers. Capital recycling from mature projects with 100%+ payback funds ongoing civil works in newly registered pipeline developments.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Portfolio Analyst)</div>
+      <div class="sig-sub">Corporate Development & Analytics</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Internal Audit)</div>
+      <div class="sig-sub">Head of Audit & Quality Assurance</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-sub">Syndicate Board of Directors</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
