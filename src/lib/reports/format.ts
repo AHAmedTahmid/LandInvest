@@ -62,7 +62,8 @@ export function getPresetRange(preset: DatePreset, customFrom?: string, customTo
     case "this_fy":
       return { from: fiscalYearStart(today), to: today };
     case "all_time":
-      return { from: new Date(2020, 0, 1), to: today };
+    case "all" as any:
+      return { from: new Date(2020, 0, 1), to: new Date(today.getFullYear() + 2, 11, 31) };
     case "custom":
     default:
       return {

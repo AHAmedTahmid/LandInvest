@@ -22,6 +22,7 @@ import PartnerContributionView from "@/components/reports/partners/PartnerContri
 import ProjectCostView from "@/components/reports/projects/ProjectCostView";
 import ProjectPnlView from "@/components/reports/projects/ProjectPnlView";
 import ProjectsComparisonView from "@/components/reports/projects/ProjectsComparisonView";
+import ExpenseRegisterView from "@/components/reports/projects/ExpenseRegisterView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -232,6 +233,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
       <ProjectsComparisonView
         def={def}
         data={data as any}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "expense-register") {
+    return (
+      <ExpenseRegisterView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
         canExport={canExport}
       />
     );

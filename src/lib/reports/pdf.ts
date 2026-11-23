@@ -4956,6 +4956,329 @@ export function buildProjectsComparisonPdfHtml(opts: {
 </html>`;
 }
 
+export function buildExpenseRegisterPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data, projectName } = opts;
+  const isBn = lang === "bn";
+  const now = formatDateTime(new Date());
+
+  const items = data.items || [];
+  const kpis = data.kpis || {
+    totalExpenses: data.totals?.amount || 0,
+    totalVouchersCount: items.length,
+    approvedAmount: 0,
+    approvedCount: 0,
+    pendingAmount: 0,
+    pendingCount: 0,
+    paidByPartnersAmount: 0,
+  };
+
+  const rowsHtml = items.map((r: any, idx: number) => {
+    const isApproved = r.status === "APPROVED";
+    const isPending = r.status === "PENDING";
+    const statusBg = isApproved ? "#ecfdf5" : isPending ? "#fffbeb" : "#fff1f2";
+    const statusColor = isApproved ? "#047857" : isPending ? "#b45309" : "#be123c";
+
+    const chLabel = r.channel === "PAID_BY_PARTNER"
+      ? `Partner: ${r.paidByPartnerName || "Partner"}`
+      : r.channel === "BANK"
+      ? `Bank: ${r.bankAccountName || "Bank Transfer"}`
+      : r.channel;
+
+    const rowBg = idx % 2 === 0 ? "#ffffff" : "#f8fafc";
+    const dateStr = formatDate(r.date);
+
+    return `
+      <tr style="background:${rowBg};border-bottom:1px solid #e2e8f0;">
+        <td style="padding:4px 6px;font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap;">${r.voucherNo}</td>
+        <td style="padding:4px 6px;font-family:monospace;color:#475569;white-space:nowrap;">${dateStr}</td>
+        <td style="padding:4px 6px;">
+          <div style="font-weight:700;color:#0f172a;">${r.projectName}</div>
+          ${r.mouza ? `<div style="font-size:7px;color:#64748b;">${r.mouza}</div>` : ""}
+        </td>
+        <td style="padding:4px 6px;white-space:nowrap;">
+          <div style="font-weight:600;color:#1e293b;">${r.category}</div>
+          <div style="font-size:6.5px;color:#64748b;text-transform:uppercase;">${r.categoryClassification || ""}</div>
+        </td>
+        <td style="padding:4px 6px;color:#334155;max-width:180px;">${r.description || "-"}</td>
+        <td style="padding:4px 6px;font-size:7px;color:#475569;">${chLabel}</td>
+        <td style="padding:4px 6px;font-size:7px;color:#64748b;">
+          <div>By: ${r.postedBy}</div>
+          ${isApproved ? `<div style="color:#047857;font-weight:600;">Appr: ${r.approver}</div>` : ""}
+        </td>
+        <td style="padding:4px 6px;text-align:center;white-space:nowrap;">
+          <span style="display:inline-block;padding:1px 5px;border-radius:4px;font-size:7px;font-weight:700;background:${statusBg};color:${statusColor};">
+            ${r.status}
+          </span>
+        </td>
+        <td style="padding:4px 6px;text-align:right;font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap;">
+          ${formatBDT(r.amount)}
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 8px;
+      line-height: 1.35;
+      color: #0f172a;
+      background: #ffffff;
+    }
+
+    /* Header */
+    table.header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #1e1b4b;
+      padding-bottom: 6px;
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #1e1b4b;
+    }
+    .brand-sub {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .report-title-main {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .report-meta-text {
+      font-size: 7.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .kpi-card {
+      flex: 1;
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+    }
+    .kpi-label {
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #0f172a;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 8px;
+    }
+    table.data-table th {
+      background: #1e1b4b;
+      color: #ffffff;
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 4px 6px;
+      text-align: left;
+      border-right: 1px solid #312e81;
+    }
+    table.data-table th:last-child {
+      border-right: none;
+    }
+
+    /* Statutory Note */
+    .statutory-box {
+      padding: 5px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      font-size: 7px;
+      color: #475569;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 6px;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      width: 28%;
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #94a3b8;
+      margin-bottom: 3px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Project Financial Control, Treasury & Accounts Department</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${isBn ? titleBn : titleEn}</div>
+        <div class="report-meta-text">
+          <span>Filter: ${filterSummary || "All Records"}</span> &nbsp;·&nbsp;
+          <span>Scope: ${projectName || "All Projects"}</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #1e1b4b;">
+      <div class="kpi-label">Total Registered Outflows</div>
+      <div class="kpi-val">${formatBDT(kpis.totalExpenses)}</div>
+      <div class="kpi-sub">${kpis.totalVouchersCount} Vouchers Recorded</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Vetted & Approved Vouchers</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(kpis.approvedAmount)}</div>
+      <div class="kpi-sub">${kpis.approvedCount} Vouchers (${kpis.totalExpenses > 0 ? ((kpis.approvedAmount / kpis.totalExpenses) * 100).toFixed(1) : 0}%)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #d97706;">
+      <div class="kpi-label">Pending Internal Audit</div>
+      <div class="kpi-val" style="color:#b45309;">${formatBDT(kpis.pendingAmount)}</div>
+      <div class="kpi-sub">${kpis.pendingCount} Vouchers Awaiting Approval</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #7c3aed;">
+      <div class="kpi-label">Paid by Syndicate Partners</div>
+      <div class="kpi-val" style="color:#6d28d9;">${formatBDT(kpis.paidByPartnersAmount)}</div>
+      <div class="kpi-sub">${kpis.paidByPartnersCount || 0} Vouchers (Reimbursable / Equity Credit)</div>
+    </div>
+  </div>
+
+  <!-- Master Voucher Ledger Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:10%;">Voucher #</th>
+        <th style="width:8%;">Date</th>
+        <th style="width:14%;">Project & Mouza</th>
+        <th style="width:12%;">Category Head</th>
+        <th style="width:20%;">Particulars / Description</th>
+        <th style="width:12%;">Channel / Source</th>
+        <th style="width:10%;">Audit Stamp</th>
+        <th style="width:6%;text-align:center;">Status</th>
+        <th style="width:8%;text-align:right;">Amount (BDT)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#1e1b4b;color:#ffffff;font-weight:700;font-size:8px;">
+        <td colspan="4" style="padding:5px 6px;">GRAND TOTAL OUTFLOWS (${items.length} VOUCHERS)</td>
+        <td colspan="4" style="padding:5px 6px;font-size:7px;color:#cbd5e1;">
+          Approved: ${formatBDT(kpis.approvedAmount)} &nbsp;|&nbsp; Pending: ${formatBDT(kpis.pendingAmount)} &nbsp;|&nbsp; Partner Paid: ${formatBDT(kpis.paidByPartnersAmount)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#ffffff;">
+          ${formatBDT(kpis.totalExpenses)}
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory & Audit Footnote -->
+  <div class="statutory-box">
+    <strong>Statutory Project Accounting Standard (Act No. 20 of 2010 & Income Tax Act 2023):</strong> All project expenditure entries are recorded on an accrual and cash basis under Section 15 of Act No. 20 of 2010. Expenditures incurred directly by syndicate partners are subject to board verification and reconciliation against equity contribution ledger accounts.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Site Accountant)</div>
+      <div class="sig-sub">Accounts & Finance Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Internal Audit)</div>
+      <div class="sig-sub">Head of Audit & Quality Control</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-sub">Executive Syndicate Committee</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
