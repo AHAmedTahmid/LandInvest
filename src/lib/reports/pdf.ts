@@ -5609,6 +5609,354 @@ export function buildPendingApprovalPdfHtml(opts: {
 </html>`;
 }
 
+export function buildLandDocumentsPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data } = opts;
+  const isBn = lang === "bn";
+  const now = formatDateTime(new Date());
+
+  const items = data.items || [];
+  const kpis = data.kpis || {
+    totalProjects: items.length,
+    totalAreaShotok: data.totals?.area || 0,
+    totalAreaAcres: (data.totals?.area || 0) / 100,
+    totalNetPlotAreaShotok: data.totals?.netArea || 0,
+    totalAcquisitionCost: data.totals?.acquisitionCost || 0,
+    totalPlots: 0,
+    overallEfficiencyRatio: 0,
+    registeredProjectsCount: 0,
+  };
+
+  const rowsHtml = items.map((r: any, idx: number) => {
+    const rowBg = idx % 2 === 0 ? "#ffffff" : "#f8fafc";
+    const statusBg =
+      r.status === "SOLD_OUT"
+        ? "#ecfdf5"
+        : r.status === "SELLING"
+        ? "#eff6ff"
+        : r.status === "DEVELOPING"
+        ? "#f5f3ff"
+        : r.status === "UNDER_BAYNA"
+        ? "#fffbeb"
+        : "#f1f5f9";
+
+    const statusColor =
+      r.status === "SOLD_OUT"
+        ? "#047857"
+        : r.status === "SELLING"
+        ? "#1d4ed8"
+        : r.status === "DEVELOPING"
+        ? "#6d28d9"
+        : r.status === "UNDER_BAYNA"
+        ? "#b45309"
+        : "#475569";
+
+    const partnerSummary = r.partners
+      ? r.partners.map((p: any) => `${p.name} (${p.sharePercentage}%)`).join(", ")
+      : "-";
+
+    return `
+      <tr style="background:${rowBg};border-bottom:1px solid #e2e8f0;">
+        <td style="padding:4px 6px;">
+          <div style="font-weight:700;color:#0f172a;">${r.projectName}</div>
+          <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:6.5px;font-weight:700;background:${statusBg};color:${statusColor};margin-top:1px;">
+            ${r.statusLabelEn}
+          </span>
+        </td>
+        <td style="padding:4px 6px;">
+          <div style="font-weight:600;color:#1e293b;">${r.mouza}</div>
+          <div style="font-size:7px;color:#64748b;font-family:monospace;">J.L. #${r.jlNumber}</div>
+        </td>
+        <td style="padding:4px 6px;font-family:monospace;font-size:7px;color:#334155;max-width:130px;">
+          ${r.dagNumbers}
+        </td>
+        <td style="padding:4px 6px;font-family:monospace;font-size:7px;color:#334155;max-width:130px;">
+          ${r.khatianNumbers}
+        </td>
+        <td style="padding:4px 6px;text-align:right;font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap;">
+          ${r.totalAreaShotok.toFixed(2)}
+        </td>
+        <td style="padding:4px 6px;text-align:right;font-family:monospace;color:#047857;white-space:nowrap;">
+          <div>${r.netPlotAreaShotok.toFixed(2)}</div>
+          <div style="font-size:6.5px;color:#059669;">${r.efficiencyRatio.toFixed(1)}%</div>
+        </td>
+        <td style="padding:4px 6px;text-align:center;font-family:monospace;white-space:nowrap;">
+          <span style="font-weight:700;color:#047857;">${r.soldPlots}</span> / <span style="font-weight:600;color:#1e293b;">${r.totalPlots}</span>
+        </td>
+        <td style="padding:4px 6px;text-align:right;font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap;">
+          <div>${formatBDT(r.totalAcquisitionCost)}</div>
+          <div style="font-size:6.5px;color:#64748b;">${formatBDT(r.costPerShotok)}/sh</div>
+        </td>
+        <td style="padding:4px 6px;font-size:7px;color:#475569;max-width:140px;">
+          ${partnerSummary}
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 8px;
+      line-height: 1.35;
+      color: #0f172a;
+      background: #ffffff;
+    }
+
+    /* Header */
+    table.header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #065f46;
+      padding-bottom: 6px;
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #1e1b4b;
+    }
+    .brand-sub {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .report-title-main {
+      font-size: 13px;
+      font-weight: 800;
+      color: #065f46;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .report-meta-text {
+      font-size: 7.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .kpi-card {
+      flex: 1;
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+    }
+    .kpi-label {
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #0f172a;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 8px;
+    }
+    table.data-table th {
+      background: #064e3b;
+      color: #ffffff;
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 4px 6px;
+      text-align: left;
+      border-right: 1px solid #047857;
+    }
+    table.data-table th:last-child {
+      border-right: none;
+    }
+
+    /* Statutory Note */
+    .statutory-box {
+      padding: 5px 8px;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 4px;
+      font-size: 7px;
+      color: #064e3b;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 6px;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      width: 28%;
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #94a3b8;
+      margin-bottom: 3px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Cadastral Survey, Land Title & Property Registration Department</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${isBn ? titleBn : titleEn}</div>
+        <div class="report-meta-text">
+          <span>Portfolio: ${kpis.totalProjects} Land Estates</span> &nbsp;·&nbsp;
+          <span>Total Acreage: ${kpis.totalAreaShotok.toFixed(2)} Shotok (${kpis.totalAreaAcres.toFixed(2)} Acres)</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Total Land Acreage</div>
+      <div class="kpi-val" style="color:#047857;">${kpis.totalAreaShotok.toFixed(2)} Shotok</div>
+      <div class="kpi-sub">${kpis.totalAreaAcres.toFixed(2)} Acres across ${kpis.totalProjects} Registered Estates</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Capitalized Acquisition Outlay</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${formatBDT(kpis.totalAcquisitionCost)}</div>
+      <div class="kpi-sub">Avg Rate: ${formatBDT(kpis.avgCostPerShotok)} / Shotok</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #7c3aed;">
+      <div class="kpi-label">Demarcated Plot Inventory</div>
+      <div class="kpi-val" style="color:#6d28d9;">${kpis.totalPlots} Plots (${kpis.totalNetPlotAreaShotok.toFixed(1)} Sh)</div>
+      <div class="kpi-sub">Planning Efficiency: ${kpis.overallEfficiencyRatio.toFixed(1)}% Saleable</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #b45309;">
+      <div class="kpi-label">Title Clearance & Status</div>
+      <div class="kpi-val" style="color:#b45309;">${kpis.registeredProjectsCount} / ${kpis.totalProjects} Registered</div>
+      <div class="kpi-sub">${kpis.underBaynaProjectsCount} Under Bayna · ${kpis.draftProjectsCount} Due Diligence</div>
+    </div>
+  </div>
+
+  <!-- Cadastral Matrix Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:14%;">Project & Status</th>
+        <th style="width:13%;">Mouza & J.L. No.</th>
+        <th style="width:14%;">Dag Numbers (CS/SA/RS/BS)</th>
+        <th style="width:14%;">Khatian Record Porchas</th>
+        <th style="width:8%;text-align:right;">Gross Area</th>
+        <th style="width:8%;text-align:right;">Net Plots</th>
+        <th style="width:6%;text-align:center;">Plots</th>
+        <th style="width:10%;text-align:right;">Acq Outlay</th>
+        <th style="width:13%;">Syndicate Ownership Shares</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#064e3b;color:#ffffff;font-weight:700;font-size:8px;">
+        <td colspan="4" style="padding:5px 6px;">PORTFOLIO TOTALS (${items.length} REGISTERED ESTATES)</td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;">${kpis.totalAreaShotok.toFixed(2)}</td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8px;color:#a7f3d0;">${kpis.totalNetPlotAreaShotok.toFixed(2)}</td>
+        <td style="padding:5px 6px;text-align:center;font-family:monospace;font-size:8px;">${kpis.totalPlots}</td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#ffffff;">
+          ${formatBDT(kpis.totalAcquisitionCost)}
+        </td>
+        <td style="padding:5px 6px;font-size:7px;color:#d1fae5;">
+          Efficiency: ${kpis.overallEfficiencyRatio.toFixed(1)}% | Avg Rate: ${formatBDT(kpis.avgCostPerShotok)}/sh
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory Cadastral Footnote -->
+  <div class="statutory-box">
+    <strong>Statutory Cadastral & Title Governance Standard (Act No. XVI of 1908 & Act XXVIII of 1951):</strong> All project land parcels are authenticated against official revenue records (CS, SA, RS, and BS porcha khatians), registered deeds, and formal mutation orders issued by the Assistant Commissioner (Land).
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Head Surveyor)</div>
+      <div class="sig-sub">Cadastral Survey & Demarcation</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Legal Counsel)</div>
+      <div class="sig-sub">Title Search & Non-Encumbrance (NEC)</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Partner)</div>
+      <div class="sig-sub">Syndicate Board of Directors</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
