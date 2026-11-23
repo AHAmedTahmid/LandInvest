@@ -23,6 +23,7 @@ import ProjectCostView from "@/components/reports/projects/ProjectCostView";
 import ProjectPnlView from "@/components/reports/projects/ProjectPnlView";
 import ProjectsComparisonView from "@/components/reports/projects/ProjectsComparisonView";
 import ExpenseRegisterView from "@/components/reports/projects/ExpenseRegisterView";
+import PendingApprovalView from "@/components/reports/projects/PendingApprovalView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -241,6 +242,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "expense-register") {
     return (
       <ExpenseRegisterView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "pending-approval") {
+    return (
+      <PendingApprovalView
         def={def}
         data={data as any}
         filters={filters}
