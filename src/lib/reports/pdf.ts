@@ -9608,6 +9608,382 @@ export function buildProfitHistoryPdfHtml(opts: {
 </html>`;
 }
 
+export function buildUserActivityPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang?: string;
+  data: any;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang = "en", data } = opts;
+
+  const kpis = data?.kpis || {
+    totalActiveUsers: 0,
+    totalUserActions: 0,
+    avgActionsPerUser: 0,
+    topOperatorName: "N/A",
+    topOperatorCount: 0,
+    monitoredModulesCount: 0,
+  };
+
+  const operators: any[] = data?.operators || [];
+  const items: any[] = data?.items || [];
+  const categoryWorkload: any[] = data?.categoryWorkload || [];
+
+  const nowStr = new Date().toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const catRowsHtml = categoryWorkload
+    .map(
+      (c: any) => `
+    <tr>
+      <td style="font-weight:700;color:#0f172a;">${c.labelEn}</td>
+      <td style="color:#475569;">${c.labelBn}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:700;color:#0f172a;">${c.count}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:700;color:#2563eb;">${c.percentage}%</td>
+    </tr>
+  `
+    )
+    .join("");
+
+  const opRowsHtml = operators
+    .map(
+      (op: any) => `
+    <tr>
+      <td style="font-weight:700;color:#0f172a;">
+        <div>${op.name}</div>
+        <div style="font-size:7px;color:#64748b;font-family:monospace;">${op.email}</div>
+      </td>
+      <td style="color:#334155;font-weight:600;">${op.role}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:800;background:#f8fafc;color:#0f172a;">${op.totalActions}</td>
+      <td style="text-align:center;font-family:monospace;color:#059669;font-weight:600;">${op.createCount}</td>
+      <td style="text-align:center;font-family:monospace;color:#2563eb;font-weight:600;">${op.updateCount}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:600;">${op.tablesTouched?.length || 0}</td>
+      <td style="font-family:monospace;font-size:7.5px;color:#64748b;white-space:nowrap;">
+        ${new Date(op.lastActive).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+      </td>
+    </tr>
+  `
+    )
+    .join("");
+
+  const itemRowsHtml = items
+    .slice(0, 100)
+    .map(
+      (item: any) => `
+    <tr>
+      <td style="font-family:monospace;font-size:7.5px;color:#64748b;white-space:nowrap;">
+        ${item.timestamp}
+      </td>
+      <td style="font-weight:600;color:#0f172a;">
+        <div>${item.userName}</div>
+        <div style="font-size:7.5px;color:#64748b;">${item.userRole}</div>
+      </td>
+      <td style="text-align:center;">
+        <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:7px;font-weight:700;font-family:monospace;background:${
+          item.action === "CREATE" ? "#ecfdf5;color:#047857;border:1px solid #a7f3d0;" : "#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;"
+        }">${item.action}</span>
+      </td>
+      <td style="font-weight:700;color:#0f172a;">
+        <div>${item.entityLabel}</div>
+        <div style="font-size:7px;color:#64748b;font-family:monospace;">${item.tableName} #${item.recordId?.slice(0, 8)}</div>
+      </td>
+      <td style="font-size:8px;color:#334155;">
+        ${item.summaryText}
+      </td>
+      <td style="font-family:monospace;font-size:7.5px;color:#64748b;">
+        ${item.ipAddress || "127.0.0.1"}
+      </td>
+    </tr>
+  `
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${titleEn} - User Activity & Personnel Accountability Register</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 8mm 10mm 10mm 10mm;
+  }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #0f172a;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    font-size: 8.5px;
+    line-height: 1.25;
+  }
+  .header-wrap {
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .comp-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin: 0 0 2px 0;
+    text-transform: uppercase;
+  }
+  .rep-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #312e81;
+    margin: 0 0 2px 0;
+  }
+  .rep-sub {
+    font-size: 8px;
+    color: #475569;
+    margin: 0;
+  }
+  .meta-col {
+    text-align: right;
+    font-size: 8px;
+    color: #475569;
+  }
+  .meta-col strong {
+    color: #0f172a;
+  }
+  .scope-banner {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    color: #334155;
+  }
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .kpi-card {
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 6px 8px;
+    background: #f8fafc;
+  }
+  .kpi-label {
+    font-size: 7.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 3px;
+  }
+  .kpi-val {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    font-family: "Courier New", Courier, monospace;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  .data-table th {
+    background: #1e1b4b;
+    color: #f8fafc;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 4px 6px;
+    border: 1px solid #1e1b4b;
+  }
+  .data-table td {
+    border: 1px solid #cbd5e1;
+    padding: 3.5px 5px;
+    font-size: 8px;
+    vertical-align: middle;
+  }
+  .data-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  .signatures-wrap {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    page-break-inside: avoid;
+  }
+  .sig-col {
+    text-align: center;
+  }
+  .sig-line {
+    border-top: 1px dashed #64748b;
+    margin-top: 32px;
+    margin-bottom: 4px;
+  }
+  .sig-title {
+    font-size: 8px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .sig-sub {
+    font-size: 7px;
+    color: #64748b;
+  }
+</style>
+</head>
+<body>
+
+  <div class="header-wrap">
+    <div>
+      <h1 class="comp-title">${companyName}</h1>
+      <h2 class="rep-title">${titleEn} / ${titleBn}</h2>
+      <p class="rep-sub">Enterprise Personnel Operational Activity, System Interaction & Accountability Register</p>
+    </div>
+    <div class="meta-col">
+      <div><strong>Security Level:</strong> INTERNAL AUDIT / RESTRICTED</div>
+      <div><strong>Generated On:</strong> ${nowStr}</div>
+      <div><strong>Compliance Officer:</strong> ${generatedBy}</div>
+      <div><strong>Audit Method:</strong> Continuous Immutable Telemetry</div>
+    </div>
+  </div>
+
+  <div class="scope-banner">
+    <div><strong>Activity Scope:</strong> ${filterSummary}</div>
+    <div><strong>Governance Framework:</strong> Multi-Tenant RBAC & Operational Integrity Verification</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card" style="border-left: 3px solid #4f46e5;">
+      <div class="kpi-label">Active Personnel</div>
+      <div class="kpi-val" style="color:#4f46e5;">${kpis.totalActiveUsers}</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">Verified Role Operators</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #059669;">
+      <div class="kpi-label">Total Logged Actions</div>
+      <div class="kpi-val" style="color:#059669;">${kpis.totalUserActions}</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">Audit-Tracked Operations</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #0284c7;">
+      <div class="kpi-label">Avg Productivity Index</div>
+      <div class="kpi-val" style="color:#0284c7;">${kpis.avgActionsPerUser}</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">Actions per Active Operator</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #d97706;">
+      <div class="kpi-label">Top Contributor</div>
+      <div class="kpi-val" style="font-size:10px;font-family:sans-serif;color:#d97706;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${kpis.topOperatorName}</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">${kpis.topOperatorCount} actions logged</div>
+    </div>
+  </div>
+
+  <!-- WORKLOAD BREAKDOWN -->
+  <div style="display:flex;gap:12px;margin-bottom:8px;">
+    <div style="flex:1;">
+      <div style="font-size:8.5px;font-weight:700;color:#0f172a;text-transform:uppercase;margin-bottom:4px;">
+        Workload Allocation by Functional Domain
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Functional Domain</th>
+            <th style="text-align:left;">Bengali Description</th>
+            <th style="text-align:center;">Operations</th>
+            <th style="text-align:center;">Workload Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${catRowsHtml}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OPERATOR PROFILES MATRIX -->
+  <div style="margin-bottom:8px;">
+    <div style="font-size:8.5px;font-weight:700;color:#0f172a;text-transform:uppercase;margin-bottom:4px;">
+      Personnel Operational Profiles & Mutation Productivity Matrix
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Operator & Email</th>
+          <th style="text-align:left;">Assigned Security Role</th>
+          <th style="text-align:center;">Total Ops</th>
+          <th style="text-align:center;">Creates</th>
+          <th style="text-align:center;">Updates</th>
+          <th style="text-align:center;">Modules</th>
+          <th style="text-align:left;">Last Activity</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${opRowsHtml}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CHRONOLOGICAL LOG -->
+  <div style="font-size:8.5px;font-weight:700;color:#0f172a;text-transform:uppercase;margin-bottom:4px;">
+    Chronological Operator Activity Stream (Showing ${Math.min(items.length, 100)} of ${items.length} records)
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;width:75px;">Timestamp</th>
+        <th style="text-align:left;width:120px;">Operator & Role</th>
+        <th style="text-align:center;width:55px;">Action</th>
+        <th style="text-align:left;width:110px;">Target Entity</th>
+        <th style="text-align:left;">Activity Summary</th>
+        <th style="text-align:left;width:70px;">Client IP</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemRowsHtml}
+    </tbody>
+  </table>
+
+  <!-- SIGNATURES -->
+  <div class="signatures-wrap">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Logged & Extracted By</div>
+      <div class="sig-sub">System Audit Daemon / DevOps</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Internal Auditor (Senior Partner)</div>
+      <div class="sig-sub">Audit & Internal Control Bureau</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Chief Compliance Officer</div>
+      <div class="sig-sub">Corporate Governance & Ethics</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

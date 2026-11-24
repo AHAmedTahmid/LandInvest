@@ -34,6 +34,7 @@ import CollectionReportView from "@/components/reports/sales/CollectionReportVie
 import ProfitAllocationView from "@/components/reports/profit/ProfitAllocationView";
 import ProfitHistoryView from "@/components/reports/profit/ProfitHistoryView";
 import AuditTrailView from "@/components/reports/audit/AuditTrailView";
+import UserActivityView from "@/components/reports/audit/UserActivityView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -381,6 +382,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "audit-trail") {
     return (
       <AuditTrailView
+        def={def}
+        data={data as any}
+        filters={filters}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "user-activity") {
+    return (
+      <UserActivityView
         def={def}
         data={data as any}
         filters={filters}
