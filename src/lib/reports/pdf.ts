@@ -7249,6 +7249,452 @@ export function buildBuyerStatementPdfHtml(opts: {
 </html>`;
 }
 
+export function buildReceivablesAgingPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data, projectName } = opts;
+  const isBn = lang === "bn";
+  const now = formatDateTime(new Date());
+
+  const items = (data.items || []) as any[];
+  const kpis = data.kpis || {
+    totalReceivables: 0,
+    totalCurrentDue: 0,
+    totalOverdue: 0,
+    days1to30Total: 0,
+    days31to60Total: 0,
+    days61to90Total: 0,
+    over90Total: 0,
+    debtorsCount: 0,
+    overdueDebtorsCount: 0,
+    healthyDebtorsCount: 0,
+    overdueRatio: 0,
+    criticalRatio: 0,
+  };
+  const projectBreakdown = (data.projectBreakdown || []) as any[];
+  const bucketPct = data.bucketPercentages || {
+    notYetDue: 0,
+    days1to30: 0,
+    days31to60: 0,
+    days61to90: 0,
+    over90: 0,
+  };
+
+  // Render Master Rows
+  const rowsHtml = items.map((row: any, idx: number) => {
+    let statusBg = "#f1f5f9";
+    let statusColor = "#334155";
+    if (row.riskTier === "HEALTHY") {
+      statusBg = "#ecfdf5";
+      statusColor = "#047857";
+    } else if (row.riskTier === "LOW_RISK") {
+      statusBg = "#fefce8";
+      statusColor = "#854d0e";
+    } else if (row.riskTier === "MEDIUM_RISK") {
+      statusBg = "#fff7ed";
+      statusColor = "#c2410c";
+    } else if (row.riskTier === "HIGH_RISK") {
+      statusBg = "#fef2f2";
+      statusColor = "#b91c1c";
+    } else if (row.riskTier === "CRITICAL_DEFAULT") {
+      statusBg = "#ffe4e6";
+      statusColor = "#be123c";
+    }
+
+    const riskText = isBn ? row.riskLabelBn : row.riskLabelEn;
+
+    return `
+      <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+        <td style="font-weight:700;color:#0f172a;white-space:nowrap;">
+          <div>${row.buyerName}</div>
+          <div style="font-size:7px;color:#64748b;font-weight:normal;">${row.buyerPhone}</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:#0f172a;">Plot ${row.plotNumber}</div>
+          <div style="font-size:7px;color:#64748b;">${row.projectName} (${row.plotSizeShotok.toFixed(1)} Sh)</div>
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">
+          ${formatBDT(row.totalDue)}
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:600;color:#047857;">
+          ${row.notYetDue > 0 ? formatBDT(row.notYetDue) : "-"}
+        </td>
+        <td style="text-align:right;font-family:monospace;color:#b45309;">
+          ${row.days1to30 > 0 ? formatBDT(row.days1to30) : "-"}
+        </td>
+        <td style="text-align:right;font-family:monospace;color:#c2410c;">
+          ${row.days31to60 > 0 ? formatBDT(row.days31to60) : "-"}
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:600;color:#b91c1c;">
+          ${row.days61to90 > 0 ? formatBDT(row.days61to90) : "-"}
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#be123c;">
+          ${row.over90 > 0 ? formatBDT(row.over90) : "-"}
+        </td>
+        <td style="text-align:center;">
+          <span style="display:inline-block;padding:2px 5px;border-radius:3px;font-size:7px;font-weight:700;background:${statusBg};color:${statusColor};">
+            ${riskText}
+          </span>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  // Project Breakdown Rows
+  const projectRowsHtml = projectBreakdown.map((p: any) => `
+    <tr style="background:#ffffff;">
+      <td style="font-weight:600;color:#0f172a;">${p.projectName}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:700;">${p.debtorsCount}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;">${formatBDT(p.totalDue)}</td>
+      <td style="text-align:right;font-family:monospace;color:#047857;">${formatBDT(p.notYetDue)}</td>
+      <td style="text-align:right;font-family:monospace;color:#b45309;">${p.days1to30 > 0 ? formatBDT(p.days1to30) : "-"}</td>
+      <td style="text-align:right;font-family:monospace;color:#c2410c;">${p.days31to60 > 0 ? formatBDT(p.days31to60) : "-"}</td>
+      <td style="text-align:right;font-family:monospace;color:#b91c1c;">${p.days61to90 > 0 ? formatBDT(p.days61to90) : "-"}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#be123c;">${p.over90 > 0 ? formatBDT(p.over90) : "-"}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:${p.overdueRatio > 25 ? "#be123c" : "#0f172a"};">${p.overdueRatio.toFixed(1)}%</td>
+    </tr>
+  `).join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${isBn ? titleBn : titleEn}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm 12mm 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.35;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .header-table {
+      width: 100%;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .report-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .report-meta-text {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .kpi-grid {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      display: table-cell;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      vertical-align: top;
+      width: 25%;
+    }
+    .kpi-card + .kpi-card {
+      padding-left: 10px;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      margin-bottom: 1px;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .section-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e293b;
+      margin: 10px 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .summary-table {
+      margin-bottom: 12px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 4px 6px;
+      border-bottom: 1px solid #cbd5e1;
+      border-right: 1px solid #e2e8f0;
+    }
+    .summary-table td {
+      padding: 3.5px 6px;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+    }
+    .data-table {
+      margin-top: 4px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .data-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 5px 6px;
+      letter-spacing: 0.02em;
+      border-right: 1px solid #334155;
+    }
+    .data-table td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .data-table tr {
+      page-break-inside: avoid;
+    }
+    .statutory-box {
+      margin-top: 10px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border-left: 3px solid #dc2626;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 7.5px;
+      color: #334155;
+      line-height: 1.4;
+      page-break-inside: avoid;
+    }
+    .sig-row {
+      margin-top: 24px;
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      display: table-cell;
+      width: 33.33%;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .sig-line {
+      border-top: 1px solid #0f172a;
+      margin-bottom: 4px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sig-title {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Credit Management, Receivables Recovery & Risk Mitigation Division</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${isBn ? titleBn : titleEn}</div>
+        <div class="report-meta-text">
+          ${projectName ? `<span>Project: ${projectName}</span> &nbsp;·&nbsp; ` : ""}
+          <span>Scope: ${filterSummary}</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #0f172a;">
+      <div class="kpi-label">Total Receivables Portfolio</div>
+      <div class="kpi-val" style="color:#0f172a;">${formatBDT(kpis.totalReceivables)}</div>
+      <div class="kpi-sub">${kpis.debtorsCount} Active Debtor Accounts</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Current / Performing</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(kpis.totalCurrentDue)}</div>
+      <div class="kpi-sub">${bucketPct.notYetDue.toFixed(1)}% Performing Book (${kpis.healthyDebtorsCount} Healthy)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #dc2626;">
+      <div class="kpi-label">Total Overdue Delinquency</div>
+      <div class="kpi-val" style="color:#dc2626;">${formatBDT(kpis.totalOverdue)}</div>
+      <div class="kpi-sub">${kpis.overdueRatio.toFixed(1)}% Portfolio (${kpis.overdueDebtorsCount} Accounts)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #be123c;">
+      <div class="kpi-label">Critical Default (90+ Days)</div>
+      <div class="kpi-val" style="color:#be123c;">${formatBDT(kpis.over90Total)}</div>
+      <div class="kpi-sub">${kpis.criticalRatio.toFixed(1)}% Statutory Notice Exposure</div>
+    </div>
+  </div>
+
+  ${projectBreakdown.length > 0 ? `
+  <!-- Project Summary -->
+  <div class="section-title">Estate-Wise Credit Exposure & Aging Summary</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width:22%;">Project Estate</th>
+        <th style="width:8%;text-align:center;">Debtors</th>
+        <th style="width:14%;text-align:right;">Total Due (৳)</th>
+        <th style="width:13%;text-align:right;">Current (৳)</th>
+        <th style="width:9%;text-align:right;">1-30d (৳)</th>
+        <th style="width:9%;text-align:right;">31-60d (৳)</th>
+        <th style="width:9%;text-align:right;">61-90d (৳)</th>
+        <th style="width:10%;text-align:right;">90+d (৳)</th>
+        <th style="width:6%;text-align:right;">Overdue %</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${projectRowsHtml}
+    </tbody>
+  </table>
+  ` : ""}
+
+  <!-- Master Aging Matrix Table -->
+  <div class="section-title">Master Debtor Aging Matrix (${items.length} Active Accounts)</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:16%;">Debtor / Buyer</th>
+        <th style="width:14%;">Contract & Plot</th>
+        <th style="width:12%;text-align:right;">Total Due</th>
+        <th style="width:10%;text-align:right;">Current (Not Due)</th>
+        <th style="width:9%;text-align:right;">1-30 Days</th>
+        <th style="width:9%;text-align:right;">31-60 Days</th>
+        <th style="width:9%;text-align:right;">61-90 Days</th>
+        <th style="width:9%;text-align:right;">90+ Days</th>
+        <th style="width:12%;text-align:center;">Risk Severity</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;font-size:8px;">
+        <td colspan="2" style="padding:5px 6px;">
+          PORTFOLIO AGING TOTALS (${items.length} DEBTORS)
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;">
+          ${formatBDT(kpis.totalReceivables)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8px;color:#86efac;">
+          ${formatBDT(kpis.totalCurrentDue)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8px;color:#fde047;">
+          ${formatBDT(kpis.days1to30Total)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8px;color:#fdba74;">
+          ${formatBDT(kpis.days31to60Total)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8px;color:#fca5a5;">
+          ${formatBDT(kpis.days61to90Total)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#fda4af;">
+          ${formatBDT(kpis.over90Total)}
+        </td>
+        <td style="padding:5px 6px;text-align:center;font-size:7.5px;color:#cbd5e1;">
+          Overdue: ${kpis.overdueRatio.toFixed(1)}%
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory Recovery Notice -->
+  <div class="statutory-box">
+    <strong>Statutory Real Estate Credit Governance (Real Estate Development and Management Act, 2010 - Section 14):</strong>
+    In the event of installment delinquency, the developer is legally mandated to deliver a formal written notice with a minimum 30-day cure period via registered post prior to initiating cancellation of allotment or forfeiture proceedings.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Credit Recovery Officer)</div>
+      <div class="sig-sub">Commercial Recovery Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Head of Finance)</div>
+      <div class="sig-sub">Treasury & Credit Control</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
