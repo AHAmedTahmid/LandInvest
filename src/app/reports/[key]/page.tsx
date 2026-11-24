@@ -31,6 +31,7 @@ import BuyerStatementView from "@/components/reports/sales/BuyerStatementView";
 import ReceivablesAgingView from "@/components/reports/sales/ReceivablesAgingView";
 import InstallmentReportView from "@/components/reports/sales/InstallmentReportView";
 import CollectionReportView from "@/components/reports/sales/CollectionReportView";
+import ProfitAllocationView from "@/components/reports/profit/ProfitAllocationView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -342,6 +343,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "collection-report") {
     return (
       <CollectionReportView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "profit-allocation") {
+    return (
+      <ProfitAllocationView
         def={def}
         data={data as any}
         filters={filters}
