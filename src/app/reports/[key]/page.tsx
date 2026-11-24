@@ -33,6 +33,7 @@ import InstallmentReportView from "@/components/reports/sales/InstallmentReportV
 import CollectionReportView from "@/components/reports/sales/CollectionReportView";
 import ProfitAllocationView from "@/components/reports/profit/ProfitAllocationView";
 import ProfitHistoryView from "@/components/reports/profit/ProfitHistoryView";
+import AuditTrailView from "@/components/reports/audit/AuditTrailView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -372,6 +373,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         data={data as any}
         filters={filters}
         projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "audit-trail") {
+    return (
+      <AuditTrailView
+        def={def}
+        data={data as any}
+        filters={filters}
         canExport={canExport}
       />
     );
