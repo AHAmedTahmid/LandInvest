@@ -5957,6 +5957,423 @@ export function buildLandDocumentsPdfHtml(opts: {
 </html>`;
 }
 
+export function buildSalesRegisterPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data, projectName } = opts;
+  const isBn = lang === "bn";
+  const now = formatDateTime(new Date());
+
+  const items = (data.items || []) as any[];
+  const kpis = data.kpis || {
+    totalSalesCount: 0,
+    totalAgreedPrice: 0,
+    totalCashCollected: 0,
+    totalActiveReceivables: 0,
+    overallCollectionRate: 0,
+    totalAreaSoldShotok: 0,
+    avgRatePerShotok: 0,
+    fullyPaidContractsCount: 0,
+    activeInstallmentPlansCount: 0,
+  };
+  const projectBreakdown = (data.projectSalesBreakdown || []) as any[];
+
+  // Render Master Rows
+  const rowsHtml = items.map((row: any, idx: number) => {
+    const isSold = row.status === "SOLD";
+    const statusBg = isSold ? "#ecfdf5" : "#eff6ff";
+    const statusColor = isSold ? "#047857" : "#1d4ed8";
+    const statusBorder = isSold ? "#a7f3d0" : "#bfdbfe";
+    const statusText = isBn ? row.statusLabelBn : row.statusLabelEn;
+
+    const rateFmt = row.ratePerShotok > 0 ? `@ ${formatBDT(row.ratePerShotok)}/sh` : "";
+
+    return `
+      <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+        <td style="font-weight:600;color:#0f172a;white-space:nowrap;">
+          <div>${row.contractNo}</div>
+          <div style="font-size:7.5px;color:#64748b;font-weight:normal;">${formatDate(row.saleDate)}</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:#0f172a;">${row.buyerName}</div>
+          <div style="font-size:7.5px;color:#64748b;">${row.buyerPhone}${row.buyerNid ? ` · NID: ${row.buyerNid}` : ""}</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:#0f172a;">${row.projectName}</div>
+          <div style="font-size:7.5px;color:#64748b;">${row.mouza || "-"}</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:#0f172a;">Plot ${row.plotNumber}</div>
+          <div style="font-size:7.5px;color:#64748b;">${row.plotSizeShotok.toFixed(2)} Shotok ${rateFmt}</div>
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">
+          ${formatBDT(row.totalAgreedPrice)}
+        </td>
+        <td style="text-align:right;font-family:monospace;color:#475569;">
+          ${row.advanceBookingAmount > 0 ? formatBDT(row.advanceBookingAmount) : "-"}
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:600;color:#047857;">
+          <div>${formatBDT(row.totalPaid)}</div>
+          <div style="font-size:7px;color:#059669;">(${row.collectionRate.toFixed(1)}%)</div>
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:${row.currentDue > 0 ? "#dc2626" : "#94a3b8"};">
+          ${row.currentDue > 0 ? formatBDT(row.currentDue) : "৳ 0.00"}
+        </td>
+        <td style="text-align:center;">
+          <span style="display:inline-block;padding:2px 6px;border-radius:3px;font-size:7.5px;font-weight:700;background:${statusBg};color:${statusColor};border:1px solid ${statusBorder};">
+            ${statusText}
+          </span>
+          ${row.installmentsCount > 0 ? `<div style="font-size:7px;color:#64748b;margin-top:2px;">${row.paidInstallmentsCount}/${row.installmentsCount} Paid</div>` : ""}
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  // Project Breakdown Rows
+  const projectRowsHtml = projectBreakdown.map((p: any) => `
+    <tr style="background:#ffffff;">
+      <td style="font-weight:600;color:#0f172a;">${p.projectName}</td>
+      <td style="text-align:center;font-family:monospace;">${p.salesCount}</td>
+      <td style="text-align:right;font-family:monospace;">${p.areaSoldShotok.toFixed(2)}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:600;">${formatBDT(p.agreedPrice)}</td>
+      <td style="text-align:right;font-family:monospace;color:#047857;font-weight:600;">${formatBDT(p.cashCollected)}</td>
+      <td style="text-align:right;font-family:monospace;color:${p.activeReceivables > 0 ? "#dc2626" : "#64748b"};font-weight:600;">${formatBDT(p.activeReceivables)}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">${p.collectionRate.toFixed(1)}%</td>
+    </tr>
+  `).join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${isBn ? titleBn : titleEn}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm 12mm 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.35;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .header-table {
+      width: 100%;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .report-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .report-meta-text {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .kpi-grid {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      display: table-cell;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      vertical-align: top;
+      width: 25%;
+    }
+    .kpi-card + .kpi-card {
+      padding-left: 10px;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      margin-bottom: 1px;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .section-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e293b;
+      margin: 10px 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .summary-table {
+      margin-bottom: 12px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 4px 6px;
+      border-bottom: 1px solid #cbd5e1;
+      border-right: 1px solid #e2e8f0;
+    }
+    .summary-table td {
+      padding: 3.5px 6px;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+    }
+    .data-table {
+      margin-top: 4px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .data-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 5px 6px;
+      letter-spacing: 0.02em;
+      border-right: 1px solid #334155;
+    }
+    .data-table td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .data-table tr {
+      page-break-inside: avoid;
+    }
+    .statutory-box {
+      margin-top: 10px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border-left: 3px solid #2563eb;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 7.5px;
+      color: #334155;
+      line-height: 1.4;
+      page-break-inside: avoid;
+    }
+    .sig-row {
+      margin-top: 24px;
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      display: table-cell;
+      width: 33.33%;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .sig-line {
+      border-top: 1px solid #0f172a;
+      margin-bottom: 4px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sig-title {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Sales, Customer Contracts & Receivables Portfolio Division</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${isBn ? titleBn : titleEn}</div>
+        <div class="report-meta-text">
+          ${projectName ? `<span>Project: ${projectName}</span> &nbsp;·&nbsp; ` : ""}
+          <span>Scope: ${filterSummary}</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Gross Booked Sales Value</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(kpis.totalAgreedPrice)}</div>
+      <div class="kpi-sub">${kpis.totalSalesCount} Contracts · ${kpis.totalAreaSoldShotok.toFixed(2)} Shotok Demarcated</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Realised Cash Collections</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${formatBDT(kpis.totalCashCollected)}</div>
+      <div class="kpi-sub">Overall Realisation Rate: ${kpis.overallCollectionRate.toFixed(1)}%</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #dc2626;">
+      <div class="kpi-label">Active Receivables Portfolio</div>
+      <div class="kpi-val" style="color:#dc2626;">${formatBDT(kpis.totalActiveReceivables)}</div>
+      <div class="kpi-sub">${kpis.activeInstallmentPlansCount} Active Installment Plans</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #7c3aed;">
+      <div class="kpi-label">Settlement & Land Metric</div>
+      <div class="kpi-val" style="color:#6d28d9;">${kpis.fullyPaidContractsCount} / ${kpis.totalSalesCount} Settled</div>
+      <div class="kpi-sub">Avg Land Rate: ${formatBDT(kpis.avgRatePerShotok)} / Shotok</div>
+    </div>
+  </div>
+
+  ${projectBreakdown.length > 0 ? `
+  <!-- Project Performance Summary -->
+  <div class="section-title">Project-Wise Sales & Recovery Summary</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width:24%;">Project Estate</th>
+        <th style="width:10%;text-align:center;">Contracts</th>
+        <th style="width:12%;text-align:right;">Area (Shotok)</th>
+        <th style="width:16%;text-align:right;">Agreed Value (৳)</th>
+        <th style="width:16%;text-align:right;">Cash Collected (৳)</th>
+        <th style="width:14%;text-align:right;">Active Due (৳)</th>
+        <th style="width:8%;text-align:right;">Realised %</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${projectRowsHtml}
+    </tbody>
+  </table>
+  ` : ""}
+
+  <!-- Master Sales Register Table -->
+  <div class="section-title">Master Sales & Booking Register (${items.length} Contracts)</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:11%;">Contract & Date</th>
+        <th style="width:15%;">Buyer / Customer</th>
+        <th style="width:13%;">Project & Mouza</th>
+        <th style="width:11%;">Plot Demarcation</th>
+        <th style="width:12%;text-align:right;">Agreed Price</th>
+        <th style="width:9%;text-align:right;">Booking Adv.</th>
+        <th style="width:11%;text-align:right;">Realised Cash</th>
+        <th style="width:10%;text-align:right;">Active Due</th>
+        <th style="width:8%;text-align:center;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;font-size:8px;">
+        <td colspan="4" style="padding:5px 6px;">
+          PORTFOLIO TOTALS (${items.length} CONTRACTS · ${kpis.totalAreaSoldShotok.toFixed(2)} SHOTOK DEMARCATED)
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;">
+          ${formatBDT(kpis.totalAgreedPrice)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8px;color:#94a3b8;">
+          -
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#86efac;">
+          ${formatBDT(kpis.totalCashCollected)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#fca5a5;">
+          ${formatBDT(kpis.totalActiveReceivables)}
+        </td>
+        <td style="padding:5px 6px;text-align:center;font-size:7.5px;color:#cbd5e1;">
+          ${kpis.overallCollectionRate.toFixed(1)}% Realised
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory Real Estate Act Footnote -->
+  <div class="statutory-box">
+    <strong>Statutory Real Estate Governance (Real Estate Development and Management Act, 2010 - Sections 13 & 14):</strong>
+    All land sales covenants, allotment schedules, and installment receipts are maintained in compliance with statutory consumer protections. Title deed registration and formal handover are executed upon complete settlement of contractual receivables.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Sales & Accounts)</div>
+      <div class="sig-sub">Commercial Booking Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Head of Finance)</div>
+      <div class="sig-sub">Treasury & Credit Recovery</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

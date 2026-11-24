@@ -25,6 +25,7 @@ import ProjectsComparisonView from "@/components/reports/projects/ProjectsCompar
 import ExpenseRegisterView from "@/components/reports/projects/ExpenseRegisterView";
 import PendingApprovalView from "@/components/reports/projects/PendingApprovalView";
 import LandDocumentsView from "@/components/reports/projects/LandDocumentsView";
+import SalesRegisterView from "@/components/reports/sales/SalesRegisterView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -269,6 +270,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
       <LandDocumentsView
         def={def}
         data={data as any}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "sales-register") {
+    return (
+      <SalesRegisterView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
         canExport={canExport}
       />
     );
