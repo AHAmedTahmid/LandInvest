@@ -9984,6 +9984,350 @@ export function buildUserActivityPdfHtml(opts: {
 </html>`;
 }
 
+export function buildReconciliationPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang?: string;
+  data: any;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang = "en", data } = opts;
+
+  const kpis = data?.kpis || {
+    totalChecks: 0,
+    passedChecks: 0,
+    failedChecks: 0,
+    warningChecks: 0,
+    overallHealthScore: 100,
+    totalVarianceAmount: 0,
+    vectorsEvaluatedCount: 4,
+  };
+
+  const vectorSummaries: any[] = data?.vectorSummaries || [];
+  const items: any[] = data?.items || [];
+
+  const nowStr = new Date().toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const vectorRowsHtml = vectorSummaries
+    .map(
+      (v: any) => `
+    <tr>
+      <td style="font-weight:700;color:#0f172a;">${v.labelEn}</td>
+      <td style="color:#475569;">${v.labelBn}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:700;color:#0f172a;">${v.totalChecks}</td>
+      <td style="text-align:center;font-family:monospace;color:#059669;font-weight:600;">${v.passedChecks}</td>
+      <td style="text-align:center;font-family:monospace;color:${v.failedChecks > 0 ? "#dc2626" : "#64748b"};font-weight:700;">${v.failedChecks}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:800;color:${v.healthPercent >= 95 ? "#047857" : "#b45309"};background:#f8fafc;">
+        ${v.healthPercent}%
+      </td>
+    </tr>
+  `
+    )
+    .join("");
+
+  const itemRowsHtml = items
+    .map(
+      (item: any) => `
+    <tr>
+      <td style="font-weight:700;color:#334155;white-space:nowrap;">
+        ${item.vectorLabelEn}
+      </td>
+      <td style="font-weight:700;color:#0f172a;">
+        <div>${item.checkTitleEn}</div>
+        <div style="font-size:7.5px;color:#64748b;font-weight:normal;margin-top:1px;">${item.detailsEn}</div>
+      </td>
+      <td style="text-align:center;">
+        <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:7px;font-weight:700;font-family:monospace;background:${
+          item.status === "PASS"
+            ? "#ecfdf5;color:#047857;border:1px solid #a7f3d0;"
+            : item.status === "WARNING"
+            ? "#fffbeb;color:#b45309;border:1px solid #fde68a;"
+            : "#fef2f2;color:#b91c1c;border:1px solid #fecaca;"
+        }">${item.status}</span>
+      </td>
+      <td style="text-align:right;font-family:monospace;font-weight:600;color:#334155;">
+        ${item.expectedDisplay}
+      </td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">
+        ${item.actualDisplay}
+      </td>
+      <td style="text-align:right;font-family:monospace;font-weight:800;color:${
+        item.status === "PASS" ? "#047857" : item.status === "WARNING" ? "#b45309" : "#b91c1c"
+      };">
+        ${item.varianceDisplay}
+      </td>
+      <td style="font-size:7.5px;color:#475569;">
+        ${item.recommendationEn}
+      </td>
+    </tr>
+  `
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${titleEn} - Multi-Vector Data Reconciliation & Financial Integrity Register</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 8mm 10mm 10mm 10mm;
+  }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #0f172a;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    font-size: 8.5px;
+    line-height: 1.25;
+  }
+  .header-wrap {
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .comp-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin: 0 0 2px 0;
+    text-transform: uppercase;
+  }
+  .rep-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #065f46;
+    margin: 0 0 2px 0;
+  }
+  .rep-sub {
+    font-size: 8px;
+    color: #475569;
+    margin: 0;
+  }
+  .meta-col {
+    text-align: right;
+    font-size: 8px;
+    color: #475569;
+  }
+  .meta-col strong {
+    color: #0f172a;
+  }
+  .scope-banner {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    color: #334155;
+  }
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .kpi-card {
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 6px 8px;
+    background: #f8fafc;
+  }
+  .kpi-label {
+    font-size: 7.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 3px;
+  }
+  .kpi-val {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    font-family: "Courier New", Courier, monospace;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  .data-table th {
+    background: #064e3b;
+    color: #f8fafc;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 4px 6px;
+    border: 1px solid #064e3b;
+  }
+  .data-table td {
+    border: 1px solid #cbd5e1;
+    padding: 3.5px 5px;
+    font-size: 8px;
+    vertical-align: middle;
+  }
+  .data-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  .signatures-wrap {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    page-break-inside: avoid;
+  }
+  .sig-col {
+    text-align: center;
+  }
+  .sig-line {
+    border-top: 1px dashed #64748b;
+    margin-top: 32px;
+    margin-bottom: 4px;
+  }
+  .sig-title {
+    font-size: 8px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .sig-sub {
+    font-size: 7px;
+    color: #64748b;
+  }
+</style>
+</head>
+<body>
+
+  <div class="header-wrap">
+    <div>
+      <h1 class="comp-title">${companyName}</h1>
+      <h2 class="rep-title">${titleEn} / ${titleBn}</h2>
+      <p class="rep-sub">Enterprise Multi-Vector Automated Data Reconciliation & Financial Integrity Certificate</p>
+    </div>
+    <div class="meta-col">
+      <div><strong>Audit Standard:</strong> Continuous Multi-Vector Balancing</div>
+      <div><strong>Generated On:</strong> ${nowStr}</div>
+      <div><strong>Internal Auditor:</strong> ${generatedBy}</div>
+      <div><strong>Reconciliation Verdict:</strong> ${kpis.overallHealthScore >= 95 ? "INTEGRITY CERTIFIED" : "ATTENTION REQUIRED"}</div>
+    </div>
+  </div>
+
+  <div class="scope-banner">
+    <div><strong>Scope:</strong> Full Ledger Reconciliation (Treasury, Sales, Expenses, Equity)</div>
+    <div><strong>Evaluation Status:</strong> ${kpis.passedChecks} of ${kpis.totalChecks} Checks Passed (${kpis.overallHealthScore.toFixed(1)}% Health Score)</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card" style="border-left: 3px solid #059669;">
+      <div class="kpi-label">System Health Score</div>
+      <div class="kpi-val" style="color:#059669;">${kpis.overallHealthScore.toFixed(1)}%</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">Overall Integrity Index</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #2563eb;">
+      <div class="kpi-label">Evaluated Checks</div>
+      <div class="kpi-val" style="color:#2563eb;">${kpis.totalChecks}</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">Across 4 Core Vectors</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #dc2626;">
+      <div class="kpi-label">Failed Checks</div>
+      <div class="kpi-val" style="color:${kpis.failedChecks > 0 ? "#dc2626" : "#059669"};">${kpis.failedChecks}</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">Critical Ledger Discrepancies</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #475569;">
+      <div class="kpi-label">Unbalanced Variance</div>
+      <div class="kpi-val">৳ ${new Intl.NumberFormat("en-BD", { minimumFractionDigits: 2 }).format(kpis.totalVarianceAmount)}</div>
+      <div style="font-size:7px;color:#64748b;margin-top:2px;">Net Monetary Discrepancy</div>
+    </div>
+  </div>
+
+  <!-- VECTORS SUMMARY TABLE -->
+  <div style="margin-bottom:8px;">
+    <div style="font-size:8.5px;font-weight:700;color:#0f172a;text-transform:uppercase;margin-bottom:4px;">
+      Integrity Vector Assessment Summary
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Integrity Vector</th>
+          <th style="text-align:left;">Bengali Description</th>
+          <th style="text-align:center;">Total Tests</th>
+          <th style="text-align:center;">Passed</th>
+          <th style="text-align:center;">Failed</th>
+          <th style="text-align:center;">Health Index</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${vectorRowsHtml}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MAIN RECONCILIATION ITEMS TABLE -->
+  <div style="font-size:8.5px;font-weight:700;color:#0f172a;text-transform:uppercase;margin-bottom:4px;">
+    Comprehensive Automated Balancing Register
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;width:95px;">Vector</th>
+        <th style="text-align:left;">Reconciliation Check & Description</th>
+        <th style="text-align:center;width:45px;">Status</th>
+        <th style="text-align:right;width:75px;">Expected</th>
+        <th style="text-align:right;width:75px;">Actual</th>
+        <th style="text-align:right;width:65px;">Variance</th>
+        <th style="text-align:left;width:130px;">Audit Recommendation</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemRowsHtml}
+    </tbody>
+  </table>
+
+  <!-- SIGNATURES -->
+  <div class="signatures-wrap">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Reconciled & Evaluated By</div>
+      <div class="sig-sub">Automated Audit Daemon / IT</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Lead Financial Controller</div>
+      <div class="sig-sub">Finance & Treasury Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Chief Internal Auditor</div>
+      <div class="sig-sub">Internal Control & Compliance</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

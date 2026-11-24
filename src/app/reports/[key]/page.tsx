@@ -35,6 +35,7 @@ import ProfitAllocationView from "@/components/reports/profit/ProfitAllocationVi
 import ProfitHistoryView from "@/components/reports/profit/ProfitHistoryView";
 import AuditTrailView from "@/components/reports/audit/AuditTrailView";
 import UserActivityView from "@/components/reports/audit/UserActivityView";
+import ReconciliationView from "@/components/reports/audit/ReconciliationView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -396,6 +397,16 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         def={def}
         data={data as any}
         filters={filters}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "reconciliation") {
+    return (
+      <ReconciliationView
+        def={def}
+        data={data as any}
         canExport={canExport}
       />
     );
