@@ -6374,6 +6374,454 @@ export function buildSalesRegisterPdfHtml(opts: {
 </html>`;
 }
 
+export function buildPlotInventoryPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data, projectName } = opts;
+  const isBn = lang === "bn";
+  const now = formatDateTime(new Date());
+
+  const items = (data.items || []) as any[];
+  const kpis = data.kpis || {
+    totalPlots: 0,
+    totalAreaShotok: 0,
+    totalAreaKatha: 0,
+    totalAreaAcres: 0,
+    availableCount: 0,
+    availableAreaShotok: 0,
+    availableValuation: 0,
+    bookedCount: 0,
+    bookedAreaShotok: 0,
+    bookedValuation: 0,
+    soldCount: 0,
+    soldAreaShotok: 0,
+    soldValuation: 0,
+    reservedHeldCount: 0,
+    reservedHeldAreaShotok: 0,
+    reservedHeldValuation: 0,
+    unpricedCount: 0,
+    unpricedAreaShotok: 0,
+    totalAskingValuation: 0,
+    avgAskingRatePerShotok: 0,
+    disposalRate: 0,
+  };
+  const projectBreakdown = (data.projectBreakdown || []) as any[];
+
+  // Render Master Rows
+  const rowsHtml = items.map((row: any, idx: number) => {
+    let statusBg = "#f1f5f9";
+    let statusColor = "#334155";
+    let statusBorder = "#cbd5e1";
+
+    if (row.status === "AVAILABLE") {
+      statusBg = "#ecfdf5";
+      statusColor = "#047857";
+      statusBorder = "#a7f3d0";
+    } else if (row.status === "BOOKED") {
+      statusBg = "#eff6ff";
+      statusColor = "#1d4ed8";
+      statusBorder = "#bfdbfe";
+    } else if (row.status === "SOLD") {
+      statusBg = "#f8fafc";
+      statusColor = "#334155";
+      statusBorder = "#cbd5e1";
+    } else if (row.status === "RESERVED" || row.status === "HELD") {
+      statusBg = "#fffbeb";
+      statusColor = "#b45309";
+      statusBorder = "#fde68a";
+    } else if (row.status === "UNPRICED") {
+      statusBg = "#f8fafc";
+      statusColor = "#64748b";
+      statusBorder = "#e2e8f0";
+    }
+
+    const statusText = isBn ? row.statusLabelBn : row.statusLabelEn;
+    const rateFmt = row.ratePerShotok > 0 ? formatBDT(row.ratePerShotok) : "-";
+
+    return `
+      <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+        <td style="font-weight:700;color:#0f172a;font-family:monospace;white-space:nowrap;">
+          <div>${row.plotNumber}</div>
+          <div style="font-size:7px;color:#64748b;font-family:sans-serif;font-weight:normal;">Demarcated Parcel</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:#0f172a;">${row.projectName}</div>
+          <div style="font-size:7px;color:#64748b;">${row.mouza || "-"}</div>
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">
+          <div>${row.plotSizeShotok.toFixed(2)} Sh</div>
+          <div style="font-size:7px;color:#64748b;font-weight:normal;">(${row.plotSizeKatha.toFixed(2)} Katha)</div>
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">
+          ${row.askingPrice > 0 ? formatBDT(row.askingPrice) : '<span style="color:#94a3b8;font-weight:normal;">Unpriced</span>'}
+        </td>
+        <td style="text-align:right;font-family:monospace;color:#475569;">
+          ${rateFmt}
+        </td>
+        <td style="text-align:center;">
+          <span style="display:inline-block;padding:2px 6px;border-radius:3px;font-size:7px;font-weight:700;background:${statusBg};color:${statusColor};border:1px solid ${statusBorder};">
+            ${statusText}
+          </span>
+        </td>
+        <td>
+          ${row.buyerName ? `
+            <div style="font-weight:600;color:#0f172a;">${row.buyerName}</div>
+            <div style="font-size:7px;color:#64748b;">${row.buyerPhone || ""}${row.currentDueAmount > 0 ? ` · Due: ${formatBDT(row.currentDueAmount)}` : " · Fully Settled"}</div>
+          ` : `
+            <span style="color:#94a3b8;font-style:italic;font-size:7.5px;">Unallocated Stock</span>
+          `}
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  // Project Breakdown Rows
+  const projectRowsHtml = projectBreakdown.map((p: any) => `
+    <tr style="background:#ffffff;">
+      <td style="font-weight:600;color:#0f172a;">${p.projectName}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:700;">${p.totalPlots}</td>
+      <td style="text-align:right;font-family:monospace;">${p.totalAreaShotok.toFixed(1)}</td>
+      <td style="text-align:center;font-family:monospace;color:#047857;font-weight:600;">${p.availableCount}</td>
+      <td style="text-align:center;font-family:monospace;color:#1d4ed8;font-weight:600;">${p.bookedCount}</td>
+      <td style="text-align:center;font-family:monospace;color:#334155;font-weight:600;">${p.soldCount}</td>
+      <td style="text-align:center;font-family:monospace;color:#64748b;">${p.unpricedCount + p.reservedCount}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:600;color:#047857;">${formatBDT(p.askingValuation)}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">${p.disposalRate.toFixed(1)}%</td>
+    </tr>
+  `).join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${isBn ? titleBn : titleEn}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm 12mm 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.35;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .header-table {
+      width: 100%;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .report-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .report-meta-text {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .kpi-grid {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      display: table-cell;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      vertical-align: top;
+      width: 25%;
+    }
+    .kpi-card + .kpi-card {
+      padding-left: 10px;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      margin-bottom: 1px;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .section-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e293b;
+      margin: 10px 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .summary-table {
+      margin-bottom: 12px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 4px 6px;
+      border-bottom: 1px solid #cbd5e1;
+      border-right: 1px solid #e2e8f0;
+    }
+    .summary-table td {
+      padding: 3.5px 6px;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+    }
+    .data-table {
+      margin-top: 4px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .data-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 5px 6px;
+      letter-spacing: 0.02em;
+      border-right: 1px solid #334155;
+    }
+    .data-table td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .data-table tr {
+      page-break-inside: avoid;
+    }
+    .statutory-box {
+      margin-top: 10px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border-left: 3px solid #059669;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 7.5px;
+      color: #334155;
+      line-height: 1.4;
+      page-break-inside: avoid;
+    }
+    .sig-row {
+      margin-top: 24px;
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      display: table-cell;
+      width: 33.33%;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .sig-line {
+      border-top: 1px solid #0f172a;
+      margin-bottom: 4px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sig-title {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Cadastral Demarcation, Plot Inventory & Real Estate Asset Division</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${isBn ? titleBn : titleEn}</div>
+        <div class="report-meta-text">
+          ${projectName ? `<span>Project: ${projectName}</span> &nbsp;·&nbsp; ` : ""}
+          <span>Scope: ${filterSummary}</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #0f172a;">
+      <div class="kpi-label">Total Demarcated Stock</div>
+      <div class="kpi-val" style="color:#0f172a;">${kpis.totalPlots} Plots</div>
+      <div class="kpi-sub">${kpis.totalAreaShotok.toFixed(2)} Shotok (${kpis.totalAreaAcres.toFixed(2)} Acres)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Available For Sale</div>
+      <div class="kpi-val" style="color:#047857;">${kpis.availableCount} Plots</div>
+      <div class="kpi-sub">${kpis.availableAreaShotok.toFixed(2)} Shotok · Val: ${formatBDT(kpis.availableValuation)}</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Contracted / Disposed</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${kpis.soldCount + kpis.bookedCount} Plots</div>
+      <div class="kpi-sub">${kpis.soldCount} Sold · ${kpis.bookedCount} Booked (${kpis.disposalRate.toFixed(1)}% Absorbed)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #7c3aed;">
+      <div class="kpi-label">Pipeline & Valuation</div>
+      <div class="kpi-val" style="color:#6d28d9;">${formatBDT(kpis.totalAskingValuation)}</div>
+      <div class="kpi-sub">Avg Benchmark: ${formatBDT(kpis.avgAskingRatePerShotok)} / Shotok</div>
+    </div>
+  </div>
+
+  ${projectBreakdown.length > 0 ? `
+  <!-- Project Performance Summary -->
+  <div class="section-title">Estate-Wise Inventory Stock & Absorption Summary</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width:24%;">Project Estate</th>
+        <th style="width:8%;text-align:center;">Total</th>
+        <th style="width:10%;text-align:right;">Area (Sh)</th>
+        <th style="width:9%;text-align:center;">Available</th>
+        <th style="width:9%;text-align:center;">Booked</th>
+        <th style="width:8%;text-align:center;">Sold</th>
+        <th style="width:8%;text-align:center;">Pipeline</th>
+        <th style="width:14%;text-align:right;">Asking Value (৳)</th>
+        <th style="width:10%;text-align:right;">Disposed %</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${projectRowsHtml}
+    </tbody>
+  </table>
+  ` : ""}
+
+  <!-- Master Plot Stock Table -->
+  <div class="section-title">Master Plot Demarcation & Allotment Register (${items.length} Plots)</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:10%;">Plot No.</th>
+        <th style="width:18%;">Project Estate & Mouza</th>
+        <th style="width:12%;text-align:right;">Area (Shotok)</th>
+        <th style="width:13%;text-align:right;">Asking Valuation</th>
+        <th style="width:11%;text-align:right;">Rate / Shotok</th>
+        <th style="width:12%;text-align:center;">Stock Status</th>
+        <th style="width:24%;">Customer Allotment / Buyer</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;font-size:8px;">
+        <td colspan="2" style="padding:5px 6px;">
+          PORTFOLIO TOTALS (${items.length} DEMARCATED PLOTS)
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#86efac;">
+          ${kpis.totalAreaShotok.toFixed(2)} Sh
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#86efac;">
+          ${formatBDT(kpis.totalAskingValuation)}
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8px;color:#cbd5e1;">
+          Avg: ${formatBDT(kpis.avgAskingRatePerShotok)}
+        </td>
+        <td style="padding:5px 6px;text-align:center;font-size:7.5px;color:#86efac;">
+          ${kpis.availableCount} Avail · ${kpis.soldCount + kpis.bookedCount} Disposed
+        </td>
+        <td style="padding:5px 6px;font-size:7.5px;color:#cbd5e1;">
+          Disposal Rate: ${kpis.disposalRate.toFixed(1)}% | Avail Val: ${formatBDT(kpis.availableValuation)}
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory Demarcation Footnote -->
+  <div class="statutory-box">
+    <strong>Statutory Demarcation & Real Estate Compliance (Town Improvement Act & Real Estate Development and Management Act, 2010):</strong>
+    All plot boundaries, dimensions, and easement covenants strictly correspond to registered master layout plans. Ownership mutation and final Sub-Kabala deed registration are executed upon complete settlement of purchase consideration.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Head Surveyor)</div>
+      <div class="sig-sub">Cadastral Demarcation Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Commercial Sales Manager)</div>
+      <div class="sig-sub">Inventory & Stock Allotment</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

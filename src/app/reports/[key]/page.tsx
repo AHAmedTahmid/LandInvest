@@ -26,6 +26,7 @@ import ExpenseRegisterView from "@/components/reports/projects/ExpenseRegisterVi
 import PendingApprovalView from "@/components/reports/projects/PendingApprovalView";
 import LandDocumentsView from "@/components/reports/projects/LandDocumentsView";
 import SalesRegisterView from "@/components/reports/sales/SalesRegisterView";
+import PlotInventoryView from "@/components/reports/sales/PlotInventoryView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -278,6 +279,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "sales-register") {
     return (
       <SalesRegisterView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "plot-inventory") {
+    return (
+      <PlotInventoryView
         def={def}
         data={data as any}
         filters={filters}

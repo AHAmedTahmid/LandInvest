@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
 import { getFiscalYears } from "@/lib/fiscalYear";
-import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, buildProjectPnlPdfHtml, buildProjectsComparisonPdfHtml, buildExpenseRegisterPdfHtml, buildPendingApprovalPdfHtml, buildLandDocumentsPdfHtml, buildSalesRegisterPdfHtml, generatePdf } from "@/lib/reports/pdf";
+import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, buildProjectPnlPdfHtml, buildProjectsComparisonPdfHtml, buildExpenseRegisterPdfHtml, buildPendingApprovalPdfHtml, buildLandDocumentsPdfHtml, buildSalesRegisterPdfHtml, buildPlotInventoryPdfHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
 
@@ -309,6 +309,30 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
       projectName,
     });
     landscape = true; // Executive A4 landscape master sales register
+  } else if (key === "plot-inventory") {
+    let projectName: string | undefined;
+    if (filters.projectId && filters.projectId !== "ALL") {
+      try {
+        const proj = await prisma.landProject.findUnique({
+          where: { id: filters.projectId },
+          select: { projectName: true },
+        });
+        if (proj) projectName = proj.projectName;
+      } catch {
+        // Fallback if query fails
+      }
+    }
+    html = buildPlotInventoryPdfHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+      projectName,
+    });
+    landscape = true; // Executive A4 landscape plot inventory & stock register
   } else {
     html = buildReportHtml({
       titleEn: def.titleEn,
