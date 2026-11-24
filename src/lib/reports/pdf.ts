@@ -8102,6 +8102,412 @@ export function buildInstallmentReportPdfHtml(opts: {
 </html>`;
 }
 
+export function buildCollectionReportPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang?: string;
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang = "en", data, projectName } = opts;
+
+  const summary = {
+    totalCollected: data?.kpis?.totalCollected ?? (data as any)?.summary?.totalCollected ?? 0,
+    transactionCount: data?.kpis?.transactionCount ?? (data as any)?.summary?.transactionCount ?? 0,
+    averageTicket: data?.kpis?.averageTicket ?? (data as any)?.summary?.averageTicket ?? 0,
+    bankCollected: data?.kpis?.bankCollected ?? (data as any)?.summary?.bankCollected ?? 0,
+    bankPercent: data?.kpis?.bankPercent ?? (data as any)?.summary?.bankPercent ?? 0,
+    cashCollected: data?.kpis?.cashCollected ?? (data as any)?.summary?.cashCollected ?? 0,
+    cashPercent: data?.kpis?.cashPercent ?? (data as any)?.summary?.cashPercent ?? 0,
+    contractedBookValue: data?.kpis?.contractedBookValue ?? (data as any)?.summary?.contractedBookValue ?? 0,
+    totalOutstandingDue: data?.kpis?.totalOutstandingDue ?? (data as any)?.summary?.totalOutstandingDue ?? 0,
+    portfolioRealizationRate: data?.kpis?.portfolioRealizationRate ?? (data as any)?.summary?.portfolioRealizationRate ?? 0,
+    projectBreakdown: data?.projectBreakdown ?? (data as any)?.summary?.projectBreakdown ?? [],
+    channelBreakdown: data?.channelBreakdown ?? (data as any)?.summary?.channelBreakdown ?? [],
+  };
+
+  const receipts: any[] = data?.receipts || [];
+
+  const nowStr = new Date().toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const projectRowsHtml = summary.projectBreakdown
+    .map(
+      (p: any) => `
+    <tr>
+      <td style="font-weight:700;color:#0f172a;">${p.projectName}</td>
+      <td style="text-align:center;">${p.contractCount}</td>
+      <td style="text-align:right;font-family:monospace;">${formatBDT(p.totalAgreedPrice)}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#047857;background:#f0fdf4;">${formatBDT(p.totalCollected)}</td>
+      <td style="text-align:right;font-family:monospace;color:#be123c;">${formatBDT(p.currentDue)}</td>
+      <td style="text-align:center;font-weight:700;font-family:monospace;color:#0f172a;">${p.realizationRate.toFixed(1)}%</td>
+      <td style="text-align:center;font-family:monospace;">${p.transactionCount}</td>
+    </tr>
+  `
+    )
+    .join("");
+
+  const channelRowsHtml = summary.channelBreakdown
+    .map(
+      (c: any) => `
+    <tr>
+      <td style="font-weight:600;color:#1e293b;">${c.accountName}</td>
+      <td style="text-align:center;">
+        <span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:7.5px;font-weight:700;${
+          c.channel === "Cash" ? "background:#fef3c7;color:#92400e;" : "background:#dbeafe;color:#1e40af;"
+        }">${c.channel}</span>
+      </td>
+      <td style="text-align:center;font-family:monospace;">${c.count}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#047857;">${formatBDT(c.totalAmount)}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:600;">${c.percentage.toFixed(1)}%</td>
+    </tr>
+  `
+    )
+    .join("");
+
+  const receiptRowsHtml = receipts
+    .slice(0, 100) // Display up to 100 recent receipts in landscape print
+    .map(
+      (r: any) => `
+    <tr>
+      <td style="font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap;">${r.receiptNo}</td>
+      <td style="font-family:monospace;white-space:nowrap;">${formatDate(r.paymentDate)}</td>
+      <td>
+        <div style="font-weight:600;color:#0f172a;">${r.buyerName}</div>
+        <div style="font-size:7.5px;color:#64748b;font-family:monospace;">${r.buyerPhone}</div>
+      </td>
+      <td>
+        <div style="font-weight:600;color:#1e293b;">Plot ${r.plotNo}</div>
+        <div style="font-size:7.5px;color:#64748b;">${r.projectName}</div>
+      </td>
+      <td>
+        <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:7.5px;font-weight:700;${
+          r.paymentMethod === "CASH" ? "background:#fef3c7;color:#92400e;" : "background:#dbeafe;color:#1e40af;"
+        }">
+          ${r.paymentMethod === "CASH" ? "Cash Vault" : r.bankAccountName}
+        </span>
+      </td>
+      <td style="color:#475569;font-size:7.5px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+        ${r.remarks}
+      </td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#047857;background:#f0fdf4;white-space:nowrap;">
+        ${formatBDT(r.amountPaid)}
+      </td>
+    </tr>
+  `
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+  <meta charset="utf-8" />
+  <title>${titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm 12mm 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.35;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .header-table {
+      width: 100%;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .report-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .report-meta-text {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .kpi-grid {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      display: table-cell;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      vertical-align: top;
+      width: 25%;
+    }
+    .kpi-card + .kpi-card {
+      padding-left: 10px;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      margin-bottom: 1px;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .section-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e293b;
+      margin: 10px 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .summary-table {
+      margin-bottom: 12px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 7.5px;
+      letter-spacing: 0.03em;
+      padding: 5px 6px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table td {
+      padding: 4px 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .ledger-table {
+      font-size: 8px;
+      border: 1px solid #0f172a;
+      margin-bottom: 16px;
+    }
+    .ledger-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 7.5px;
+      letter-spacing: 0.04em;
+      padding: 5px 6px;
+      border: 1px solid #1e293b;
+    }
+    .ledger-table td {
+      padding: 4px 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .ledger-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .sig-row {
+      display: table;
+      width: 100%;
+      margin-top: 24px;
+      padding-top: 10px;
+    }
+    .sig-col {
+      display: table-cell;
+      width: 33.33%;
+      text-align: center;
+      vertical-align: top;
+      padding: 0 15px;
+    }
+    .sig-line {
+      border-top: 1px dashed #64748b;
+      margin-bottom: 4px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Table -->
+  <table class="header-table">
+    <tr>
+      <td style="width: 50%; vertical-align: top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Commercial Treasury, Customer Realization & Audit Division</div>
+        ${projectName ? `<div style="font-size:8.5px;color:#047857;font-weight:700;margin-top:2px;">Project Filter: ${projectName}</div>` : ""}
+      </td>
+      <td style="width: 50%; text-align: right; vertical-align: top;">
+        <div class="report-title-main">${titleEn}</div>
+        <div style="font-size: 9px; color: #475569; font-weight: 600;">${titleBn}</div>
+        <div class="report-meta-text">
+          Scope: ${filterSummary} · Generated: ${nowStr} · By: ${generatedBy}
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- 4 Macro KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left: 3px solid #047857;">
+      <div class="kpi-label">Total Realized Inflow</div>
+      <div class="kpi-val" style="color: #047857;">${formatBDT(summary.totalCollected)}</div>
+      <div class="kpi-sub">${summary.transactionCount} Receipts · Avg ৳ ${Math.round(summary.averageTicket).toLocaleString()}</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #2563eb;">
+      <div class="kpi-label">Bank & MFS Clearing</div>
+      <div class="kpi-val" style="color: #2563eb;">${formatBDT(summary.bankCollected)}</div>
+      <div class="kpi-sub">${summary.bankPercent.toFixed(1)}% of Inflows · Direct Wire</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #d97706;">
+      <div class="kpi-label">Petty Cash Treasury</div>
+      <div class="kpi-val" style="color: #d97706;">${formatBDT(summary.cashCollected)}</div>
+      <div class="kpi-sub">${summary.cashPercent.toFixed(1)}% of Inflows · Vault Receipts</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #7c3aed;">
+      <div class="kpi-label">Portfolio Realization</div>
+      <div class="kpi-val" style="color: #7c3aed;">${summary.portfolioRealizationRate.toFixed(1)}%</div>
+      <div class="kpi-sub">Due: ${formatBDT(summary.totalOutstandingDue)}</div>
+    </div>
+  </div>
+
+  <!-- Estate Realization Table -->
+  <div class="section-title">Estate-Wise Collection Realization & Recovery Summary</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;">Project Estate</th>
+        <th style="text-align:center;">Contracts</th>
+        <th style="text-align:right;">Agreed Value (৳)</th>
+        <th style="text-align:right;">Realized Collections (৳)</th>
+        <th style="text-align:right;">Outstanding Due (৳)</th>
+        <th style="text-align:center;">Realization %</th>
+        <th style="text-align:center;">Period Txns</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${projectRowsHtml}
+    </tbody>
+  </table>
+
+  <!-- Channels & Destination Accounts Table -->
+  <div class="section-title">Clearing Channels & Treasury Accounts</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;">Destination Account / Clearing Channel</th>
+        <th style="text-align:center;">Type</th>
+        <th style="text-align:center;">Transactions</th>
+        <th style="text-align:right;">Total Deposited (৳)</th>
+        <th style="text-align:center;">Inflow Share</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${channelRowsHtml}
+    </tbody>
+  </table>
+
+  <!-- Master Money Receipt Register -->
+  <div class="section-title">Master Money Receipt Register (${receipts.length} Total Receipts)</div>
+  <table class="ledger-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;width:12%;">Receipt No</th>
+        <th style="text-align:left;width:10%;">Date</th>
+        <th style="text-align:left;width:20%;">Debtor / Customer</th>
+        <th style="text-align:left;width:20%;">Demarcated Property</th>
+        <th style="text-align:left;width:16%;">Clearing Channel</th>
+        <th style="text-align:left;width:12%;">Remarks / Ref</th>
+        <th style="text-align:right;width:10%;">Amount (৳)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${receiptRowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;">
+        <td colspan="6" style="padding:6px;text-transform:uppercase;letter-spacing:0.04em;">
+          Total Filtered Collections (${receipts.length} Receipts)
+        </td>
+        <td style="text-align:right;font-family:monospace;font-size:9.5px;color:#34d399;">
+          ${formatBDT(summary.totalCollected)}
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Treasury Accountant)</div>
+      <div class="sig-sub">Commercial Accounts Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Chief Financial Officer)</div>
+      <div class="sig-sub">Finance & Treasury Operations</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");
