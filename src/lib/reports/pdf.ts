@@ -7695,6 +7695,413 @@ export function buildReceivablesAgingPdfHtml(opts: {
 </html>`;
 }
 
+export function buildInstallmentReportPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data, projectName } = opts;
+  const isBn = lang === "bn";
+  const now = formatDateTime(new Date());
+
+  const items = (data.items || []) as any[];
+  const kpis = data.kpis || {
+    totalInstallmentsCount: 0,
+    totalUnsettledCount: 0,
+    totalUnsettledAmount: 0,
+    overdueCount: 0,
+    overdueAmount: 0,
+    dueNext7DaysCount: 0,
+    dueNext7DaysAmount: 0,
+    dueNext30DaysCount: 0,
+    dueNext30DaysAmount: 0,
+    futureCount: 0,
+    futureAmount: 0,
+    paidCount: 0,
+    paidAmount: 0,
+    activeDebtorsCount: 0,
+    overdueDebtorsCount: 0,
+    overdueRatio: 0,
+  };
+  const projectBreakdown = (data.projectBreakdown || []) as any[];
+
+  // Render Master Rows (Show active and overdue schedules, limit to reasonable preview if too large)
+  const rowsHtml = items.map((row: any, idx: number) => {
+    let statusBg = "#f1f5f9";
+    let statusColor = "#334155";
+    if (row.status === "OVERDUE") {
+      statusBg = "#fef2f2";
+      statusColor = "#dc2626";
+    } else if (row.status === "DUE_7D") {
+      statusBg = "#fefce8";
+      statusColor = "#b45309";
+    } else if (row.status === "DUE_30D") {
+      statusBg = "#eff6ff";
+      statusColor = "#1d4ed8";
+    } else if (row.status === "PAID") {
+      statusBg = "#ecfdf5";
+      statusColor = "#047857";
+    }
+
+    const statusText = isBn ? row.statusLabelBn : row.statusLabelEn;
+
+    return `
+      <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+        <td style="font-family:monospace;white-space:nowrap;">
+          <div style="font-weight:700;color:#0f172a;">${formatDate(row.dueDate)}</div>
+          <div style="font-size:7px;color:${row.diffDays < 0 ? "#dc2626" : "#64748b"};font-weight:600;">${row.daysText}</div>
+        </td>
+        <td>
+          <div style="font-weight:700;color:#0f172a;">${row.buyerName}</div>
+          <div style="font-size:7px;color:#64748b;">${row.buyerPhone}</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:#0f172a;">Plot ${row.plotNumber}</div>
+          <div style="font-size:7px;color:#64748b;">${row.projectName} (${row.contractNo})</div>
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;font-size:8.5px;">
+          ${formatBDT(row.dueAmount)}
+        </td>
+        <td style="text-align:center;">
+          <span style="display:inline-block;padding:2px 6px;border-radius:3px;font-size:7px;font-weight:700;background:${statusBg};color:${statusColor};">
+            ${statusText}
+          </span>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  // Project Breakdown Rows
+  const projectRowsHtml = projectBreakdown.map((p: any) => `
+    <tr style="background:#ffffff;">
+      <td style="font-weight:600;color:#0f172a;">${p.projectName}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:700;">${p.unsettledCount}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;">${formatBDT(p.unsettledAmount)}</td>
+      <td style="text-align:center;font-family:monospace;color:#dc2626;font-weight:700;">${p.overdueCount}</td>
+      <td style="text-align:right;font-family:monospace;color:#dc2626;font-weight:700;">${formatBDT(p.overdueAmount)}</td>
+      <td style="text-align:center;font-family:monospace;color:#1d4ed8;">${p.dueNext30DaysCount}</td>
+      <td style="text-align:right;font-family:monospace;color:#1d4ed8;font-weight:600;">${formatBDT(p.dueNext30DaysAmount)}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:${p.overdueRatio > 20 ? "#dc2626" : "#0f172a"};">${p.overdueRatio.toFixed(1)}%</td>
+    </tr>
+  `).join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${isBn ? titleBn : titleEn}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm 12mm 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.35;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .header-table {
+      width: 100%;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .report-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .report-meta-text {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .kpi-grid {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      display: table-cell;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      vertical-align: top;
+      width: 25%;
+    }
+    .kpi-card + .kpi-card {
+      padding-left: 10px;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      margin-bottom: 1px;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .section-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e293b;
+      margin: 10px 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .summary-table {
+      margin-bottom: 12px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 4px 6px;
+      border-bottom: 1px solid #cbd5e1;
+      border-right: 1px solid #e2e8f0;
+    }
+    .summary-table td {
+      padding: 3.5px 6px;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+    }
+    .data-table {
+      margin-top: 4px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .data-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 5px 6px;
+      letter-spacing: 0.02em;
+      border-right: 1px solid #334155;
+    }
+    .data-table td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .data-table tr {
+      page-break-inside: avoid;
+    }
+    .statutory-box {
+      margin-top: 10px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border-left: 3px solid #dc2626;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 7.5px;
+      color: #334155;
+      line-height: 1.4;
+      page-break-inside: avoid;
+    }
+    .sig-row {
+      margin-top: 24px;
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      display: table-cell;
+      width: 33.33%;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .sig-line {
+      border-top: 1px solid #0f172a;
+      margin-bottom: 4px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sig-title {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Credit Management, Installment Amortization & Delinquency Recovery Division</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${isBn ? titleBn : titleEn}</div>
+        <div class="report-meta-text">
+          ${projectName ? `<span>Project: ${projectName}</span> &nbsp;·&nbsp; ` : ""}
+          <span>Scope: ${filterSummary}</span> &nbsp;·&nbsp;
+          <span>Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #dc2626;">
+      <div class="kpi-label">Overdue Arrears</div>
+      <div class="kpi-val" style="color:#dc2626;">${formatBDT(kpis.overdueAmount)}</div>
+      <div class="kpi-sub">${kpis.overdueCount} Overdue Schedules (${kpis.overdueDebtorsCount} Delinquent Debtors)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #b45309;">
+      <div class="kpi-label">Due in Next 7 Days</div>
+      <div class="kpi-val" style="color:#b45309;">${formatBDT(kpis.dueNext7DaysAmount)}</div>
+      <div class="kpi-sub">${kpis.dueNext7DaysCount} Imminent Due Schedules</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Monthly Inflow (8-30 Days)</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${formatBDT(kpis.dueNext30DaysAmount)}</div>
+      <div class="kpi-sub">${kpis.dueNext30DaysCount} Schedules in 30-Day Pipeline</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #0f172a;">
+      <div class="kpi-label">Active Portfolio Due</div>
+      <div class="kpi-val" style="color:#0f172a;">${formatBDT(kpis.totalUnsettledAmount)}</div>
+      <div class="kpi-sub">${kpis.totalUnsettledCount} Active Schedules (${kpis.activeDebtorsCount} Active Debtors)</div>
+    </div>
+  </div>
+
+  ${projectBreakdown.length > 0 ? `
+  <!-- Project Summary -->
+  <div class="section-title">Estate-Wise Installment Due & Arrears Summary</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width:24%;">Project Estate</th>
+        <th style="width:10%;text-align:center;">Active Schedules</th>
+        <th style="width:15%;text-align:right;">Active Due (৳)</th>
+        <th style="width:10%;text-align:center;">Overdue Count</th>
+        <th style="width:15%;text-align:right;">Overdue Arrears (৳)</th>
+        <th style="width:10%;text-align:center;">30-Day Due</th>
+        <th style="width:16%;text-align:right;">30-Day Inflow (৳)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${projectRowsHtml}
+    </tbody>
+  </table>
+  ` : ""}
+
+  <!-- Master Schedules Table -->
+  <div class="section-title">Master Installment Schedule Ledger (${items.length} Schedules)</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:18%;">Due Date & Timeline</th>
+        <th style="width:22%;">Debtor / Customer</th>
+        <th style="width:26%;">Demarcated Property</th>
+        <th style="width:18%;text-align:right;">Due Amount</th>
+        <th style="width:16%;text-align:center;">Due Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;font-size:8px;">
+        <td colspan="3" style="padding:5px 6px;">
+          TOTAL SCHEDULES IN REGISTER (${items.length} SCHEDULES)
+        </td>
+        <td style="padding:5px 6px;text-align:right;font-family:monospace;font-size:8.5px;color:#86efac;">
+          ${formatBDT(kpis.totalUnsettledAmount)}
+        </td>
+        <td style="padding:5px 6px;text-align:center;font-size:7.5px;color:#cbd5e1;">
+          Overdue: ${formatBDT(kpis.overdueAmount)} (${kpis.overdueCount})
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Statutory Recovery Notice -->
+  <div class="statutory-box">
+    <strong>Statutory Installment Recovery Governance (Real Estate Development and Management Act, 2010 - Section 14):</strong>
+    Developers are legally obligated to issue formal written demand notices via registered post with a minimum 30-day cure window prior to initiating allotment cancellation or forfeiture proceedings on overdue installments.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Installment Recovery Officer)</div>
+      <div class="sig-sub">Commercial Collection Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Credit Manager)</div>
+      <div class="sig-sub">Treasury & Credit Control</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

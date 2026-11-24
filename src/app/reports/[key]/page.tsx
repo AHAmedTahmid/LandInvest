@@ -29,6 +29,7 @@ import SalesRegisterView from "@/components/reports/sales/SalesRegisterView";
 import PlotInventoryView from "@/components/reports/sales/PlotInventoryView";
 import BuyerStatementView from "@/components/reports/sales/BuyerStatementView";
 import ReceivablesAgingView from "@/components/reports/sales/ReceivablesAgingView";
+import InstallmentReportView from "@/components/reports/sales/InstallmentReportView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -316,6 +317,18 @@ export default async function ReportDetailPage({ params, searchParams }: { param
   if (key === "receivables-aging") {
     return (
       <ReceivablesAgingView
+        def={def}
+        data={data as any}
+        filters={filters}
+        projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "installment-report") {
+    return (
+      <InstallmentReportView
         def={def}
         data={data as any}
         filters={filters}
