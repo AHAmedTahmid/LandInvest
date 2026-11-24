@@ -8884,6 +8884,373 @@ export function buildProfitAllocationPdfHtml(opts: {
 </html>`;
 }
 
+export function buildProfitHistoryPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang?: string;
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang = "en", data, projectName } = opts;
+
+  const kpis = data?.kpis || {
+    totalDistributed: 0,
+    tranchesCount: 0,
+    averageTranchePayout: 0,
+    uniquePartnersCount: 0,
+    cashBasisTotal: 0,
+    completionBasisTotal: 0,
+  };
+
+  const items: any[] = data?.items || [];
+  const partnerTotals: any[] = data?.partnerTotals || [];
+
+  const nowStr = new Date().toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const partnerTotalsRowsHtml = partnerTotals
+    .map((pt: any) => {
+      const shareOfTotal = kpis.totalDistributed > 0 ? (pt.totalPayout / kpis.totalDistributed) * 100 : 0;
+      return `
+    <tr>
+      <td style="font-weight:700;color:#0f172a;">${pt.partnerName}</td>
+      <td style="font-family:monospace;color:#64748b;">${pt.partnerPhone}</td>
+      <td style="text-align:center;font-weight:700;font-family:monospace;">${pt.sharePercentage}%</td>
+      <td style="text-align:center;font-family:monospace;">${pt.tranchesCount}</td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#047857;background:#f0fdf4;">${formatBDT(pt.totalPayout)}</td>
+      <td style="text-align:center;font-family:monospace;font-weight:600;">${shareOfTotal.toFixed(1)}%</td>
+    </tr>
+  `;
+    })
+    .join("");
+
+  const itemRowsHtml = items
+    .map(
+      (item: any) => `
+    <tr>
+      <td style="font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap;">
+        ${formatDate(item.distributionDate)}
+      </td>
+      <td>
+        <div style="font-weight:600;color:#0f172a;">${item.projectName}</div>
+        <div style="font-size:7.5px;color:#64748b;">${item.projectLocation}</div>
+      </td>
+      <td>
+        <div style="font-weight:700;color:#0f172a;">${item.partnerName}</div>
+        <div style="font-size:7.5px;color:#64748b;font-family:monospace;">${item.partnerPhone}</div>
+      </td>
+      <td style="text-align:center;">
+        <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:7px;font-weight:700;${
+          item.realizationBasis === "CASH_BASIS" ? "background:#dbeafe;color:#1e40af;" : "background:#fef3c7;color:#92400e;"
+        }">
+          ${item.realizationBasis === "CASH_BASIS" ? "Cash Realized" : "Completion / Invoiced"}
+        </span>
+      </td>
+      <td style="text-align:center;font-family:monospace;font-weight:700;">
+        ${item.partnerSharePercent.toFixed(1)}%
+      </td>
+      <td style="text-align:right;font-family:monospace;color:#475569;">
+        ${formatBDT(item.totalProjectNetProfit)}
+      </td>
+      <td style="text-align:right;font-family:monospace;font-weight:700;color:#047857;background:#f0fdf4;white-space:nowrap;">
+        ${formatBDT(item.payoutAmount)}
+      </td>
+    </tr>
+  `
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+  <meta charset="utf-8" />
+  <title>${titleEn} - ${companyName}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm 12mm 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.35;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .header-table {
+      width: 100%;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .report-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .report-meta-text {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .kpi-grid {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      display: table-cell;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      vertical-align: top;
+      width: 25%;
+    }
+    .kpi-card + .kpi-card {
+      padding-left: 10px;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      margin-bottom: 1px;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .section-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e293b;
+      margin: 10px 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .summary-table {
+      margin-bottom: 12px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 7.5px;
+      letter-spacing: 0.03em;
+      padding: 5px 6px;
+      border: 1px solid #cbd5e1;
+    }
+    .summary-table td {
+      padding: 4px 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .ledger-table {
+      font-size: 8px;
+      border: 1px solid #0f172a;
+      margin-bottom: 16px;
+    }
+    .ledger-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 7.5px;
+      letter-spacing: 0.04em;
+      padding: 5px 6px;
+      border: 1px solid #1e293b;
+    }
+    .ledger-table td {
+      padding: 4px 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .ledger-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .sig-row {
+      display: table;
+      width: 100%;
+      margin-top: 24px;
+      padding-top: 10px;
+    }
+    .sig-col {
+      display: table-cell;
+      width: 33.33%;
+      text-align: center;
+      vertical-align: top;
+      padding: 0 15px;
+    }
+    .sig-line {
+      border-top: 1px dashed #64748b;
+      margin-bottom: 4px;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+    }
+    .sig-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Table -->
+  <table class="header-table">
+    <tr>
+      <td style="width: 50%; vertical-align: top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Commercial Treasury, Syndicate Capital & Dividend Disbursement Division</div>
+        ${projectName ? `<div style="font-size:9px;color:#047857;font-weight:800;margin-top:3px;">Syndicate Filter: ${projectName}</div>` : ""}
+      </td>
+      <td style="width: 50%; text-align: right; vertical-align: top;">
+        <div class="report-title-main">${titleEn}</div>
+        <div style="font-size: 9px; color: #475569; font-weight: 600;">${titleBn}</div>
+        <div class="report-meta-text">
+          Scope: ${filterSummary} · Generated: ${nowStr} · By: ${generatedBy}
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- 4 Macro KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left: 3px solid #047857;">
+      <div class="kpi-label">Total Disbursed Dividends</div>
+      <div class="kpi-val" style="color: #047857;">${formatBDT(kpis.totalDistributed)}</div>
+      <div class="kpi-sub">${items.length} Payout Vouchers Executed</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #7c3aed;">
+      <div class="kpi-label">Disbursement Tranches</div>
+      <div class="kpi-val" style="color: #7c3aed;">${kpis.tranchesCount} Tranche Runs</div>
+      <div class="kpi-sub">Avg Tranche: ${formatBDT(kpis.averageTranchePayout)}</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #2563eb;">
+      <div class="kpi-label">Cash Realized Basis</div>
+      <div class="kpi-val" style="color: #2563eb;">${formatBDT(kpis.cashBasisTotal)}</div>
+      <div class="kpi-sub">${kpis.totalDistributed > 0 ? ((kpis.cashBasisTotal / kpis.totalDistributed) * 100).toFixed(1) : 0}% of Total Disbursed</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #d97706;">
+      <div class="kpi-label">Completion / Milestone Basis</div>
+      <div class="kpi-val" style="color: #d97706;">${formatBDT(kpis.completionBasisTotal)}</div>
+      <div class="kpi-sub">${kpis.totalDistributed > 0 ? ((kpis.completionBasisTotal / kpis.totalDistributed) * 100).toFixed(1) : 0}% of Total Disbursed</div>
+    </div>
+  </div>
+
+  <!-- Partner Cumulative Earnings Summary Table -->
+  <div class="section-title">Partner Cumulative Dividend Earnings Summary</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;">Syndicate Partner</th>
+        <th style="text-align:left;">Contact Phone</th>
+        <th style="text-align:center;">Equity Share</th>
+        <th style="text-align:center;">Tranches Received</th>
+        <th style="text-align:right;">Total Disbursed Dividend (৳)</th>
+        <th style="text-align:center;">Share of Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${partnerTotalsRowsHtml}
+    </tbody>
+  </table>
+
+  <!-- Master Dividend Distribution Register Table -->
+  <div class="section-title">Master Dividend Distribution Register (${items.length} Vouchers)</div>
+  <table class="ledger-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;width:12%;">Disbursement Date</th>
+        <th style="text-align:left;width:20%;">Project Syndicate</th>
+        <th style="text-align:left;width:20%;">Equity Partner</th>
+        <th style="text-align:center;width:12%;">Accounting Basis</th>
+        <th style="text-align:center;width:8%;">Share %</th>
+        <th style="text-align:right;width:14%;">Project Net Profit (৳)</th>
+        <th style="text-align:right;width:14%;">Dividend Payout (৳)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemRowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;">
+        <td colspan="6" style="padding:6px;text-transform:uppercase;letter-spacing:0.04em;">
+          Total Filtered Disbursements (${items.length} Vouchers)
+        </td>
+        <td style="text-align:right;font-family:monospace;font-size:9.5px;color:#34d399;">
+          ${formatBDT(kpis.totalDistributed)}
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Treasury Accountant)</div>
+      <div class="sig-sub">Commercial Accounts Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Chief Financial Officer)</div>
+      <div class="sig-sub">Finance & Treasury Operations</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Approved By (Managing Director)</div>
+      <div class="sig-sub">Board of Management</div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+}
+
 
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");

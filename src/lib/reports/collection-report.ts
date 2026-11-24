@@ -83,7 +83,7 @@ export type CollectionReportData = CollectionReportResult;
 
 export async function queryCollectionReport(prisma: any, filters: ReportFilters): Promise<CollectionReportResult> {
   const where: any = {};
-  
+
   if (filters.projectId && filters.projectId !== "ALL") {
     const projectSales = await prisma.landSale.findMany({
       where: { projectId: filters.projectId },

@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
 import { getFiscalYears } from "@/lib/fiscalYear";
-import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, buildProjectPnlPdfHtml, buildProjectsComparisonPdfHtml, buildExpenseRegisterPdfHtml, buildPendingApprovalPdfHtml, buildLandDocumentsPdfHtml, buildSalesRegisterPdfHtml, buildPlotInventoryPdfHtml, buildBuyerStatementPdfHtml, buildReceivablesAgingPdfHtml, buildInstallmentReportPdfHtml, buildCollectionReportPdfHtml, buildProfitAllocationPdfHtml, generatePdf } from "@/lib/reports/pdf";
+import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, buildProjectPnlPdfHtml, buildProjectsComparisonPdfHtml, buildExpenseRegisterPdfHtml, buildPendingApprovalPdfHtml, buildLandDocumentsPdfHtml, buildSalesRegisterPdfHtml, buildPlotInventoryPdfHtml, buildBuyerStatementPdfHtml, buildReceivablesAgingPdfHtml, buildInstallmentReportPdfHtml, buildCollectionReportPdfHtml, buildProfitAllocationPdfHtml, buildProfitHistoryPdfHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
 
@@ -440,6 +440,30 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
       projectName,
     });
     landscape = true; // Executive A4 landscape syndicate profit allocation sheet
+  } else if (key === "profit-history") {
+    let projectName: string | undefined;
+    if (filters.projectId && filters.projectId !== "ALL") {
+      try {
+        const proj = await prisma.landProject.findUnique({
+          where: { id: filters.projectId },
+          select: { projectName: true },
+        });
+        if (proj) projectName = proj.projectName;
+      } catch {
+        // Fallback if query fails
+      }
+    }
+    html = buildProfitHistoryPdfHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+      projectName,
+    });
+    landscape = true; // Executive A4 landscape master profit distribution history
   } else {
     html = buildReportHtml({
       titleEn: def.titleEn,
