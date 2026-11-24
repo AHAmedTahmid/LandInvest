@@ -6822,6 +6822,433 @@ export function buildPlotInventoryPdfHtml(opts: {
 </html>`;
 }
 
+export function buildBuyerStatementPdfHtml(opts: {
+  titleEn: string;
+  titleBn: string;
+  companyName: string;
+  filterSummary: string;
+  generatedBy: string;
+  lang: "en" | "bn";
+  data: any;
+  projectName?: string;
+}): string {
+  const { titleEn, titleBn, companyName, filterSummary, generatedBy, lang, data, projectName } = opts;
+  const isBn = lang === "bn";
+  const now = formatDateTime(new Date());
+
+  const sale = data.sale;
+  const kpis = data.kpis || {
+    totalAgreedPrice: 0,
+    totalPaid: 0,
+    currentDue: 0,
+    collectionRate: 0,
+    installmentsCount: 0,
+    paidInstallmentsCount: 0,
+    upcomingInstallmentsCount: 0,
+    overdueInstallmentsCount: 0,
+  };
+  const ledgerEntries = (data.ledgerEntries || []) as any[];
+  const schedules = (data.schedules || []) as any[];
+
+  // Render Ledger Rows
+  const ledgerRowsHtml = ledgerEntries.map((row: any, idx: number) => {
+    return `
+      <tr style="background:${idx % 2 === 0 ? "#ffffff" : "#f8fafc"};">
+        <td style="font-family:monospace;white-space:nowrap;color:#475569;">
+          ${formatDate(row.date)}
+        </td>
+        <td style="font-family:monospace;font-weight:700;color:#0f172a;">
+          ${row.reference}
+        </td>
+        <td>
+          <div style="font-weight:600;color:#0f172a;">${row.description}</div>
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">
+          ${row.debit > 0 ? formatBDT(row.debit) : "-"}
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#047857;">
+          ${row.credit > 0 ? formatBDT(row.credit) : "-"}
+        </td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">
+          ${formatBDT(row.balance)}
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  // Render Schedule Rows
+  const scheduleRowsHtml = schedules.map((sch: any) => {
+    const isPaid = sch.status === "PAID";
+    const isOverdue = sch.status === "OVERDUE";
+    const statusBg = isPaid ? "#ecfdf5" : isOverdue ? "#fef2f2" : "#eff6ff";
+    const statusColor = isPaid ? "#047857" : isOverdue ? "#dc2626" : "#1d4ed8";
+    const statusText = isBn ? sch.statusLabelBn : sch.statusLabelEn;
+
+    return `
+      <tr style="background:#ffffff;">
+        <td style="text-align:center;font-family:monospace;font-weight:700;">#${sch.installmentNo}</td>
+        <td style="font-family:monospace;color:#334155;">${formatDate(sch.dueDate)}</td>
+        <td style="text-align:right;font-family:monospace;font-weight:700;">${formatBDT(sch.dueAmount)}</td>
+        <td style="text-align:center;">
+          <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:7px;font-weight:700;background:${statusBg};color:${statusColor};">
+            ${statusText}
+          </span>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${isBn ? titleBn : titleEn}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm 12mm 12mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.5px;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.35;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .header-table {
+      width: 100%;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 6px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .report-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .report-meta-text {
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .dossier-grid {
+      display: table;
+      width: 100%;
+      margin-bottom: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+    }
+    .dossier-col {
+      display: table-cell;
+      width: 50%;
+      padding: 8px 12px;
+      vertical-align: top;
+    }
+    .dossier-col + .dossier-col {
+      border-left: 1px solid #cbd5e1;
+    }
+    .dossier-title {
+      font-size: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #047857;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 2px;
+    }
+    .dossier-row {
+      display: table;
+      width: 100%;
+      margin-bottom: 2px;
+      font-size: 8px;
+    }
+    .dossier-label {
+      display: table-cell;
+      width: 35%;
+      color: #64748b;
+    }
+    .dossier-val {
+      display: table-cell;
+      width: 65%;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .kpi-grid {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 10px;
+    }
+    .kpi-card {
+      display: table-cell;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      vertical-align: top;
+      width: 25%;
+    }
+    .kpi-card + .kpi-card {
+      padding-left: 10px;
+    }
+    .kpi-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .kpi-val {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: monospace;
+      margin-bottom: 1px;
+    }
+    .kpi-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .section-title {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e293b;
+      margin: 8px 0 3px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .data-table {
+      margin-top: 4px;
+      font-size: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .data-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 7.5px;
+      text-transform: uppercase;
+      padding: 4px 6px;
+      letter-spacing: 0.02em;
+      border-right: 1px solid #334155;
+    }
+    .data-table td {
+      padding: 3.5px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .data-table tr {
+      page-break-inside: avoid;
+    }
+    .statutory-box {
+      margin-top: 8px;
+      padding: 5px 8px;
+      background: #f8fafc;
+      border-left: 3px solid #2563eb;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 7px;
+      color: #334155;
+      line-height: 1.35;
+      page-break-inside: avoid;
+    }
+    .sig-row {
+      margin-top: 20px;
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+      page-break-inside: avoid;
+    }
+    .sig-col {
+      display: table-cell;
+      width: 33.33%;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .sig-line {
+      border-top: 1px solid #0f172a;
+      margin-bottom: 4px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .sig-title {
+      font-size: 8px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .sig-sub {
+      font-size: 6.5px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td style="vertical-align:top;">
+        <div class="brand-title">${companyName}</div>
+        <div class="brand-sub">Customer Accounts, Plot Allotment & Credit Portfolio Division</div>
+      </td>
+      <td style="text-align:right;vertical-align:top;">
+        <div class="report-title-main">${isBn ? titleBn : titleEn}</div>
+        <div class="report-meta-text">
+          <span>Statement Generated: ${now}</span> &nbsp;·&nbsp;
+          <span>By: ${generatedBy}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  ${sale ? `
+  <!-- Customer & Property Dossier -->
+  <div class="dossier-grid">
+    <div class="dossier-col">
+      <div class="dossier-title">Customer / Buyer Profile</div>
+      <div class="dossier-row"><div class="dossier-label">Full Name:</div><div class="dossier-val">${sale.buyerName}</div></div>
+      <div class="dossier-row"><div class="dossier-label">Contact Phone:</div><div class="dossier-val">${sale.buyerPhone}</div></div>
+      <div class="dossier-row"><div class="dossier-label">National ID (NID):</div><div class="dossier-val" style="font-family:monospace;">${sale.buyerNid || "N/A"}</div></div>
+      <div class="dossier-row"><div class="dossier-label">Contract Number:</div><div class="dossier-val" style="font-family:monospace;">${sale.contractNo}</div></div>
+      <div class="dossier-row"><div class="dossier-label">Contract Date:</div><div class="dossier-val">${formatDate(sale.saleDate)} (${sale.statusLabelEn})</div></div>
+    </div>
+    <div class="dossier-col">
+      <div class="dossier-title">Demarcated Property Specification</div>
+      <div class="dossier-row"><div class="dossier-label">Project Estate:</div><div class="dossier-val">${sale.projectName}</div></div>
+      <div class="dossier-row"><div class="dossier-label">Cadastral Mouza:</div><div class="dossier-val">${sale.mouza || "Registered Cadastral Area"}</div></div>
+      <div class="dossier-row"><div class="dossier-label">Demarcated Plot:</div><div class="dossier-val">Plot #${sale.plotNumber}</div></div>
+      <div class="dossier-row"><div class="dossier-label">Land Dimensions:</div><div class="dossier-val">${sale.plotSizeShotok.toFixed(2)} Shotok (${sale.plotSizeKatha.toFixed(2)} Katha · ${sale.plotSizeSqFt.toFixed(0)} sq ft)</div></div>
+      <div class="dossier-row"><div class="dossier-label">Benchmark Rate:</div><div class="dossier-val" style="font-family:monospace;">${formatBDT(sale.ratePerShotok)} / Shotok</div></div>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-left:3px solid #0f172a;">
+      <div class="kpi-label">Agreed Purchase Value</div>
+      <div class="kpi-val" style="color:#0f172a;">${formatBDT(kpis.totalAgreedPrice)}</div>
+      <div class="kpi-sub">Plot ${sale.plotNumber} (${sale.plotSizeShotok.toFixed(2)} Shotok)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #059669;">
+      <div class="kpi-label">Cash Realized / Paid</div>
+      <div class="kpi-val" style="color:#047857;">${formatBDT(kpis.totalPaid)}</div>
+      <div class="kpi-sub">${kpis.collectionRate.toFixed(1)}% Settled (${ledgerEntries.length - 1} Receipts)</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #dc2626;">
+      <div class="kpi-label">Outstanding Balance Due</div>
+      <div class="kpi-val" style="color:${kpis.currentDue > 0 ? "#dc2626" : "#047857"};">${kpis.currentDue > 0 ? formatBDT(kpis.currentDue) : "৳ 0.00"}</div>
+      <div class="kpi-sub">${kpis.upcomingInstallmentsCount + kpis.overdueInstallmentsCount} Remaining Due Schedules</div>
+    </div>
+    <div class="kpi-card" style="border-left:3px solid #2563eb;">
+      <div class="kpi-label">Installment Progress</div>
+      <div class="kpi-val" style="color:#1d4ed8;">${kpis.paidInstallmentsCount} / ${kpis.installmentsCount || 1} Paid</div>
+      <div class="kpi-sub">${sale.status === "SOLD" ? "Fully Disposed" : `${kpis.upcomingInstallmentsCount} Upcoming Schedules`}</div>
+    </div>
+  </div>
+
+  <!-- Running Ledger -->
+  <div class="section-title">Chronological Running Financial Account Ledger (${ledgerEntries.length} Transactions)</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:12%;">Date</th>
+        <th style="width:15%;">Reference No</th>
+        <th style="width:37%;">Transaction Particulars</th>
+        <th style="width:12%;text-align:right;">Debit (+Due)</th>
+        <th style="width:12%;text-align:right;">Credit (-Paid)</th>
+        <th style="width:12%;text-align:right;">Running Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${ledgerRowsHtml}
+    </tbody>
+    <tfoot>
+      <tr style="background:#0f172a;color:#ffffff;font-weight:700;font-size:7.5px;">
+        <td colspan="3" style="padding:4px 6px;">ACCOUNT STATEMENT TOTALS</td>
+        <td style="padding:4px 6px;text-align:right;font-family:monospace;">${formatBDT(kpis.totalAgreedPrice)}</td>
+        <td style="padding:4px 6px;text-align:right;font-family:monospace;color:#86efac;">${formatBDT(kpis.totalPaid)}</td>
+        <td style="padding:4px 6px;text-align:right;font-family:monospace;color:#fde047;">${formatBDT(kpis.currentDue)}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  ${schedules.length > 0 ? `
+  <!-- Installment Amortization Schedule (Compact Table) -->
+  <div class="section-title" style="margin-top:10px;">Scheduled Installment Amortization Matrix (${schedules.length} Installments)</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:15%;text-align:center;">Installment #</th>
+        <th style="width:25%;">Scheduled Due Date</th>
+        <th style="width:30%;text-align:right;">Scheduled Amount (৳)</th>
+        <th style="width:30%;text-align:center;">Settlement Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${scheduleRowsHtml}
+    </tbody>
+  </table>
+  ` : ""}
+
+  <!-- Statutory Real Estate Footnote -->
+  <div class="statutory-box">
+    <strong>Statutory Real Estate Notice (Real Estate Development and Management Act, 2010 - Section 13 & 14):</strong>
+    This account statement certifies financial consideration received from the buyer. Registered deed transfer and physical possession demarcation are issued immediately upon complete settlement of outstanding dues.
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Prepared By (Customer Accounts)</div>
+      <div class="sig-sub">Commercial Credit Division</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Verified By (Head of Finance)</div>
+      <div class="sig-sub">Treasury & Credit Recovery</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-title">Buyer / Allottee Acknowledgment</div>
+      <div class="sig-sub">Signature & Date</div>
+    </div>
+  </div>
+  ` : `
+  <div style="padding:40px;text-align:center;color:#64748b;">
+    No buyer contract selected.
+  </div>
+  `}
+
+</body>
+</html>`;
+}
+
 export async function generatePdf(html: string, options?: { landscape?: boolean }): Promise<Buffer> {
   const puppeteer = await import("puppeteer");
   const fs = await import("fs");

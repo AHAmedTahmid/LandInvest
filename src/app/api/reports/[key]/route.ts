@@ -6,7 +6,7 @@ import { can } from "@/lib/rbac";
 import { getReportDef } from "@/lib/reports/registry";
 import { getPresetRange, filterSummary } from "@/lib/reports/format";
 import { getFiscalYears } from "@/lib/fiscalYear";
-import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, buildProjectPnlPdfHtml, buildProjectsComparisonPdfHtml, buildExpenseRegisterPdfHtml, buildPendingApprovalPdfHtml, buildLandDocumentsPdfHtml, buildSalesRegisterPdfHtml, buildPlotInventoryPdfHtml, generatePdf } from "@/lib/reports/pdf";
+import { buildReportHtml, buildBalanceSheetPdfHtml, buildCashBookPdfHtml, buildBankBookPdfHtml, buildDailySummaryPdfHtml, buildReceiptsPaymentsPdfHtml, buildContraRegisterPdfHtml, buildPartnerCapitalPdfHtml, buildPartnersSummaryPdfHtml, buildPartnerContributionPdfHtml, buildProjectCostPdfHtml, buildProjectPnlPdfHtml, buildProjectsComparisonPdfHtml, buildExpenseRegisterPdfHtml, buildPendingApprovalPdfHtml, buildLandDocumentsPdfHtml, buildSalesRegisterPdfHtml, buildPlotInventoryPdfHtml, buildBuyerStatementPdfHtml, generatePdf } from "@/lib/reports/pdf";
 import { buildXlsxHtml } from "@/lib/reports/excel";
 import { REPORT_QUERIES } from "@/lib/reports";
 
@@ -333,6 +333,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
       projectName,
     });
     landscape = true; // Executive A4 landscape plot inventory & stock register
+  } else if (key === "buyer-statement") {
+    html = buildBuyerStatementPdfHtml({
+      titleEn: def.titleEn,
+      titleBn: def.titleBn,
+      companyName,
+      filterSummary: fSummary,
+      generatedBy,
+      lang,
+      data,
+    });
+    landscape = true; // Executive A4 landscape buyer statement & customer ledger
   } else {
     html = buildReportHtml({
       titleEn: def.titleEn,

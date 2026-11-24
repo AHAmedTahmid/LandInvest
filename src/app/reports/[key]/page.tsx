@@ -27,6 +27,7 @@ import PendingApprovalView from "@/components/reports/projects/PendingApprovalVi
 import LandDocumentsView from "@/components/reports/projects/LandDocumentsView";
 import SalesRegisterView from "@/components/reports/sales/SalesRegisterView";
 import PlotInventoryView from "@/components/reports/sales/PlotInventoryView";
+import BuyerStatementView from "@/components/reports/sales/BuyerStatementView";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -295,6 +296,17 @@ export default async function ReportDetailPage({ params, searchParams }: { param
         data={data as any}
         filters={filters}
         projects={projects}
+        canExport={canExport}
+      />
+    );
+  }
+
+  if (key === "buyer-statement") {
+    return (
+      <BuyerStatementView
+        def={def}
+        data={data as any}
+        filters={filters}
         canExport={canExport}
       />
     );
