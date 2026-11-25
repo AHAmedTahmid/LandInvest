@@ -5,7 +5,14 @@ import UsersClient from "./UsersClient";
 
 export default async function UsersSettingsPage() {
   const session = await getServerSession(authOptions);
-  if (!session) return <div className="p-8">Unauthorized</div>;
-  if (!(await can(session, "users.manage"))) return <div className="p-8 text-red-600">Forbidden: Super Admin only</div>;
-  return <UsersClient canManage={true} />;
+  if (!session) return <div className="p-8 text-slate-500">Unauthorized</div>;
+
+  const canManage = await can(session, "users.manage");
+  const canView = await can(session, "users.view");
+
+  if (!canManage && !canView) {
+    return <div className="p-8 text-rose-600 font-semibold">Forbidden: You lack permission to view team members</div>;
+  }
+
+  return <UsersClient canManage={canManage} />;
 }
