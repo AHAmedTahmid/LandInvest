@@ -113,6 +113,30 @@ async function executeContra(prisma: any, args: ContraArgs & { requestId: string
       },
     });
     await writeAudit(tx, "treasury_ledger", inId, "CREATE", args.userId, null, inn);
+
+    if (args.bankAccountId) {
+      if (args.fromType === "BANK") {
+        const prevBank = await tx.bankAccount.findUnique({ where: { id: args.bankAccountId } });
+        if (prevBank) {
+          const updBank = await tx.bankAccount.update({
+            where: { id: args.bankAccountId },
+            data: { currentBalance: { decrement: args.amount } },
+          });
+          await writeAudit(tx, "bank_accounts", args.bankAccountId, "UPDATE", args.userId, prevBank, updBank);
+        }
+      }
+      if (args.toType === "BANK") {
+        const prevBank = await tx.bankAccount.findUnique({ where: { id: args.bankAccountId } });
+        if (prevBank) {
+          const updBank = await tx.bankAccount.update({
+            where: { id: args.bankAccountId },
+            data: { currentBalance: { increment: args.amount } },
+          });
+          await writeAudit(tx, "bank_accounts", args.bankAccountId, "UPDATE", args.userId, prevBank, updBank);
+        }
+      }
+    }
+
     return { outId, inId, amount: args.amount };
   });
 }

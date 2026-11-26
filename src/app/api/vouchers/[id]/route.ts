@@ -32,8 +32,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const canEdit = (await can(session, "expenses.create")) || (await can(session, "expenses.approve"));
-  if (!canEdit) return NextResponse.json({ error: "Forbidden: expenses.create or expenses.approve required." }, { status: 403 });
+  const canEdit =
+    (await can(session, "expenses.edit")) ||
+    (await can(session, "expenses.create")) ||
+    (await can(session, "expenses.approve"));
+  if (!canEdit) return NextResponse.json({ error: "Forbidden: expenses.edit, expenses.create or expenses.approve required." }, { status: 403 });
 
   const userId = (session.user as any).id;
   const prisma: any = await getTenantClientFromSession();
@@ -98,13 +101,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (body.voucherImageUrl !== undefined) voucherUrl = body.voucherImageUrl;
   }
 
-  // Business logic: if voucher is already APPROVED, do not allow changing financial amounts or channel directly
+  // Business logic: if voucher is already APPROVED, do not allow changing financial amounts, channel, bank, partner, or project directly
   if (existing.status === "APPROVED") {
     if (amount !== undefined && amount !== Number(existing.amount)) {
       return NextResponse.json({ error: "Cannot change the amount of an already APPROVED voucher. Please reject/cancel or create an adjustment." }, { status: 400 });
     }
     if (paymentChannel !== undefined && paymentChannel !== existing.paymentChannel) {
       return NextResponse.json({ error: "Cannot change payment channel of an already APPROVED voucher." }, { status: 400 });
+    }
+    if (bankAccountId !== undefined && bankAccountId !== existing.bankAccountId) {
+      return NextResponse.json({ error: "Cannot change bank account of an already APPROVED voucher." }, { status: 400 });
+    }
+    if (paidByPartnerId !== undefined && paidByPartnerId !== existing.paidByPartnerId) {
+      return NextResponse.json({ error: "Cannot change paid-by-partner of an already APPROVED voucher." }, { status: 400 });
+    }
+    if (projectId !== undefined && projectId !== existing.projectId) {
+      return NextResponse.json({ error: "Cannot change project allocation of an already APPROVED voucher." }, { status: 400 });
     }
   }
 

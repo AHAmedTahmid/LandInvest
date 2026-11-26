@@ -108,8 +108,9 @@ export async function POST(req: NextRequest) {
         const dueDate = new Date();
         dueDate.setMonth(dueDate.getMonth() + i);
         const rid = randomUUID();
+        const dueAmount = i === months ? Math.round((remaining - per * (months - 1)) * 100) / 100 : per;
         const r = await tx.installmentSchedule.create({
-          data: { id: rid, saleId, dueDate, dueAmount: per, status: "UPCOMING" },
+          data: { id: rid, saleId, dueDate, dueAmount, status: "UPCOMING" },
         });
         await writeAudit(tx, "installment_schedule", rid, "CREATE", userId, null, r);
       }

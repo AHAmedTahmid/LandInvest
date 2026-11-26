@@ -81,6 +81,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           where: { referenceType: "EXPENSE", referenceId: recordId },
         });
         for (const tl of ledgers) {
+          if (tl.bankAccountId) {
+            const prevBank = await tx.bankAccount.findUnique({ where: { id: tl.bankAccountId } });
+            if (prevBank) {
+              const delta = tl.flowType === "OUT" ? Number(tl.amount) : -Number(tl.amount);
+              const updBank = await tx.bankAccount.update({
+                where: { id: tl.bankAccountId },
+                data: { currentBalance: { increment: delta } },
+              });
+              await writeAudit(tx, "bank_accounts", tl.bankAccountId, "UPDATE", userId, prevBank, updBank);
+            }
+          }
           await tx.treasuryLedger.delete({ where: { id: tl.id } });
           await writeAudit(tx, "treasury_ledger", tl.id, "DELETE", userId, tl, null);
         }
@@ -156,6 +167,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           },
         });
         await writeAudit(tx, "treasury_ledger", tl.id, "CREATE", userId, null, tl);
+        if (accType === "BANK" && exp.bankAccountId) {
+          const prevBank = await tx.bankAccount.findUnique({ where: { id: exp.bankAccountId } });
+          if (prevBank) {
+            const updBank = await tx.bankAccount.update({
+              where: { id: exp.bankAccountId },
+              data: { currentBalance: { decrement: Number(exp.amount) } },
+            });
+            await writeAudit(tx, "bank_accounts", exp.bankAccountId, "UPDATE", userId, prevBank, updBank);
+          }
+        }
       }
     }
 
